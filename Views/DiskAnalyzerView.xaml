@@ -1,0 +1,169 @@
+<UserControl x:Class="WinCleaner.Views.DiskAnalyzerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- Cabecera -->
+            <RowDefinition Height="Auto"/>
+            <!-- Selector de carpeta y progreso -->
+            <RowDefinition Height="Auto"/>
+            <!-- Barra de navegación jerárquica -->
+            <RowDefinition Height="Auto"/>
+            <!-- Gráfico Treemap Canvas -->
+            <RowDefinition Height="*"/>
+            <!-- Leyenda y estado -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Analizador de Espacio en Disco" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+                <TextBlock Text="Localice qué carpetas y archivos consumen más almacenamiento usando un mapa interactivo de rectángulos (Treemap). Haga doble clic en las carpetas para explorarlas." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- SELECTOR DE CARPETA Y PROGRESO -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Ruta de la Carpeta -->
+                <Grid Grid.Column="0" Margin="0,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBox Grid.Column="0" Text="{Binding RootPath, Mode=TwoWay}" IsReadOnly="True"
+                             Background="#0B0F19" Foreground="#F8FAFC" BorderBrush="#334155" BorderThickness="1" Padding="10,8" FontSize="13">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type TextBox}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type TextBox}">
+                                            <Border x:Name="bg" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="6">
+                                                <ScrollViewer x:Name="PART_ContentHost" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <Button Grid.Column="1" Content="..." Command="{Binding SelectFolderCommand}" Width="40" Margin="5,0,0,0" Style="{StaticResource ActionButton}" Padding="0"/>
+                </Grid>
+
+                <Button Grid.Column="1" Content="Analizar Carpeta" Style="{StaticResource ActionButton}" Command="{Binding AnalyzeCommand}" Padding="20,8"/>
+
+                <!-- Barra de Progreso de Escaneo -->
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="15,0,0,0" 
+                            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ProgressBar Width="120" Height="8" Minimum="0" Maximum="100" Value="{Binding ScanProgress}" Style="{StaticResource ModernProgressBar}"/>
+                    <TextBlock Text="{Binding ScanProgress, StringFormat='Escaneando: {0:F0}%'}" FontSize="10" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- BARRA DE NAVEGACIÓN JERÁRQUICA -->
+        <Border Grid.Row="2" Background="#0B0F19" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,10"
+                Visibility="{Binding CurrentViewNode, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Botón Volver -->
+                <Button Grid.Column="0" Content="← Subir Nivel" Command="{Binding GoBackCommand}" IsEnabled="{Binding CanGoBack}" Margin="0,0,12,0" Padding="10,5">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ActionButton}">
+                            <Setter Property="Background" Value="#334155"/>
+                            <Setter Property="FontSize" Value="11"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="#1E293B"/>
+                                    <Setter Property="Foreground" Value="#475569"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- Ruta de Navegación -->
+                <TextBlock Grid.Column="1" Text="{Binding NavigationPath, StringFormat='Explorando: {0}'}" FontSize="12" Foreground="#818CF8" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            </Grid>
+        </Border>
+
+        <!-- GRÁFICO TREEMAP CANVAS -->
+        <Border Grid.Row="3" Background="#0B0F19" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="8" Margin="0,0,0,12">
+            <Grid>
+                <!-- Mensaje cuando está vacío -->
+                <Grid Visibility="{Binding NoData, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Path Data="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 17h2v-3H7v3zm4 0h2V7h-2v10zm4 0h2v-6h-2v6z"
+                              Fill="#334155" Width="48" Height="48" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                        <TextBlock Text="Listo para Analizar" FontSize="15" FontWeight="SemiBold" Foreground="#475569" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Elija una carpeta arriba y pulse 'Analizar Carpeta' para construir el mapa de disco." FontSize="11" Foreground="#475569" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Canvas de Renderizado Dinámico -->
+                <Canvas x:Name="TreemapCanvas" ClipToBounds="True" Background="Transparent"
+                        Visibility="{Binding HasData, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid>
+        </Border>
+
+        <!-- LEYENDA Y ESTADO -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Leyenda de colores -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5,0,0">
+                <TextBlock Text="Tipos:" FontSize="11" Foreground="#64748B" FontWeight="SemiBold" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                
+                <!-- Carpetas -->
+                <Border Width="12" Height="12" Background="#4F46E5" CornerRadius="2" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Carpetas" FontSize="11" Foreground="#94A3B8" Margin="0,0,12,0" VerticalAlignment="Center"/>
+
+                <!-- Documentos -->
+                <Border Width="12" Height="12" Background="#3B82F6" CornerRadius="2" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Documentos" FontSize="11" Foreground="#94A3B8" Margin="0,0,12,0" VerticalAlignment="Center"/>
+
+                <!-- Multimedia -->
+                <Border Width="12" Height="12" Background="#EF4444" CornerRadius="2" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Multimedia (Video/Imagen)" FontSize="11" Foreground="#94A3B8" Margin="0,0,12,0" VerticalAlignment="Center"/>
+
+                <!-- Comprimidos -->
+                <Border Width="12" Height="12" Background="#F59E0B" CornerRadius="2" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Comprimidos (Zip/Iso)" FontSize="11" Foreground="#94A3B8" Margin="0,0,12,0" VerticalAlignment="Center"/>
+
+                <!-- Ejecutables/Sistema -->
+                <Border Width="12" Height="12" Background="#10B981" CornerRadius="2" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Sistema/Apps (.dll/.exe)" FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Estado -->
+            <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center" TextAlignment="Right"/>
+        </Grid>
+    </Grid>
+</UserControl>

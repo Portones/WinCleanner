@@ -1,0 +1,108 @@
+<UserControl x:Class="WinCleaner.Views.StartupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <!-- Registro del Conversor Booleano a Visibilidad de WPF -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- Cabecera -->
+            <RowDefinition Height="Auto"/>
+            <!-- Panel de Acciones Rápidas -->
+            <RowDefinition Height="Auto"/>
+            <!-- Lista de Programas de Inicio -->
+            <RowDefinition Height="*"/>
+            <!-- Pie de Estado -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="Gestión de Aplicaciones de Inicio" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+                <TextBlock Text="Controle las aplicaciones que se inician automáticamente al encender su equipo. Desactive elementos para acelerar el arranque." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- PANEL DE ACCIONES RÁPIDAS -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Recargar Lista" Style="{StaticResource ActionButton}" Command="{Binding LoadAppsCommand}" Margin="0,0,10,0"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Escaneando el registro y carpetas de inicio de Windows..." FontSize="11" Foreground="#94A3B8"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- LISTA DE APLICACIONES DE INICIO -->
+        <ListView Grid.Row="2" ItemsSource="{Binding StartupApps}" Style="{StaticResource ModernListView}" ItemContainerStyle="{StaticResource ModernListViewItem}">
+            <ListView.View>
+                <GridView>
+                    <!-- Columna de Estado (Activar/Desactivar) -->
+                    <GridViewColumn Header="Inicio" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsEnabled, Mode=OneWay}" 
+                                          Command="{Binding DataContext.ToggleAppCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                          CommandParameter="{Binding}"
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Nombre de Aplicación -->
+                    <GridViewColumn Header="Aplicación" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="#F8FAFC" TextTrimming="CharacterEllipsis"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Origen/Ubicación -->
+                    <GridViewColumn Header="Ubicación" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Location}" FontSize="11" Foreground="#818CF8" FontWeight="SemiBold"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Comando ejecutado -->
+                    <GridViewColumn Header="Comando de Ejecución" Width="430">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Command}" FontSize="11" Foreground="#64748B" TextTrimming="CharacterEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip Content="{Binding Command}"/>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- PIE DE ESTADO -->
+        <Border Grid.Row="3" Background="#0B0F19" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="12,10" Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+        </Border>
+    </Grid>
+</UserControl>

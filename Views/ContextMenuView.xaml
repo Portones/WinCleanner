@@ -1,0 +1,107 @@
+<UserControl x:Class="WinCleaner.Views.ContextMenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- Cabecera -->
+            <RowDefinition Height="Auto"/>
+            <!-- Acciones rápidas -->
+            <RowDefinition Height="Auto"/>
+            <!-- Lista -->
+            <RowDefinition Height="*"/>
+            <!-- Pie de estado -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Limpiador del Menú Contextual" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+                <TextBlock Text="Desactive las opciones innecesarias que agregan otros programas al hacer clic derecho sobre archivos y carpetas." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- PANEL DE ACCIONES RÁPIDAS -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Recargar Lista" Style="{StaticResource ActionButton}" Command="{Binding LoadItemsCommand}" Margin="0,0,10,0"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Escaneando el registro de extensiones de shell de Windows..." FontSize="11" Foreground="#94A3B8"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- LISTA DE MENÚS CONTEXTUALES -->
+        <ListView Grid.Row="2" ItemsSource="{Binding ContextMenuItems}" Style="{StaticResource ModernListView}" ItemContainerStyle="{StaticResource ModernListViewItem}">
+            <ListView.View>
+                <GridView>
+                    <!-- Columna de Estado (Activar/Desactivar) -->
+                    <GridViewColumn Header="Estado" Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsEnabled, Mode=TwoWay}" 
+                                          Command="{Binding DataContext.ToggleItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                          CommandParameter="{Binding}"
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Nombre descriptivo -->
+                    <GridViewColumn Header="Opción / Programa" Width="220">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Foreground="#F8FAFC" TextTrimming="CharacterEllipsis"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Categoría (Archivos, Carpetas) -->
+                    <GridViewColumn Header="Se aplica a" Width="130">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Category}" FontSize="11" Foreground="#818CF8" FontWeight="SemiBold"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- GUID identificador -->
+                    <GridViewColumn Header="Identificador GUID" Width="360">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding HandlerGuid}" FontSize="11" Foreground="#64748B" TextTrimming="CharacterEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip Content="{Binding HandlerGuid}"/>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- PIE DE ESTADO -->
+        <Border Grid.Row="3" Background="#0B0F19" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="12,10" Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+        </Border>
+    </Grid>
+</UserControl>
