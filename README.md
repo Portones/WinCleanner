@@ -4,16 +4,30 @@ Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 d
 
 ---
 
-## 🚀 Requisitos Previos y Ejecución
+## 🚀 Instalación y Ejecución
 
-### Requisitos Previos
+### 💻 Para Usuarios (Método Recomendado)
+Si solo deseas utilizar WinCleaner en tu ordenador, no necesitas compilar código ni instalar herramientas de desarrollo:
+
+1. Ve a la sección lateral de **[Releases](https://github.com/RodrigoPortones/WinCleaner/releases)** a la derecha de este repositorio.
+2. Descarga la versión más reciente del instalador único: **`WinCleanerSetup.exe`**.
+3. Ejecuta el instalador. Este colocará la aplicación de forma segura en tu sistema, creará un acceso directo en el Escritorio e integrará la utilidad de desinstalación de Windows.
+
+> [!IMPORTANT]
+> **Privilegios de Administrador**: WinCleaner realiza análisis profundos de disco, optimizaciones de RAM, vaciado de DNS, control de servicios de sistema y actualizaciones silenciosas mediante Winget. Por ello, la aplicación solicitará **ejecutarse como Administrador** al abrirse. Esto es totalmente normal y necesario para el correcto funcionamiento de todas las herramientas.
+
+---
+
+### 🛠️ Para Desarrolladores (Compilación desde Código)
+Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma local:
+
+#### Requisitos Previos
 * **Sistema Operativo**: Windows 10 o Windows 11.
-* **SDK o Runtime de .NET 9**: Asegúrate de tener instalado [.NET 9](https://dotnet.microsoft.com/download/dotnet/9.0) (WPF/Desktop Runtime).
+* **SDK de .NET 9**: Asegúrate de tener instalado el [SDK de .NET 9](https://dotnet.microsoft.com/download/dotnet/9.0) para escritorio.
 
-### Cómo Lanzar la Aplicación (Terminal)
-1. Abre una terminal (PowerShell o CMD) en la carpeta raíz del proyecto:
-   `c:\Users\Rodrigo Portones\Programacion\WinCleanner`
-2. Ejecuta el comando para restaurar, compilar y arrancar la aplicación:
+#### Cómo Lanzar la Aplicación
+1. Abre una terminal con privilegios de **Administrador** en la carpeta raíz del proyecto.
+2. Ejecuta el comando para compilar y arrancar la aplicación:
    ```bash
    dotnet run
    ```
