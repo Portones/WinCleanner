@@ -11,6 +11,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <!-- Desactivar importaciones globales implícitas de WinForms para evitar conflictos de tipo con WPF (UserControl, Application) -->
     <DisableWinFormsImplicitUsings>true</DisableWinFormsImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
