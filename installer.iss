@@ -16,8 +16,8 @@ UninstallDisplayIcon={app}\WinCleanerLogo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-; OutputDir define dónde se guardará el instalador compilado (en la carpeta raíz del proyecto)
-OutputDir=.
+; OutputDir define dónde se guardará el instalador compilado
+OutputDir=Releases
 OutputBaseFilename=WinCleanerSetup
 ; Solicitar privilegios de administrador para realizar la instalación en archivos de programa
 PrivilegesRequired=admin

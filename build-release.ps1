@@ -39,7 +39,7 @@ try {
     if ($null -ne $iscc) {
         Write-Host "Encontrado compilador de Inno Setup en: $iscc" -ForegroundColor Gray
         & $iscc "installer.iss"
-        Write-Host "`n✔ ¡Instalador WinCleanerSetup.exe creado con éxito en la raíz!" -ForegroundColor Green
+        Write-Host "`n✔ ¡Instalador WinCleanerSetup.exe creado con éxito en la carpeta Releases/!" -ForegroundColor Green
     } else {
         Write-Host "`n⚠ No se detectó 'ISCC.exe' en las rutas por defecto de Inno Setup." -ForegroundColor Orange
         Write-Host "Se omitió el empaquetado automático." -ForegroundColor Orange
