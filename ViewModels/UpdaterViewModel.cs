@@ -23,6 +23,7 @@ namespace WinCleaner.ViewModels
         private string _statusMessage = "Listo. Presione 'Buscar Actualizaciones' para comenzar.";
         private double _progressValue;
         private bool _isUpgrading;
+        private bool _isWingetAvailable = true;
 
         public List<AppUpdateItem> FilteredUpdates
         {
@@ -66,6 +67,12 @@ namespace WinCleaner.ViewModels
             set => SetProperty(ref _statusMessage, value);
         }
 
+        public bool IsWingetAvailable
+        {
+            get => _isWingetAvailable;
+            set => SetProperty(ref _isWingetAvailable, value);
+        }
+
         public ICommand LoadUpdatesCommand { get; }
         public ICommand UpgradeSelectedCommand { get; }
         public ICommand ToggleAllSelectionCommand { get; }
@@ -78,12 +85,25 @@ namespace WinCleaner.ViewModels
             UpgradeSelectedCommand = new AsyncRelayCommand(UpgradeSelectedAsync);
             ToggleAllSelectionCommand = new RelayCommand<string>(ToggleAllSelection);
 
+            // Verificar disponibilidad de Winget
+            IsWingetAvailable = _updaterService.IsWingetInstalled();
+            if (!IsWingetAvailable)
+            {
+                StatusMessage = "El Administrador de Paquetes de Windows (Winget) no está instalado en este equipo.";
+            }
+
             // Cargar actualizaciones automáticamente al iniciar la pestaña
             _ = LoadUpdatesAsync();
         }
 
         private async Task LoadUpdatesAsync()
         {
+            if (!IsWingetAvailable)
+            {
+                StatusMessage = "Winget no está disponible en este sistema. Instálelo desde Microsoft Store.";
+                return;
+            }
+
             if (IsLoading || IsUpgrading) return;
 
             IsLoading = true;

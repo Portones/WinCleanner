@@ -14,6 +14,29 @@ namespace WinCleaner.Services.Implementations
 {
     public class AppUpdaterService : IAppUpdaterService
     {
+        public bool IsWingetInstalled()
+        {
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = "winget",
+                    Arguments = "--version",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+                using var process = Process.Start(startInfo);
+                process?.WaitForExit(3000);
+                return process != null && process.ExitCode == 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<List<AppUpdateItem>> GetAvailableUpdatesAsync(CancellationToken cancellationToken)
         {
             return await Task.Run(() =>

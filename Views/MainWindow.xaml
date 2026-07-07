@@ -32,10 +32,19 @@
                 </Grid.RowDefinitions>
 
                 <!-- Logo de la Aplicación -->
-                <StackPanel Grid.Row="0" Margin="10,15,0,30" Orientation="Horizontal">
-                    <Path Data="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm1,17.93V19a1,1,0,0,1-2,0v-1.07A8,8,0,0,1,4.07,13H5a1,1,0,0,1,0,2H4.07A8,8,0,0,1,11,4.07V5a1,1,0,0,1,2,0v-.93A8,8,0,0,1,19.93,11H19a1,1,0,0,1,0-2h.93A8,8,0,0,1,13,17.93Z" 
-                          Fill="#6366F1" Width="26" Height="26" Margin="0,0,10,0"/>
-                    <TextBlock Text="WinCleaner" FontSize="20" FontWeight="Bold" Foreground="#F8FAFC" VerticalAlignment="Center"/>
+                <StackPanel Grid.Row="0" Margin="10,15,0,25">
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm1,17.93V19a1,1,0,0,1-2,0v-1.07A8,8,0,0,1,4.07,13H5a1,1,0,0,1,0,2H4.07A8,8,0,0,1,11,4.07V5a1,1,0,0,1,2,0v-.93A8,8,0,0,1,19.93,11H19a1,1,0,0,1,0-2h.93A8,8,0,0,1,13,17.93Z" 
+                              Fill="#6366F1" Width="26" Height="26" Margin="0,0,10,0"/>
+                        <TextBlock Text="WinCleaner" FontSize="20" FontWeight="Bold" Foreground="#F8FAFC" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <!-- Indicador Admin -->
+                    <Border Background="#0F172A" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="4" Padding="6,3" Margin="0,8,0,0" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="6" Height="6" Fill="#10B981" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Administrador (Elevado)" FontSize="9" FontWeight="Bold" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
 
                 <!-- Botones de Navegación con ScrollViewer -->

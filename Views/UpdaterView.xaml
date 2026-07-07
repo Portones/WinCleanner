@@ -80,8 +80,8 @@
 
                 <!-- Acciones -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Button Content="Buscar Actualizaciones" Style="{StaticResource SidebarButton}" Command="{Binding LoadUpdatesCommand}" IsEnabled="{Binding IsLoading, Converter={x:Null}}" Margin="0,0,10,0"/>
-                    <Button Content="Actualizar Seleccionados" Style="{StaticResource ActionButton}" Command="{Binding UpgradeSelectedCommand}"/>
+                    <Button Content="Buscar Actualizaciones" Style="{StaticResource SidebarButton}" Command="{Binding LoadUpdatesCommand}" IsEnabled="{Binding IsWingetAvailable}" Margin="0,0,10,0"/>
+                    <Button Content="Actualizar Seleccionados" Style="{StaticResource ActionButton}" Command="{Binding UpgradeSelectedCommand}" IsEnabled="{Binding IsWingetAvailable}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -103,6 +103,25 @@
                     <TextBlock Text="{Binding StatusMessage}" FontSize="12.5" FontWeight="SemiBold" Foreground="#6366F1" Margin="0,10,0,0" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Grid>
+
+            <!-- Mensaje de advertencia si Winget no está instalado -->
+            <Border x:Name="WingetWarningPanel" CornerRadius="10" Background="#3B1818" BorderBrush="#7F1D1D" BorderThickness="1" Padding="20" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="500" Panel.ZIndex="20">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsWingetAvailable}" Value="False">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock Text="⚠️ Administrador de Paquetes (Winget) no detectado" FontSize="16" FontWeight="Bold" Foreground="#FEE2E2" Margin="0,0,0,8"/>
+                    <TextBlock Text="El sistema no cuenta con Winget instalado o disponible en la variable de entorno PATH. Esto impide buscar y aplicar actualizaciones de tus aplicaciones." FontSize="12.5" Foreground="#FCA5A5" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                    <TextBlock Text="Puedes descargarlo e instalarlo de forma oficial buscando 'App Installer' (o 'Instalador de aplicación') en Microsoft Store." FontSize="12" Foreground="#F8FAFC" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
 
             <!-- Tabla -->
             <ListView ItemsSource="{Binding FilteredUpdates}" Style="{StaticResource ModernListView}" ItemContainerStyle="{StaticResource ModernListViewItem}">
