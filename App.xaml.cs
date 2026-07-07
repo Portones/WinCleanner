@@ -153,7 +153,24 @@ namespace WinCleaner
         private void SetupSystemTray()
         {
             _notifyIcon = new System.Windows.Forms.NotifyIcon();
-            _notifyIcon.Icon = System.Drawing.SystemIcons.Shield; // Icono estándar del sistema para seguridad
+            
+            // Cargar de forma dinámica el icono principal compilado en el ejecutable
+            if (!string.IsNullOrEmpty(Environment.ProcessPath))
+            {
+                try
+                {
+                    _notifyIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath);
+                }
+                catch
+                {
+                    _notifyIcon.Icon = System.Drawing.SystemIcons.Shield;
+                }
+            }
+            else
+            {
+                _notifyIcon.Icon = System.Drawing.SystemIcons.Shield;
+            }
+
             _notifyIcon.Text = "WinCleaner - Suite de Optimización";
             _notifyIcon.Visible = true;
 
