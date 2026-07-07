@@ -55,6 +55,7 @@
                         <!-- SECCIÓN 3: OPTIMIZACIÓN Y SISTEMA -->
                         <TextBlock Text="OPTIMIZACIÓN Y SISTEMA" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,0,0,6"/>
                         <Button Content="Rendimiento y Red" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Performance" Tag="Performance" Margin="0,0,0,4"/>
+                        <Button Content="Actualizar Apps" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Updater" Tag="Updater" Margin="0,0,0,4"/>
                         <Button Content="Gestión de Inicio" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Startup" Tag="Startup" Margin="0,0,0,4"/>
                         <Button Content="Servicios de Windows" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Services" Tag="Services" Margin="0,0,0,4"/>
                         <Button Content="Menú Contextual" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="ContextMenu" Tag="ContextMenu" Margin="0,0,0,18"/>
@@ -103,6 +104,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:PerformanceViewModel}">
                     <local:PerformanceView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:UpdaterViewModel}">
+                    <local:UpdaterView/>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                     <local:SettingsView/>

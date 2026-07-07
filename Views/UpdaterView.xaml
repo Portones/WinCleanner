@@ -1,0 +1,176 @@
+<UserControl x:Class="WinCleaner.Views.UpdaterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="850">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- Cabecera -->
+            <RowDefinition Height="Auto"/>
+            <!-- Barra de Acciones y Búsqueda -->
+            <RowDefinition Height="Auto"/>
+            <!-- Listado de Actualizaciones -->
+            <RowDefinition Height="*"/>
+            <!-- Barra de Estado -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Actualizador de Aplicaciones" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+                <TextBlock Text="Mantenga sus programas actualizados y seguros de forma desatendida. WinCleaner descarga e instala las nuevas versiones en segundo plano." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- BARRA DE ACCIONES Y BÚSQUEDA -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Campo de búsqueda -->
+                <Grid Grid.Column="0" Margin="0,0,15,0">
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                             Background="#0B0F19" Foreground="#F8FAFC" BorderBrush="#334155" BorderThickness="1" Padding="10,8" FontSize="13">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type TextBox}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type TextBox}">
+                                            <Border x:Name="bg" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="6">
+                                                <Grid>
+                                                    <ScrollViewer x:Name="PART_ContentHost" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="placeholder" Text="Filtrar por nombre o ID..." FontSize="13" Foreground="#475569" Margin="10,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed"/>
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="Text" Value="">
+                                                    <Setter TargetName="placeholder" Property="Visibility" Value="Visible"/>
+                                                </Trigger>
+                                                <Trigger Property="IsFocused" Value="True">
+                                                    <Setter Property="BorderBrush" Value="#6366F1"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                </Grid>
+
+                <!-- Selección Colectiva -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,15,0" VerticalAlignment="Center">
+                    <Button Content="✓ Todo" Style="{StaticResource SidebarButton}" Command="{Binding ToggleAllSelectionCommand}" CommandParameter="True" Padding="8,5" Margin="0,0,5,0"/>
+                    <Button Content="✗ Ninguno" Style="{StaticResource SidebarButton}" Command="{Binding ToggleAllSelectionCommand}" CommandParameter="False" Padding="8,5"/>
+                </StackPanel>
+
+                <!-- Acciones -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="Buscar Actualizaciones" Style="{StaticResource SidebarButton}" Command="{Binding LoadUpdatesCommand}" IsEnabled="{Binding IsLoading, Converter={x:Null}}" Margin="0,0,10,0"/>
+                    <Button Content="Actualizar Seleccionados" Style="{StaticResource ActionButton}" Command="{Binding UpgradeSelectedCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- LISTADO DE ACTUALIZACIONES -->
+        <Grid Grid.Row="2">
+            <!-- Loader Indeterminado (Búsqueda) -->
+            <Grid Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="10" Background="#900F172A">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar Width="200" Height="8" IsIndeterminate="True" Style="{StaticResource ModernProgressBar}"/>
+                    <TextBlock Text="Buscando actualizaciones disponibles..." FontSize="12" Foreground="#94A3B8" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Loader de Progreso (Actualizando) -->
+            <Grid Visibility="{Binding IsUpgrading, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="10" Background="#900F172A">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar Width="240" Height="10" Value="{Binding ProgressValue}" Minimum="0" Maximum="100" Style="{StaticResource ModernProgressBar}"/>
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="12.5" FontWeight="SemiBold" Foreground="#6366F1" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Tabla -->
+            <ListView ItemsSource="{Binding FilteredUpdates}" Style="{StaticResource ModernListView}" ItemContainerStyle="{StaticResource ModernListViewItem}">
+                <ListView.View>
+                    <GridView>
+                        <!-- Selección -->
+                        <GridViewColumn Width="45">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <!-- Nombre -->
+                        <GridViewColumn Header="APLICACIÓN" Width="240">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold" Foreground="#F8FAFC" TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <!-- ID -->
+                        <GridViewColumn Header="IDENTIFICADOR ID" Width="200">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Id}" FontSize="11" Foreground="#64748B" TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <!-- Versión Actual -->
+                        <GridViewColumn Header="INSTALADA" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding CurrentVersion}" FontSize="11.5" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <!-- Versión Disponible -->
+                        <GridViewColumn Header="DISPONIBLE" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding AvailableVersion}" FontSize="11.5" Foreground="#10B981" FontWeight="Bold" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <!-- Origen -->
+                        <GridViewColumn Header="ORIGEN" Width="90">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="4" Padding="5,2" Background="#1E1B4B" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding Source}" FontSize="9" FontWeight="Bold" Foreground="#818CF8"/>
+                                    </Border>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+
+        <!-- BARRA DE ESTADO -->
+        <Border Grid.Row="3" Background="#0B0F19" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="12,10" Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+        </Border>
+    </Grid>
+</UserControl>

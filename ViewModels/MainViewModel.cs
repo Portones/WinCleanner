@@ -17,6 +17,7 @@ namespace WinCleaner.ViewModels
         private readonly UninstallerViewModel _uninstallerViewModel;
         private readonly DiskAnalyzerViewModel _diskAnalyzerViewModel;
         private readonly PerformanceViewModel _performanceViewModel;
+        private readonly UpdaterViewModel _updaterViewModel;
         private readonly SettingsViewModel _settingsViewModel;
 
         public ViewModelBase CurrentPage
@@ -43,6 +44,7 @@ namespace WinCleaner.ViewModels
             UninstallerViewModel uninstallerViewModel,
             DiskAnalyzerViewModel diskAnalyzerViewModel,
             PerformanceViewModel performanceViewModel,
+            UpdaterViewModel updaterViewModel,
             SettingsViewModel settingsViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
@@ -54,6 +56,7 @@ namespace WinCleaner.ViewModels
             _uninstallerViewModel = uninstallerViewModel ?? throw new ArgumentNullException(nameof(uninstallerViewModel));
             _diskAnalyzerViewModel = diskAnalyzerViewModel ?? throw new ArgumentNullException(nameof(diskAnalyzerViewModel));
             _performanceViewModel = performanceViewModel ?? throw new ArgumentNullException(nameof(performanceViewModel));
+            _updaterViewModel = updaterViewModel ?? throw new ArgumentNullException(nameof(updaterViewModel));
             _settingsViewModel = settingsViewModel ?? throw new ArgumentNullException(nameof(settingsViewModel));
 
             // Configurar página de inicio por defecto
@@ -103,6 +106,10 @@ namespace WinCleaner.ViewModels
             else if (destination.Equals("Performance", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _performanceViewModel;
+            }
+            else if (destination.Equals("Updater", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _updaterViewModel;
             }
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {
