@@ -61,6 +61,14 @@ try {
         # Pasar la versión dinámica usando el parámetro /D de ISCC
         & $iscc "/DAppVersion=$Version" "installer.iss"
         Write-Host "`n✔ ¡Instalador WinCleanerSetup-v$Version.exe creado con éxito en la carpeta Releases/!" -ForegroundColor Green
+
+        # 4. Comprimir el instalador en un archivo ZIP
+        Write-Host "`nComprimiendo instalador en un archivo ZIP..." -ForegroundColor Yellow
+        $exePath = "Releases\WinCleanerSetup-v$Version.exe"
+        $zipPath = "Releases\WinCleanerSetup-v$Version.zip"
+        if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+        Compress-Archive -Path $exePath -DestinationPath $zipPath -Force
+        Write-Host "✔ ¡Archivo ZIP WinCleanerSetup-v$Version.zip creado con éxito en Releases/!" -ForegroundColor Green
     } else {
         Write-Host "`n⚠ No se detectó 'ISCC.exe' en las rutas por defecto de Inno Setup." -ForegroundColor Orange
         Write-Host "Se omitió el empaquetado automático." -ForegroundColor Orange
