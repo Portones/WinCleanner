@@ -115,6 +115,11 @@ namespace WinCleaner.Services.Implementations
             var commonStartupPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup);
             await AddStartupFolderAppsAsync(commonStartupPath, "Inicio (Común)", "FolderCommon", apps, cancellationToken);
 
+            foreach (var app in apps)
+            {
+                PopulateStartupImpact(app);
+            }
+
             return apps;
         }
 
@@ -285,5 +290,73 @@ namespace WinCleaner.Services.Implementations
             return shortcutPath;
         }
 #pragma warning restore CS8602
+
+        private void PopulateStartupImpact(StartupApp app)
+        {
+            if (app == null) return;
+
+            string cmd = app.Command.ToLowerInvariant();
+            string name = app.Name.ToLowerInvariant();
+
+            // Criterios para impacto Alto
+            var highKeywords = new[]
+            {
+                "electron", "discord", "spotify", "teams", "slack", "steam", "epicgames", 
+                "gog", "onedrive", "dropbox", "adobe", "creative cloud", "office", "msedge", 
+                "chrome", "firefox", "browser", "update", "telemetry", "assistant"
+            };
+
+            // Criterios para impacto Bajo
+            var lowKeywords = new[]
+            {
+                "rtkaudioservice", "realtek", "synaptics", "windows defender", "securityhealth", 
+                "sound", "audio", "driver", "intel", "amd", "nvidia", "display", "keys", "hotkey"
+            };
+
+            if (highKeywords.Any(k => cmd.Contains(k) || name.Contains(k)))
+            {
+                app.Impact = "Alto";
+                app.ImpactColor = "#EF4444"; // Rojo
+            }
+            else if (lowKeywords.Any(k => cmd.Contains(k) || name.Contains(k)))
+            {
+                app.Impact = "Bajo";
+                app.ImpactColor = "#10B981"; // Verde
+            }
+            else
+            {
+                app.Impact = "Medio";
+                app.ImpactColor = "#F59E0B"; // Amarillo
+            }
+
+            // Opcional: si el archivo ejecutable existe en el disco, comprobar su tamaño
+            try
+            {
+                string cleanPath = app.Command.Trim(' ', '"');
+                if (cleanPath.Contains(" -") || cleanPath.Contains(" /"))
+                {
+                    int index = cleanPath.IndexOf(" -");
+                    if (index > 0) cleanPath = cleanPath.Substring(0, index).Trim();
+                    index = cleanPath.IndexOf(" /");
+                    if (index > 0) cleanPath = cleanPath.Substring(0, index).Trim();
+                }
+
+                if (File.Exists(cleanPath))
+                {
+                    var fileInfo = new FileInfo(cleanPath);
+                    if (fileInfo.Length > 40 * 1024 * 1024) // Mayor a 40MB
+                    {
+                        app.Impact = "Alto";
+                        app.ImpactColor = "#EF4444";
+                    }
+                    else if (fileInfo.Length < 1.5 * 1024 * 1024 && app.Impact == "Medio") // Menor a 1.5MB y era Medio
+                    {
+                        app.Impact = "Bajo";
+                        app.ImpactColor = "#10B981";
+                    }
+                }
+            }
+            catch { /* Ignorar errores de acceso a disco */ }
+        }
     }
 }

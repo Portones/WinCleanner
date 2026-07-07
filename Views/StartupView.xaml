@@ -84,8 +84,19 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
+                    <!-- Impacto de Inicio -->
+                    <GridViewColumn Header="Impacto" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="#0F172A" BorderBrush="{Binding ImpactColor}" BorderThickness="1" CornerRadius="6" Padding="8,3" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Impact}" FontSize="9.5" FontWeight="Bold" Foreground="{Binding ImpactColor}" TextAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
                     <!-- Comando ejecutado -->
-                    <GridViewColumn Header="Comando de Ejecución" Width="430">
+                    <GridViewColumn Header="Comando de Ejecución" Width="330">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Command}" FontSize="11" Foreground="#64748B" TextTrimming="CharacterEllipsis">

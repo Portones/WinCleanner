@@ -12,6 +12,8 @@ namespace WinCleaner.Models
         public string LocationType { get; set; } = string.Empty; // "RegistryHKCU", "RegistryHKLM", "FolderUser", "FolderCommon"
         public string FilePath { get; set; } = string.Empty; // Ruta del acceso directo si aplica
         public string RegistryValueName { get; set; } = string.Empty; // Nombre del valor de registro si aplica
+        public string Impact { get; set; } = "Medio";
+        public string ImpactColor { get; set; } = "#F59E0B";
 
         public bool IsEnabled
         {
