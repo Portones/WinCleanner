@@ -13,8 +13,6 @@
     <DisableWinFormsImplicitUsings>true</DisableWinFormsImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\WinCleanerLogo.ico</ApplicationIcon>
-    <!-- Asegurar que las DLLs nativas de WPF se empaqueten dentro del ejecutable único en la publicación -->
-    <IncludeNativeLibrariesInSingleFile>true</IncludeNativeLibrariesInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
