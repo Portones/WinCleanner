@@ -214,8 +214,43 @@ namespace WinCleaner.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Error al desinstalar: {ex.Message}";
-                MessageBox.Show($"Ocurrió un error al ejecutar la desinstalación.\nDetalle: {ex.Message}",
-                                "Error de Desinstalación", MessageBoxButton.OK, MessageBoxImage.Error);
+                var forceOption = MessageBox.Show(
+                    $"El desinstalador oficial no se pudo iniciar o falló.\n\nDetalle: {ex.Message}\n\n¿Desea forzar la eliminación de la entrada en el registro de Windows y buscar posibles archivos o carpetas huérfanas de '{appToUninstall.DisplayName}'?",
+                    "Fallo de Desinstalador - Forzar Eliminación",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (forceOption == MessageBoxResult.Yes)
+                {
+                    StatusMessage = $"Forzando eliminación de {appToUninstall.DisplayName}...";
+                    bool removed = await _uninstallerService.ForceRemoveAppEntryAsync(appToUninstall);
+                    if (removed)
+                    {
+                        StatusMessage = "Entrada de registro eliminada. Buscando residuos huérfanos...";
+                        var leftovers = await _uninstallerService.ScanResidualsAsync(appToUninstall, CancellationToken.None);
+                        await LoadAppsAsync();
+
+                        if (leftovers != null && leftovers.Count > 0)
+                        {
+                            Residuals = leftovers;
+                            ShowResidualsCard = true;
+                            StatusMessage = $"Registro quitado. Se encontraron {leftovers.Count} residuos huérfanos.";
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                $"Se eliminó la entrada de '{appToUninstall.DisplayName}' del registro de Windows.\nNo se detectaron más archivos residuales.",
+                                "Eliminación Completada", MessageBoxButton.OK, MessageBoxImage.Information);
+                            StatusMessage = "Eliminación forzada completada sin residuos.";
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se pudo eliminar la entrada del registro. Es posible que la entrada ya no exista o requiera permisos elevados.",
+                                        "Error al forzar eliminación", MessageBoxButton.OK, MessageBoxImage.Error);
+                        StatusMessage = "Fallo al forzar la eliminación.";
+                    }
+                }
             }
             finally
             {

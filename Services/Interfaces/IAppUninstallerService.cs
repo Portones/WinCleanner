@@ -11,5 +11,6 @@ namespace WinCleaner.Services.Interfaces
         Task<bool> UninstallAppAsync(InstalledApp app, CancellationToken cancellationToken);
         Task<List<ResidualItem>> ScanResidualsAsync(InstalledApp app, CancellationToken cancellationToken);
         Task<bool> CleanResidualsAsync(List<ResidualItem> residuals, CancellationToken cancellationToken);
+        Task<bool> ForceRemoveAppEntryAsync(InstalledApp app);
     }
 }

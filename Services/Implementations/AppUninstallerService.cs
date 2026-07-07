@@ -489,6 +489,50 @@ namespace WinCleaner.Services.Implementations
             }, cancellationToken);
         }
 
+        public async Task<bool> ForceRemoveAppEntryAsync(InstalledApp app)
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    string[] registryPaths = new[]
+                    {
+                        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                        @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+                    };
+
+                    foreach (var path in registryPaths)
+                    {
+                        using (var key = Registry.LocalMachine.OpenSubKey(path, true))
+                        {
+                            if (key != null && key.GetSubKeyNames().Contains(app.Name))
+                            {
+                                key.DeleteSubKeyTree(app.Name, false);
+                                Log.Information("Clave de desinstalación eliminada de HKLM\\{Path}\\{Name}", path, app.Name);
+                                return true;
+                            }
+                        }
+
+                        using (var key = Registry.CurrentUser.OpenSubKey(path, true))
+                        {
+                            if (key != null && key.GetSubKeyNames().Contains(app.Name))
+                            {
+                                key.DeleteSubKeyTree(app.Name, false);
+                                Log.Information("Clave de desinstalación eliminada de HKCU\\{Path}\\{Name}", path, app.Name);
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error al forzar la eliminación de la entrada de registro para {Name}", app.DisplayName);
+                    return false;
+                }
+            });
+        }
+
         private static long GetFolderSize(string path)
         {
             if (string.IsNullOrEmpty(path) || !Directory.Exists(path)) return 0;
