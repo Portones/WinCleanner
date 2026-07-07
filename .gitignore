@@ -19,3 +19,9 @@
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+## Installer and Release Packages
+WinCleanerSetup.exe
+WinCleanerSetup.zip
+*.zip
+
