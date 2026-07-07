@@ -122,6 +122,7 @@ namespace WinCleaner
             services.AddSingleton<IDiskAnalyzerService, DiskAnalyzerService>();
             services.AddSingleton<IPerformanceService, PerformanceService>();
             services.AddSingleton<IAppUpdaterService, AppUpdaterService>();
+            services.AddSingleton<IPhotosCleanupService, PhotosCleanupService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
@@ -142,6 +143,7 @@ namespace WinCleaner
             services.AddSingleton<DiskAnalyzerViewModel>();
             services.AddSingleton<PerformanceViewModel>();
             services.AddSingleton<UpdaterViewModel>();
+            services.AddSingleton<PhotosCleanupViewModel>();
             services.AddSingleton<SettingsViewModel>();
 
             // Vistas

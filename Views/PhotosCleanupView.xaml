@@ -1,0 +1,273 @@
+<UserControl x:Class="WinCleaner.Views.PhotosCleanupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="850">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        
+        <!-- Estilo TabControl Oscuro -->
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
+        <Style TargetType="TabItem">
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{TemplateBinding Content}" FontSize="13.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="border" Background="#1E293B" BorderBrush="#334155" BorderThickness="1,1,1,1" CornerRadius="6" Padding="15,10" Margin="0,0,8,0" Cursor="Hand">
+                            <ContentPresenter x:Name="contentPresenter" ContentSource="Header" Focusable="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#312E81"/>
+                                <Setter Property="Foreground" Value="#F8FAFC"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#4F46E5"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter Property="Foreground" Value="#94A3B8"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#334155"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- Cabecera -->
+            <RowDefinition Height="Auto"/>
+            <!-- Contenido Principal con TabControl -->
+            <RowDefinition Height="*"/>
+            <!-- Barra de Estado -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Limpiador Inteligente de Fotos" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+                <TextBlock Text="Libere espacio analizando capturas de pantalla viejas y detectando imágenes idénticas agrupadas por firma digital SHA-256." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <Grid Grid.Row="1">
+            <!-- Loader Indeterminado (Escaneando) -->
+            <Grid Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" Panel.ZIndex="10" Background="#900F172A">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar Width="200" Height="8" IsIndeterminate="True" Style="{StaticResource ModernProgressBar}"/>
+                    <TextBlock Text="Analizando carpetas de fotos..." FontSize="12" Foreground="#94A3B8" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <TabControl>
+                <!-- PESTAÑA 1: CAPTURAS DE PANTALLA -->
+                <TabItem Header="Capturas Obsoletas">
+                    <Grid Margin="0,15,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Panel de Filtros -->
+                        <Border Grid.Row="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="Antigüedad mínima:" FontSize="13" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBox Text="{Binding ScreenshotAgeLimit, UpdateSourceTrigger=PropertyChanged}" 
+                                             Background="#0B0F19" Foreground="#F8FAFC" BorderBrush="#334155" BorderThickness="1" 
+                                             Padding="8,4" FontSize="13" Width="55" HorizontalContentAlignment="Center"/>
+                                    <TextBlock Text=" días" FontSize="13" Foreground="#64748B" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                    <Button Content="Buscar Capturas" Style="{StaticResource SidebarButton}" Command="{Binding ScanScreenshotsCommand}" Margin="0,0,10,0"/>
+                                    <Button Content="Eliminar Seleccionadas" Style="{StaticResource ActionButton}" Command="{Binding DeleteSelectedScreenshotsCommand}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Grid de Miniaturas -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ListBox ItemsSource="{Binding Screenshots}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Margin="0,5"/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="150" Margin="6" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="6">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="100"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <!-- Checkbox -->
+                                                <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Top" HorizontalAlignment="Left" Panel.ZIndex="10" Margin="4"/>
+                                                
+                                                <!-- Miniatura -->
+                                                <Border Grid.Row="0" CornerRadius="4" ClipToBounds="True" Background="#0B0F19">
+                                                    <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"/>
+                                                </Border>
+                                                
+                                                <!-- Nombre -->
+                                                <TextBlock Grid.Row="1" Text="{Binding Name}" FontSize="10.5" Foreground="#F8FAFC" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,6,0,2"/>
+                                                
+                                                <!-- Detalles -->
+                                                <Grid Grid.Row="2">
+                                                    <TextBlock Text="{Binding SizeText}" FontSize="9.5" Foreground="#94A3B8" HorizontalAlignment="Left"/>
+                                                    <TextBlock Text="{Binding DateCreated, StringFormat=d}" FontSize="9.5" Foreground="#64748B" HorizontalAlignment="Right"/>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <!-- PESTAÑA 2: FOTOS DUPLICADAS -->
+                <TabItem Header="Imágenes Duplicadas">
+                    <Grid Margin="0,15,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Panel de Control de Escaneo -->
+                        <Border Grid.Row="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Ruta -->
+                                <Grid Grid.Column="0" Margin="0,0,10,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding ScanPath}" Background="#0B0F19" Foreground="#F8FAFC" BorderBrush="#334155" BorderThickness="1" Padding="8,4" FontSize="13" IsReadOnly="True"/>
+                                    <Button Grid.Column="1" Content="..." Style="{StaticResource SidebarButton}" Command="{Binding SelectFolderCommand}" Margin="5,0,0,0" Padding="10,0"/>
+                                </Grid>
+
+                                <!-- Selección Automática -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,15,0" VerticalAlignment="Center">
+                                    <Button Content="Conservar Más Nueva" Style="{StaticResource SidebarButton}" Command="{Binding KeepNewestInGroupsCommand}" Padding="8,4" Margin="0,0,5,0"/>
+                                    <Button Content="Conservar Más Vieja" Style="{StaticResource SidebarButton}" Command="{Binding KeepOldestInGroupsCommand}" Padding="8,4"/>
+                                </StackPanel>
+
+                                <!-- Acciones -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <Button Content="Buscar Duplicados" Style="{StaticResource SidebarButton}" Command="{Binding ScanDuplicatesCommand}" Margin="0,0,10,0"/>
+                                    <Button Content="Eliminar Seleccionadas" Style="{StaticResource ActionButton}" Command="{Binding DeleteSelectedDuplicatesCommand}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Listado de Grupos Duplicados -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding DuplicateGroups}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="0,0,0,10" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="12">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <!-- Info del Grupo -->
+                                                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                                                    <Border CornerRadius="4" Padding="5,2" Background="#1E1B4B" Margin="0,0,8,0">
+                                                        <TextBlock Text="DUPLICADOS" FontSize="9" FontWeight="Bold" Foreground="#818CF8"/>
+                                                    </Border>
+                                                    <TextBlock Text="Firma SHA-256: " FontSize="11" Foreground="#64748B"/>
+                                                    <TextBlock Text="{Binding Hash}" FontSize="11" Foreground="#94A3B8" FontWeight="SemiBold" Margin="0,0,15,0"/>
+                                                    <TextBlock Text="Tamaño: " FontSize="11" Foreground="#64748B"/>
+                                                    <TextBlock Text="{Binding Photos[0].SizeText}" FontSize="11" Foreground="#10B981" FontWeight="Bold"/>
+                                                </StackPanel>
+
+                                                <!-- Comparativa de Fotos -->
+                                                <ItemsControl Grid.Row="1" ItemsSource="{Binding Photos}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Width="245" Margin="4" Background="#0B0F19" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="6">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="65"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    
+                                                                    <!-- Miniatura -->
+                                                                    <Border Grid.Column="0" Height="50" CornerRadius="3" ClipToBounds="True" Background="#020617">
+                                                                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"/>
+                                                                    </Border>
+                                                                    
+                                                                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                                                        <CheckBox IsChecked="{Binding IsSelected}" Content="Eliminar esta copia" FontSize="11" Foreground="#F8FAFC" FontWeight="SemiBold"/>
+                                                                        <TextBlock Text="{Binding Name}" FontSize="10" Foreground="#94A3B8" TextTrimming="CharacterEllipsis" Margin="0,4,0,1"/>
+                                                                        <TextBlock Text="{Binding Path}" ToolTip="{Binding Path}" FontSize="9" Foreground="#475569" TextTrimming="CharacterEllipsis"/>
+                                                                        <TextBlock Text="{Binding DateCreated, StringFormat='dd/MM/yyyy HH:mm'}" FontSize="9" Foreground="#64748B" Margin="0,2,0,0"/>
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+
+        <!-- BARRA DE ESTADO -->
+        <Border Grid.Row="2" Background="#0B0F19" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="12,10" Margin="0,10,0,0">
+            <TextBlock Text="{Binding StatusMessage}" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+        </Border>
+    </Grid>
+</UserControl>

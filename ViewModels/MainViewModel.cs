@@ -18,6 +18,7 @@ namespace WinCleaner.ViewModels
         private readonly DiskAnalyzerViewModel _diskAnalyzerViewModel;
         private readonly PerformanceViewModel _performanceViewModel;
         private readonly UpdaterViewModel _updaterViewModel;
+        private readonly PhotosCleanupViewModel _photosCleanupViewModel;
         private readonly SettingsViewModel _settingsViewModel;
 
         public ViewModelBase CurrentPage
@@ -45,6 +46,7 @@ namespace WinCleaner.ViewModels
             DiskAnalyzerViewModel diskAnalyzerViewModel,
             PerformanceViewModel performanceViewModel,
             UpdaterViewModel updaterViewModel,
+            PhotosCleanupViewModel photosCleanupViewModel,
             SettingsViewModel settingsViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
@@ -57,6 +59,7 @@ namespace WinCleaner.ViewModels
             _diskAnalyzerViewModel = diskAnalyzerViewModel ?? throw new ArgumentNullException(nameof(diskAnalyzerViewModel));
             _performanceViewModel = performanceViewModel ?? throw new ArgumentNullException(nameof(performanceViewModel));
             _updaterViewModel = updaterViewModel ?? throw new ArgumentNullException(nameof(updaterViewModel));
+            _photosCleanupViewModel = photosCleanupViewModel ?? throw new ArgumentNullException(nameof(photosCleanupViewModel));
             _settingsViewModel = settingsViewModel ?? throw new ArgumentNullException(nameof(settingsViewModel));
 
             // Configurar página de inicio por defecto
@@ -110,6 +113,10 @@ namespace WinCleaner.ViewModels
             else if (destination.Equals("Updater", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _updaterViewModel;
+            }
+            else if (destination.Equals("PhotosCleanup", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _photosCleanupViewModel;
             }
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {
