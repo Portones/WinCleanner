@@ -30,7 +30,7 @@ Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 d
 ### 2. Navegación Categorizada
 * Acceso organizado mediante un panel lateral dividido en 4 categorías:
   * **Diagnóstico y Estado**: Dashboard, Analizador de Disco.
-  * **Limpieza de Espacio**: Limpieza Avanzada, Buscador de Duplicados, Desinstalador de Apps.
+  * **Limpieza de Espacio**: Limpieza Avanzada, Buscador de Duplicados, Limpiador de Fotos, Desinstalador de Apps.
   * **Optimización y Sistema**: Rendimiento y Red, Actualizar Apps, Gestión de Inicio, Servicios, Menú Contextual.
   * **Opciones**: Configuración de tema/idioma.
 * **Indicador de Página Activa**: Resaltado en azul índigo del apartado abierto actualmente.
@@ -48,6 +48,10 @@ Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 d
 * **Escaneo de Actualizaciones**: Conexión con el Gestor de Paquetes de Windows (`winget`) para listar programas del sistema con versiones nuevas disponibles.
 * **Instalación Silenciosa**: Descarga e instala en segundo plano las aplicaciones seleccionadas de forma automática, omitiendo los asistentes interactivos.
 * **Filtros e Interfaz**: Caja de búsqueda interactiva por nombre o ID del paquete, y visualización de progreso global.
+
+### 6. Limpiador Inteligente de Fotos
+* **Capturas Obsoletas**: Escaneo en directorios comunes (Imágenes, Escritorio, Descargas) para encontrar capturas de pantalla de antigüedad configurable (ej. > 30 días) con previsualización eficiente en miniaturas.
+* **Fotos Duplicadas (SHA-256)**: Algoritmo de doble filtro (agrupamiento rápido por peso y posterior coincidencia de firma SHA-256) para identificar y comparar imágenes idénticas lado a lado con casillas de acción.
 
 ---
 
