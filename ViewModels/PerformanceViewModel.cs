@@ -99,6 +99,7 @@ namespace WinCleaner.ViewModels
         public ICommand ToggleGameModeCommand { get; }
         public ICommand RunDnsTestCommand { get; }
         public ICommand ApplyDnsCommand { get; }
+        public ICommand ApplyFastestDnsCommand { get; }
         public ICommand FlushDnsCommand { get; }
         public ICommand RunSpeedTestCommand { get; }
 
@@ -111,6 +112,7 @@ namespace WinCleaner.ViewModels
             ToggleGameModeCommand = new AsyncRelayCommand(ToggleGameModeAsync);
             RunDnsTestCommand = new AsyncRelayCommand(RunDnsTestAsync);
             ApplyDnsCommand = new AsyncRelayCommand<DnsServerItem>(ApplyDnsAsync);
+            ApplyFastestDnsCommand = new AsyncRelayCommand(ApplyFastestDnsAsync);
             FlushDnsCommand = new AsyncRelayCommand(FlushDnsAsync);
             RunSpeedTestCommand = new AsyncRelayCommand(RunSpeedTestAsync);
 
@@ -290,6 +292,31 @@ namespace WinCleaner.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Error: {ex.Message}";
+            }
+        }
+
+        private async Task ApplyFastestDnsAsync()
+        {
+            // Si el test de latencia no se ha realizado (todos los LatencyMs son null), lo ejecutamos primero
+            if (DnsServers.All(s => !s.LatencyMs.HasValue))
+            {
+                await RunDnsTestAsync();
+            }
+
+            // Filtrar y ordenar para encontrar el de menor latencia (que no sea un timeout/999)
+            var fastest = DnsServers
+                .Where(s => s.LatencyMs.HasValue && s.LatencyMs.Value > 0 && s.LatencyMs.Value < 999)
+                .OrderBy(s => s.LatencyMs ?? 999)
+                .FirstOrDefault();
+
+            if (fastest != null)
+            {
+                await ApplyDnsAsync(fastest);
+            }
+            else
+            {
+                MessageBox.Show("No se detectó ningún servidor DNS con latencia válida. Por favor, realice el test de velocidad DNS manualmente primero.",
+                                "Sin latencia válida", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

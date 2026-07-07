@@ -1,4 +1,4 @@
-# WinCleaner - Panel de Control y Limpieza Profesional (v1.1.2)
+# WinCleaner - Panel de Control y Limpieza Profesional (v1.2.0)
 
 Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 desarrollado con .NET 9, WPF y arquitectura MVVM.
 
