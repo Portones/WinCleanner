@@ -2,9 +2,13 @@
 ; Descarga Inno Setup desde: https://jrsoftware.org/isdl.php
 ; Abre este archivo con Inno Setup y pulsa F9 para compilar el instalador único.
 
+#ifndef AppVersion
+  #define AppVersion "1.1.0"
+#endif
+
 [Setup]
 AppName=WinCleaner
-AppVersion=1.1.0
+AppVersion={#AppVersion}
 AppPublisher=Rodrigo Portones
 AppPublisherURL=https://github.com/RodrigoPortones/WinCleaner
 DefaultDirName={commonpf}\WinCleaner
@@ -18,7 +22,7 @@ SolidCompression=yes
 WizardStyle=modern
 ; OutputDir define dónde se guardará el instalador compilado
 OutputDir=Releases
-OutputBaseFilename=WinCleanerSetup
+OutputBaseFilename=WinCleanerSetup-v{#AppVersion}
 ; Solicitar privilegios de administrador para realizar la instalación en archivos de programa
 PrivilegesRequired=admin
 

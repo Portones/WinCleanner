@@ -1,9 +1,29 @@
 # Script de automatización de compilación y empaquetado para WinCleaner
-# Ejecutar en PowerShell: .\build-release.ps1
+# Ejecutar en PowerShell: .\build-release.ps1 [-Version "1.2.0"]
+
+param(
+    [string]$Version
+)
 
 $ErrorActionPreference = "Stop"
+
+# Intentar detectar la versión automáticamente desde la UI si no se pasa como parámetro
+if ([string]::IsNullOrEmpty($Version)) {
+    $xamlPath = "Views\MainWindow.xaml"
+    if (Test-Path $xamlPath) {
+        $content = Get-Content $xamlPath -Raw
+        if ($content -match 'Versión\s+(\d+\.\d+\.\d+)') {
+            $Version = $Matches[1]
+        }
+    }
+    # Valor de respaldo si todo falla
+    if ([string]::IsNullOrEmpty($Version)) {
+        $Version = "1.1.0"
+    }
+}
+
 Write-Host "=============================================" -ForegroundColor Cyan
-Write-Host "   WinCleaner - Generador de Release v1.1.0  " -ForegroundColor Cyan
+Write-Host "   WinCleaner - Generador de Release v$Version  " -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
 
 try {
@@ -38,8 +58,9 @@ try {
 
     if ($null -ne $iscc) {
         Write-Host "Encontrado compilador de Inno Setup en: $iscc" -ForegroundColor Gray
-        & $iscc "installer.iss"
-        Write-Host "`n✔ ¡Instalador WinCleanerSetup.exe creado con éxito en la carpeta Releases/!" -ForegroundColor Green
+        # Pasar la versión dinámica usando el parámetro /D de ISCC
+        & $iscc "/DAppVersion=$Version" "installer.iss"
+        Write-Host "`n✔ ¡Instalador WinCleanerSetup-v$Version.exe creado con éxito en la carpeta Releases/!" -ForegroundColor Green
     } else {
         Write-Host "`n⚠ No se detectó 'ISCC.exe' en las rutas por defecto de Inno Setup." -ForegroundColor Orange
         Write-Host "Se omitió el empaquetado automático." -ForegroundColor Orange
