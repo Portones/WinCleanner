@@ -202,6 +202,7 @@ namespace WinCleaner.ViewModels
                 }
 
                 MessageBox.Show($"Se eliminaron correctamente {deletedCount} capturas de pantalla.", "Limpieza Completada", MessageBoxButton.OK, MessageBoxImage.Information);
+                IsLoading = false;
                 await ScanScreenshotsAsync();
             }
             catch (Exception ex)
@@ -253,6 +254,7 @@ namespace WinCleaner.ViewModels
                 }
 
                 MessageBox.Show($"Se eliminaron correctamente {deletedCount} imágenes duplicadas.", "Limpieza Completada", MessageBoxButton.OK, MessageBoxImage.Information);
+                IsLoading = false;
                 await ScanDuplicatesAsync();
             }
             catch (Exception ex)
