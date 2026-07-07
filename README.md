@@ -31,7 +31,7 @@ Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 d
 * Acceso organizado mediante un panel lateral dividido en 4 categorías:
   * **Diagnóstico y Estado**: Dashboard, Analizador de Disco.
   * **Limpieza de Espacio**: Limpieza Avanzada, Buscador de Duplicados, Desinstalador de Apps.
-  * **Optimización y Sistema**: Rendimiento y Red, Gestor de Inicio, Servicios, Menú Contextual.
+  * **Optimización y Sistema**: Rendimiento y Red, Actualizar Apps, Gestión de Inicio, Servicios, Menú Contextual.
   * **Opciones**: Configuración de tema/idioma.
 * **Indicador de Página Activa**: Resaltado en azul índigo del apartado abierto actualmente.
 
@@ -43,6 +43,11 @@ Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 d
 * **DNS Speed Test**: Mide el ping en ms de los principales servidores DNS públicos (Cloudflare, Google, Quad9, OpenDNS).
 * **Speed Test de Descarga**: Descarga activa de bloques de datos de 10 MB desde Cloudflare CDN para reportar la velocidad de bajada real en **Mbps**.
 * **Flush DNS**: Vaciado rápido de la caché local de resolución DNS.
+
+### 5. Actualizador de Aplicaciones Desatendido (Winget)
+* **Escaneo de Actualizaciones**: Conexión con el Gestor de Paquetes de Windows (`winget`) para listar programas del sistema con versiones nuevas disponibles.
+* **Instalación Silenciosa**: Descarga e instala en segundo plano las aplicaciones seleccionadas de forma automática, omitiendo los asistentes interactivos.
+* **Filtros e Interfaz**: Caja de búsqueda interactiva por nombre o ID del paquete, y visualización de progreso global.
 
 ---
 
