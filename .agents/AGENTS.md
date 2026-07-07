@@ -9,3 +9,5 @@ Estas reglas guían el comportamiento y las prioridades de los agentes de IA en 
 3. **Commits Frecuentes y Probados**: Realiza confirmaciones (commits) de Git cada vez que completes cambios utilizables, estables y que hayan sido compilados/probados exitosamente con `dotnet build`.
 4. **Versionado Adaptativo**: Incrementa o ajusta la versión del proyecto (ej. en la interfaz o en `README.md`) acorde al impacto de las modificaciones añadidas.
 5. **Incremento de Versión Proactivo**: En cada cambio funcional o de corrección de errores (bugs), incrementa la versión en `MainWindow.xaml` y `README.md` (según los criterios de SemVer: Patch para correcciones, Minor para características) de forma que el proyecto quede preparado para que el usuario compile la release en cualquier momento.
+6. **Notas de Versión (Release Notes)**: Cada vez que incrementes la versión en `MainWindow.xaml`, genera un archivo markdown en `Releases/ReleaseNotes-vX.X.X.md` con un resumen estructurado y profesional de los cambios y correcciones de esa versión, listo para ser copiado en la descripción de la release de GitHub.
+
