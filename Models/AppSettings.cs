@@ -33,6 +33,26 @@ namespace WinCleaner.Models
 
         // Backup de registros de inicio desactivados
         public List<StartupRegistryBackup> DisabledStartupRegistryApps { get; set; } = new();
+
+        // Historial de limpiezas realizadas
+        public List<CleanupHistoryItem> CleanupHistory { get; set; } = new();
+    }
+
+    public class CleanupRegistryBackup
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Command { get; set; } = string.Empty;
+        public string RegistryPath { get; set; } = string.Empty; // "HKCU" o "HKLM"
+    }
+
+    public class CleanupHistoryItem
+    {
+        public DateTime DateTime { get; set; } = DateTime.Now;
+        public long BytesCleaned { get; set; }
+        public int ItemsCount { get; set; }
+
+        public string SizeText => CleanableItem.FormatSize(BytesCleaned);
+        public string DateText => DateTime.ToString("dd/MM/yyyy HH:mm");
     }
 
     public class StartupRegistryBackup

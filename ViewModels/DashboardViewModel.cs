@@ -32,6 +32,8 @@ namespace WinCleaner.ViewModels
         private DateTime _lastScanTime = DateTime.Now;
         private bool _isOptimizingRam;
         private List<OptimizationRecommendation> _recommendations = new();
+        private string _totalBytesCleanedText = "0 Bytes";
+        private List<CleanupHistoryItem> _recentCleanups = new();
 
         public string StatusMessage
         {
@@ -113,6 +115,18 @@ namespace WinCleaner.ViewModels
             set => SetProperty(ref _recommendations, value);
         }
 
+        public string TotalBytesCleanedText
+        {
+            get => _totalBytesCleanedText;
+            set => SetProperty(ref _totalBytesCleanedText, value);
+        }
+
+        public List<CleanupHistoryItem> RecentCleanups
+        {
+            get => _recentCleanups;
+            set => SetProperty(ref _recentCleanups, value);
+        }
+
         public ICommand OptimizeRamCommand { get; }
         public ICommand ExecuteRecommendationCommand { get; }
 
@@ -173,6 +187,16 @@ namespace WinCleaner.ViewModels
                 {
                     LastScanTimeText = $"Hace {elapsed.Minutes} min";
                 }
+
+                // Cargar datos de historial de limpiezas
+                var history = _configurationService.CurrentSettings.CleanupHistory;
+                long totalBytes = 0;
+                foreach (var h in history)
+                {
+                    totalBytes += h.BytesCleaned;
+                }
+                TotalBytesCleanedText = CleanableItem.FormatSize(totalBytes);
+                RecentCleanups = history.OrderByDescending(x => x.DateTime).Take(5).ToList();
 
                 // Calcular recomendaciones en tiempo real
                 GenerateRecommendations();

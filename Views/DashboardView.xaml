@@ -391,54 +391,71 @@
             </Border>
 
             <!-- ═══════════════════════════════════════ -->
-            <!-- TARJETA DIAGNÓSTICO ACTIVO -->
+            <!-- TARJETA HISTORIAL DE LIMPIEZAS -->
             <!-- ═══════════════════════════════════════ -->
             <Border Grid.Row="1" Grid.Column="2" Background="#1E293B" BorderBrush="#334155"
                     BorderThickness="1" CornerRadius="14" Margin="6,6,0,0" Padding="18">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
                         <Border Background="#1A1525" CornerRadius="8" Padding="6" Margin="0,0,10,0">
-                            <Path Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h-2v-2h4v8zm0-10h-2V5h2v2z"
+                            <Path Data="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
                                   Fill="#A78BFA" Width="14" Height="14" Stretch="Uniform"/>
                         </Border>
                         <StackPanel>
-                            <TextBlock Text="SISTEMA" FontSize="9" FontWeight="Bold" Foreground="#7C3AED"/>
-                            <TextBlock Text="Diagnóstico Activo" FontSize="15" FontWeight="Bold" Foreground="#F8FAFC"/>
+                            <TextBlock Text="HISTORIAL" FontSize="9" FontWeight="Bold" Foreground="#7C3AED"/>
+                            <TextBlock Text="Espacio Liberado" FontSize="15" FontWeight="Bold" Foreground="#F8FAFC"/>
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Grid Width="72" Height="72" HorizontalAlignment="Center" Margin="0,0,0,16">
-                            <Ellipse Width="72" Height="72" Stroke="#1E293B" StrokeThickness="4" Fill="#0F172A"/>
-                            <Ellipse Width="72" Height="72" Stroke="#6366F1" StrokeThickness="4" Fill="Transparent"
-                                     RenderTransformOrigin="0.5,0.5" StrokeDashArray="7 5">
-                                <Ellipse.RenderTransform><RotateTransform Angle="0"/></Ellipse.RenderTransform>
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="Ellipse.Loaded">
-                                        <BeginStoryboard>
-                                            <Storyboard RepeatBehavior="Forever">
-                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
-                                                                 From="0" To="360" Duration="0:0:3"/>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
-                            <Path Data="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"
-                                  Fill="#6366F1" Width="26" Height="26" Stretch="Uniform"
-                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border Grid.Row="1" Background="#0F172A" CornerRadius="10" Padding="12,10" Margin="0,4,0,10" BorderThickness="1" BorderBrush="#334155">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="TOTAL RECUPERADO" FontSize="8.5" FontWeight="Bold" Foreground="#94A3B8"/>
+                                <TextBlock Text="{Binding TotalBytesCleanedText}" FontSize="20" FontWeight="Bold" Foreground="#A78BFA" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <Path Grid.Column="1" Data="M19.36 10.04C18.61 6.56 15.5 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z"
+                                  Fill="#7C3AED" Width="20" Height="20" Stretch="Uniform" VerticalAlignment="Center" Margin="5,0,0,0"/>
                         </Grid>
-                        <TextBlock Text="Monitoreo en Tiempo Real" FontSize="13" FontWeight="Bold"
-                                   Foreground="#F8FAFC" HorizontalAlignment="Center"/>
-                        <TextBlock Text="WinCleaner supervisa CPU, RAM, GPU y disco continuamente."
-                                   FontSize="10.5" Foreground="#64748B" TextAlignment="Center"
-                                   TextWrapping="Wrap" Margin="0,6,0,0" MaxWidth="220"/>
-                    </StackPanel>
+                    </Border>
+
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Últimas limpiezas:" FontSize="10.5" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding RecentCleanups}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="0,6" Margin="0,0,0,4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding DateText}" FontSize="10.5" Foreground="#94A3B8" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding ItemsCount, StringFormat='{}{0} elementos limpios'}" FontSize="9" Foreground="#64748B"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="1" Text="{Binding SizeText}" FontSize="11.5" FontWeight="Bold" Foreground="#34D399" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

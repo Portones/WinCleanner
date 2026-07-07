@@ -242,7 +242,20 @@ namespace WinCleaner.ViewModels
                 var progressIndicator = new Progress<double>(val => Progress = val);
                 var token = CancellationToken.None;
 
+                long sizeToClean = itemsToClean.Sum(x => x.Size);
                 int cleanedCount = await _cleanupManager.CleanItemsAsync(itemsToClean, progressIndicator, token);
+
+                // Registrar en el historial de limpiezas si se liberó espacio
+                if (cleanedCount > 0 && sizeToClean > 0)
+                {
+                    _configurationService.CurrentSettings.CleanupHistory.Add(new CleanupHistoryItem
+                    {
+                        DateTime = DateTime.Now,
+                        BytesCleaned = sizeToClean,
+                        ItemsCount = cleanedCount
+                    });
+                    _configurationService.SaveSettings();
+                }
 
                 foreach (var cleanedItem in itemsToClean)
                 {
