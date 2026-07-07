@@ -155,6 +155,7 @@ namespace WinCleaner.ViewModels
                                 "Actualización Completada", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 // Refrescar listado
+                IsUpgrading = false;
                 await LoadUpdatesAsync();
             }
             catch (Exception ex)
