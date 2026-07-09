@@ -1,4 +1,4 @@
-# Notas de Lanzamiento - WinCleaner v1.3.0
+# 🚀 WinCleaner v1.3.30 - Release Notes
 
 Esta versión presenta grandes novedades orientadas a la optimización, privacidad del sistema operativo y un control mucho más flexible sobre los programas del equipo, agrupando todos los cambios y mejoras desde la versión **v1.2.2**.
 
