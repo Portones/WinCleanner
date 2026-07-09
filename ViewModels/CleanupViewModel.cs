@@ -24,6 +24,8 @@ namespace WinCleaner.ViewModels
         private bool _isCleaning;
         private double _progress;
         private string _searchText = string.Empty;
+        private string _selectedCategory = "Todos";
+        private List<string> _categories = new() { "Todos" };
         
         private long _totalFoundSize;
         private string _totalFoundSizeText = "0 Bytes";
@@ -33,6 +35,24 @@ namespace WinCleaner.ViewModels
 
         private string _currentSortOption = "Tamaño"; // Tamaño, Nombre, Tipo
         private string _currentSortDirection = "Descendente"; // Descendente, Ascendente
+
+        public string SelectedCategory
+        {
+            get => _selectedCategory;
+            set
+            {
+                if (SetProperty(ref _selectedCategory, value))
+                {
+                    ApplyFilterAndSort();
+                }
+            }
+        }
+
+        public List<string> Categories
+        {
+            get => _categories;
+            set => SetProperty(ref _categories, value);
+        }
 
         public bool IsScanning
         {
@@ -177,6 +197,14 @@ namespace WinCleaner.ViewModels
                     item.PropertyChanged += Item_PropertyChanged;
                 }
 
+                // Cargar categorías dinámicas encontradas
+                var uniqueCategories = _allItems.Select(x => x.FileType).Distinct().OrderBy(x => x).ToList();
+                var newList = new List<string> { "Todos" };
+                newList.AddRange(uniqueCategories);
+                Categories = newList;
+                _selectedCategory = "Todos"; // Asignar a field para no lanzar ApplyFilterAndSort dos veces
+                OnPropertyChanged(nameof(SelectedCategory));
+
                 UpdateSelectedSize();
                 ApplyFilterAndSort();
                 OnPropertyChanged(nameof(CanClean));
@@ -311,6 +339,11 @@ namespace WinCleaner.ViewModels
         private void ApplyFilterAndSort()
         {
             IEnumerable<CleanableItem> query = _allItems;
+
+            if (SelectedCategory != "Todos")
+            {
+                query = query.Where(x => x.FileType == SelectedCategory);
+            }
 
             if (!string.IsNullOrWhiteSpace(SearchText))
             {

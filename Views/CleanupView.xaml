@@ -19,6 +19,25 @@
             <Setter Property="BorderBrush" Value="#334155"/>
             <Setter Property="Padding" Value="8,6"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="#1E293B"/>
+                        <Setter Property="Foreground" Value="#F8FAFC"/>
+                        <Setter Property="Padding" Value="8,6"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#334155"/>
+                                <Setter Property="Foreground" Value="#F8FAFC"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#6366F1"/>
+                                <Setter Property="Foreground" Value="#F8FAFC"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- Estilo para TextBox Moderno -->
@@ -104,6 +123,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- Búsqueda -->
@@ -111,21 +131,24 @@
                 <!-- Caja de texto de búsqueda en tiempo real -->
             </TextBox>
 
+            <!-- Categoría -->
+            <ComboBox Grid.Column="1" Style="{StaticResource ModernComboBox}" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" Width="150" Margin="0,0,10,0"/>
+
             <!-- Ordenar Por -->
-            <ComboBox Grid.Column="1" Style="{StaticResource ModernComboBox}" SelectedValuePath="Content" SelectedValue="{Binding CurrentSortOption}" Width="120" Margin="0,0,10,0">
+            <ComboBox Grid.Column="2" Style="{StaticResource ModernComboBox}" SelectedValuePath="Content" SelectedValue="{Binding CurrentSortOption}" Width="120" Margin="0,0,10,0">
                 <ComboBoxItem Content="Tamaño"/>
                 <ComboBoxItem Content="Nombre"/>
                 <ComboBoxItem Content="Tipo"/>
             </ComboBox>
 
             <!-- Dirección de Ordenación -->
-            <ComboBox Grid.Column="2" Style="{StaticResource ModernComboBox}" SelectedValuePath="Content" SelectedValue="{Binding CurrentSortDirection}" Width="130" Margin="0,0,10,0">
+            <ComboBox Grid.Column="3" Style="{StaticResource ModernComboBox}" SelectedValuePath="Content" SelectedValue="{Binding CurrentSortDirection}" Width="130" Margin="0,0,10,0">
                 <ComboBoxItem Content="Descendente"/>
                 <ComboBoxItem Content="Ascendente"/>
             </ComboBox>
 
             <!-- Acciones de Selección Colectiva -->
-            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+            <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
                 <Button Content="✓ Todo" Style="{StaticResource SidebarButton}" Command="{Binding ToggleAllSelectionCommand}" CommandParameter="True" Padding="8,5" Margin="0,0,5,0"/>
                 <Button Content="✗ Ninguno" Style="{StaticResource SidebarButton}" Command="{Binding ToggleAllSelectionCommand}" CommandParameter="False" Padding="8,5"/>
             </StackPanel>
