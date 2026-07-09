@@ -35,6 +35,7 @@ namespace WinCleaner.ViewModels
 
         private string _currentSortOption = "Tamaño"; // Tamaño, Nombre, Tipo
         private string _currentSortDirection = "Descendente"; // Descendente, Ascendente
+        private bool _isApplyingFilter;
 
         public string SelectedCategory
         {
@@ -324,7 +325,7 @@ namespace WinCleaner.ViewModels
 
         private void Item_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(CleanableItem.IsSelected))
+            if (!_isApplyingFilter && e.PropertyName == nameof(CleanableItem.IsSelected))
             {
                 UpdateSelectedSize();
             }
@@ -370,7 +371,26 @@ namespace WinCleaner.ViewModels
                     : query.OrderBy(x => x.FileType);
             }
 
-            DisplayItems = query.ToList();
+            _isApplyingFilter = true;
+            try
+            {
+                DisplayItems = query.ToList();
+
+                var displayedSet = new HashSet<CleanableItem>(DisplayItems);
+                foreach (var item in _allItems)
+                {
+                    if (item.IsSelected && !displayedSet.Contains(item))
+                    {
+                        item.IsSelected = false;
+                    }
+                }
+            }
+            finally
+            {
+                _isApplyingFilter = false;
+            }
+
+            UpdateSelectedSize();
         }
     }
 }
