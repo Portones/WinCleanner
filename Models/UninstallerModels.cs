@@ -4,8 +4,16 @@ using WinCleaner.Models;
 
 namespace WinCleaner.Models
 {
-    public class InstalledApp
+    public class InstalledApp : ObservableObject
     {
+        private bool _isSelected;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
+        }
+
         public string Name { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         public string Publisher { get; set; } = string.Empty;
@@ -17,6 +25,7 @@ namespace WinCleaner.Models
         public string IconPath { get; set; } = string.Empty;
         public bool IsUwp { get; set; }
         public string PackageFullName { get; set; } = string.Empty;
+        public bool IsBloatware { get; set; }
 
         public string SizeText => EstimatedSize > 0 ? CleanableItem.FormatSize(EstimatedSize) : "Desconocido";
         public string InstallDateText => InstallDate.HasValue ? InstallDate.Value.ToString("dd/MM/yyyy") : "Desconocido";

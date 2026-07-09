@@ -14,6 +14,35 @@ namespace WinCleaner.Services.Implementations
 {
     public class AppUninstallerService : IAppUninstallerService
     {
+        private static readonly HashSet<string> KnownBloatware = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Microsoft.549981C3F5F10", // Cortana
+            "Microsoft.GetHelp",
+            "Microsoft.Getstarted",
+            "Microsoft.Messaging",
+            "Microsoft.MixedReality.Portal",
+            "Microsoft.OneConnect",
+            "Microsoft.People",
+            "Microsoft.SkypeApp",
+            "Microsoft.Xbox.TCUI",
+            "Microsoft.XboxApp",
+            "Microsoft.XboxGameOverlay",
+            "Microsoft.XboxGamingOverlay",
+            "Microsoft.XboxIdentityProvider",
+            "Microsoft.XboxSpeechToTextOverlay",
+            "Microsoft.YourPhone",
+            "Microsoft.ZuneMusic",
+            "Microsoft.ZuneVideo",
+            "Microsoft.MicrosoftSolitaireCollection",
+            "Microsoft.BingNews",
+            "Microsoft.BingWeather",
+            "Microsoft.MicrosoftOfficeHub",
+            "Microsoft.BingSearch",
+            "Microsoft.WindowsFeedbackHub",
+            "Microsoft.WindowsMaps",
+            "Microsoft.StickyNotes",
+            "Microsoft.Office.OneNote"
+        };
         public async Task<List<InstalledApp>> GetInstalledAppsAsync(CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
@@ -145,9 +174,10 @@ namespace WinCleaner.Services.Implementations
                     if (string.IsNullOrEmpty(displayName))
                         continue;
 
-                    // Omitir componentes nativos esenciales de Windows
-                    if (pkg.SignatureKind == Windows.ApplicationModel.PackageSignatureKind.System || 
-                        pkg.Id.PublisherId == "cw5n1h2txyewy") // Clave de firmas nativas de Microsoft
+                    // Omitir componentes nativos esenciales de Windows (a menos que sean bloatware conocido)
+                    bool isBloatware = KnownBloatware.Contains(pkg.Id.Name);
+                    if (!isBloatware && (pkg.SignatureKind == Windows.ApplicationModel.PackageSignatureKind.System || 
+                        pkg.Id.PublisherId == "cw5n1h2txyewy")) // Clave de firmas nativas de Microsoft
                         continue;
 
                     string publisher = pkg.PublisherDisplayName;
@@ -181,7 +211,8 @@ namespace WinCleaner.Services.Implementations
                         EstimatedSize = size,
                         InstallLocation = installLocation,
                         PackageFullName = pkg.Id.FullName,
-                        IsUwp = true
+                        IsUwp = true,
+                        IsBloatware = isBloatware
                     });
                 }
                 catch { }

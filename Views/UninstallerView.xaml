@@ -112,144 +112,290 @@
             </Grid>
         </Border>
 
-        <!-- ═══ TABLA DE APLICACIONES ═══ -->
-        <Border Grid.Row="2" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>   <!-- Cabecera de columnas -->
-                    <RowDefinition Height="*"/>       <!-- Filas de datos -->
-                </Grid.RowDefinitions>
-
-                <!-- ─── Cabecera de columnas ─── -->
-                <Border Grid.Row="0" Background="#0B0F19" CornerRadius="12,12,0,0" Padding="12,10">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>    <!-- Nombre -->
-                            <ColumnDefinition Width="1.2*"/>  <!-- Editor -->
-                            <ColumnDefinition Width="80"/>    <!-- Tipo -->
-                            <ColumnDefinition Width="90"/>    <!-- Tamaño -->
-                            <ColumnDefinition Width="170"/>   <!-- Acción -->
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0" Text="APLICACIÓN" Style="{StaticResource ColumnHeaderStyle}" Margin="4,0,0,0"/>
-                        <TextBlock Grid.Column="1" Text="EDITOR" Style="{StaticResource ColumnHeaderStyle}"/>
-                        <TextBlock Grid.Column="2" Text="TIPO" Style="{StaticResource ColumnHeaderStyle}"/>
-                        <TextBlock Grid.Column="3" Text="TAMAÑO" Style="{StaticResource ColumnHeaderStyle}"/>
-                        <TextBlock Grid.Column="4" Text="ACCIÓN" Style="{StaticResource ColumnHeaderStyle}" HorizontalAlignment="Center"/>
-                    </Grid>
-                </Border>
-
-                <!-- ─── Filas de datos ─── -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding FilteredApps}">
-                        <ItemsControl.ItemTemplate>
+        <!-- ═══ TABLA DE APLICACIONES CON PESTAÑAS ═══ -->
+        <TabControl Grid.Row="2" Background="Transparent" BorderThickness="0" Padding="0">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
                             <DataTemplate>
-                                <!-- Cada fila es un Grid con todas las columnas + botón Desinstalar -->
-                                <Border Padding="12,9" BorderBrush="#1A2540" BorderThickness="0,0,0,1">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="Transparent"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#1A2D4A"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="2*"/>
-                                            <ColumnDefinition Width="1.2*"/>
-                                            <ColumnDefinition Width="80"/>
-                                            <ColumnDefinition Width="90"/>
-                                            <ColumnDefinition Width="170"/>
-                                        </Grid.ColumnDefinitions>
+                                <TextBlock Text="{TemplateBinding Content}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="#94A3B8"/>
+                    <Setter Property="Padding" Value="16,8"/>
+                    <Setter Property="Margin" Value="0,0,8,8"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="Border" CornerRadius="6" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter ContentSource="Header"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#1E293B"/>
+                                        <Setter Property="Foreground" Value="#F8FAFC"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#6366F1"/>
+                                        <Setter Property="Foreground" Value="#F8FAFC"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
 
-                                        <!-- Nombre -->
-                                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="4,0,10,0">
-                                            <TextBlock Text="{Binding DisplayName}" FontSize="12.5" FontWeight="SemiBold"
-                                                       Foreground="#F1F5F9" TextTrimming="CharacterEllipsis"/>
-                                        </StackPanel>
+            <!-- Pestaña 1: Aplicaciones Instaladas -->
+            <TabItem Header="Aplicaciones Instaladas">
+                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>   <!-- Cabecera de columnas -->
+                            <RowDefinition Height="*"/>       <!-- Filas de datos -->
+                        </Grid.RowDefinitions>
 
-                                        <!-- Editor -->
-                                        <TextBlock Grid.Column="1" Text="{Binding Publisher}"
-                                                   FontSize="11" Foreground="#64748B" VerticalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis"/>
+                        <!-- ─── Cabecera de columnas ─── -->
+                        <Border Grid.Row="0" Background="#0B0F19" CornerRadius="12,12,0,0" Padding="12,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>    <!-- Nombre -->
+                                    <ColumnDefinition Width="1.2*"/>  <!-- Editor -->
+                                    <ColumnDefinition Width="80"/>    <!-- Tipo -->
+                                    <ColumnDefinition Width="90"/>    <!-- Tamaño -->
+                                    <ColumnDefinition Width="170"/>   <!-- Acción -->
+                                </Grid.ColumnDefinitions>
 
-                                        <!-- Tipo badge -->
-                                        <Border Grid.Column="2" CornerRadius="5" Padding="6,3" HorizontalAlignment="Left"
-                                                VerticalAlignment="Center">
+                                <TextBlock Grid.Column="0" Text="APLICACIÓN" Style="{StaticResource ColumnHeaderStyle}" Margin="4,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="EDITOR" Style="{StaticResource ColumnHeaderStyle}"/>
+                                <TextBlock Grid.Column="2" Text="TIPO" Style="{StaticResource ColumnHeaderStyle}"/>
+                                <TextBlock Grid.Column="3" Text="TAMAÑO" Style="{StaticResource ColumnHeaderStyle}"/>
+                                <TextBlock Grid.Column="4" Text="ACCIÓN" Style="{StaticResource ColumnHeaderStyle}" HorizontalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- ─── Filas de datos ─── -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding FilteredApps}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="12,9" BorderBrush="#1A2540" BorderThickness="0,0,0,1">
                                             <Border.Style>
                                                 <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="Transparent"/>
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsUwp}" Value="True">
-                                                            <Setter Property="Background" Value="#1E1B4B"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IsUwp}" Value="False">
-                                                            <Setter Property="Background" Value="#0F2233"/>
-                                                        </DataTrigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#1A2D4A"/>
+                                                        </Trigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBlock FontSize="9" FontWeight="Bold" VerticalAlignment="Center">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="1.2*"/>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="90"/>
+                                                    <ColumnDefinition Width="170"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Nombre -->
+                                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="4,0,10,0">
+                                                    <TextBlock Text="{Binding DisplayName}" FontSize="12.5" FontWeight="SemiBold"
+                                                               Foreground="#F1F5F9" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+
+                                                <!-- Editor -->
+                                                <TextBlock Grid.Column="1" Text="{Binding Publisher}"
+                                                           FontSize="11" Foreground="#64748B" VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis"/>
+
+                                                <!-- Tipo badge -->
+                                                <Border Grid.Column="2" CornerRadius="5" Padding="6,3" HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsUwp}" Value="True">
+                                                                    <Setter Property="Background" Value="#1E1B4B"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsUwp}" Value="False">
+                                                                    <Setter Property="Background" Value="#0F2233"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="9" FontWeight="Bold" VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsUwp}" Value="True">
+                                                                        <Setter Property="Text" Value="STORE"/>
+                                                                        <Setter Property="Foreground" Value="#818CF8"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsUwp}" Value="False">
+                                                                        <Setter Property="Text" Value="WIN32"/>
+                                                                        <Setter Property="Foreground" Value="#38BDF8"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+
+                                                <!-- Tamaño -->
+                                                <TextBlock Grid.Column="3" Text="{Binding SizeText}"
+                                                           FontSize="11.5" Foreground="#34D399" FontWeight="SemiBold"
+                                                           VerticalAlignment="Center"/>
+
+                                                <!-- Botón Desinstalar -->
+                                                <Button Grid.Column="4"
+                                                        Command="{Binding DataContext.UninstallCommand, ElementName=UninstallerRoot}"
+                                                        CommandParameter="{Binding}"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                        Height="30" Cursor="Hand">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="bg" CornerRadius="6" Padding="14,0"
+                                                                    Background="#3F0F0F" BorderBrush="#7F1D1D" BorderThickness="1">
+                                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <Path Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+                                                                          Fill="#FCA5A5" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
+                                                                    <TextBlock Text="Desinstalar" FontSize="11.5" FontWeight="Bold" Foreground="#FCA5A5"/>
+                                                                </StackPanel>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="bg" Property="Background" Value="#7F1D1D"/>
+                                                                    <Setter TargetName="bg" Property="BorderBrush" Value="#EF4444"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsPressed" Value="True">
+                                                                    <Setter TargetName="bg" Property="Background" Value="#991B1B"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <!-- Pestaña 2: Bloatware de Windows -->
+            <TabItem Header="Bloatware de Windows">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Cabecera de columnas -->
+                            <Border Grid.Row="0" Background="#0B0F19" CornerRadius="12,12,0,0" Padding="12,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="2.5*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="100"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="SELEC." Style="{StaticResource ColumnHeaderStyle}" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="APLICACIÓN DE SISTEMA" Style="{StaticResource ColumnHeaderStyle}"/>
+                                    <TextBlock Grid.Column="2" Text="IDENTIFICADOR" Style="{StaticResource ColumnHeaderStyle}"/>
+                                    <TextBlock Grid.Column="3" Text="TAMAÑO" Style="{StaticResource ColumnHeaderStyle}"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Filas de datos -->
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl ItemsSource="{Binding BloatwareApps}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="12,9" BorderBrush="#1A2540" BorderThickness="0,0,0,1">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="Transparent"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsUwp}" Value="True">
-                                                                <Setter Property="Text" Value="STORE"/>
-                                                                <Setter Property="Foreground" Value="#818CF8"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsUwp}" Value="False">
-                                                                <Setter Property="Text" Value="WIN32"/>
-                                                                <Setter Property="Foreground" Value="#38BDF8"/>
-                                                            </DataTrigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#1A2D4A"/>
+                                                            </Trigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </Border>
+                                                </Border.Style>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="60"/>
+                                                        <ColumnDefinition Width="2.5*"/>
+                                                        <ColumnDefinition Width="2*"/>
+                                                        <ColumnDefinition Width="100"/>
+                                                    </Grid.ColumnDefinitions>
 
-                                        <!-- Tamaño -->
-                                        <TextBlock Grid.Column="3" Text="{Binding SizeText}"
-                                                   FontSize="11.5" Foreground="#34D399" FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"/>
+                                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding DisplayName}" FontSize="12.5" FontWeight="SemiBold" Foreground="#F1F5F9" TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
 
-                                        <!-- ════ BOTÓN DESINSTALAR EN LA PROPIA FILA ════ -->
-                                        <Button Grid.Column="4"
-                                                Command="{Binding DataContext.UninstallCommand, ElementName=UninstallerRoot}"
-                                                CommandParameter="{Binding}"
-                                                HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                Height="30" Cursor="Hand">
-                                            <Button.Template>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border x:Name="bg" CornerRadius="6" Padding="14,0"
-                                                            Background="#3F0F0F" BorderBrush="#7F1D1D" BorderThickness="1">
-                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                            <Path Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                                                                  Fill="#FCA5A5" Width="12" Height="12" Stretch="Uniform" Margin="0,0,6,0"/>
-                                                            <TextBlock Text="Desinstalar" FontSize="11.5" FontWeight="Bold" Foreground="#FCA5A5"/>
-                                                        </StackPanel>
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="bg" Property="Background" Value="#7F1D1D"/>
-                                                            <Setter TargetName="bg" Property="BorderBrush" Value="#EF4444"/>
-                                                        </Trigger>
-                                                        <Trigger Property="IsPressed" Value="True">
-                                                            <Setter TargetName="bg" Property="Background" Value="#991B1B"/>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                        </Button>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-            </Grid>
-        </Border>
+                                                    <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="11.5" Foreground="#64748B" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Grid.Column="3" Text="{Binding SizeText}" FontSize="11.5" Foreground="#34D399" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <!-- Acciones inferiores -->
+                    <Grid Grid.Row="1" Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <Button Content="✓ Seleccionar Todo" Style="{StaticResource SidebarButton}" Command="{Binding ToggleAllBloatwareSelectionCommand}" CommandParameter="True" Padding="12,6" Margin="0,0,8,0"/>
+                            <Button Content="✗ Deseleccionar Todo" Style="{StaticResource SidebarButton}" Command="{Binding ToggleAllBloatwareSelectionCommand}" CommandParameter="False" Padding="12,6"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="2" Content="Desinstalar Bloatware Seleccionado" Command="{Binding UninstallSelectedBloatwareCommand}" Height="36" Padding="20,0" Background="#EF4444" Foreground="White" FontWeight="Bold" Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="border" CornerRadius="8" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#DC2626"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="border" Property="Background" Value="#B91C1C"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
 
         <!-- ═══ PANEL DE RESIDUOS (overlay completo) ═══ -->
         <Border Grid.Row="2" Background="#1E293B" BorderBrush="#818CF8" BorderThickness="2"

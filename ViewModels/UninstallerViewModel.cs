@@ -29,7 +29,7 @@ namespace WinCleaner.ViewModels
         {
             get
             {
-                var query = _apps.AsQueryable();
+                var query = _apps.Where(a => !a.IsBloatware).AsQueryable();
 
                 if (!ShowStoreApps)
                 {
@@ -45,6 +45,22 @@ namespace WinCleaner.ViewModels
                     string search = SearchText.Trim();
                     query = query.Where(a => a.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase) || 
                                              a.Publisher.Contains(search, StringComparison.OrdinalIgnoreCase));
+                }
+
+                return query.ToList();
+            }
+        }
+
+        public List<InstalledApp> BloatwareApps
+        {
+            get
+            {
+                var query = _apps.Where(a => a.IsBloatware).AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(SearchText))
+                {
+                    string search = SearchText.Trim();
+                    query = query.Where(a => a.DisplayName.Contains(search, StringComparison.OrdinalIgnoreCase));
                 }
 
                 return query.ToList();
@@ -71,6 +87,7 @@ namespace WinCleaner.ViewModels
                 if (SetProperty(ref _searchText, value))
                 {
                     OnPropertyChanged(nameof(FilteredApps));
+                    OnPropertyChanged(nameof(BloatwareApps));
                 }
             }
         }
@@ -129,6 +146,8 @@ namespace WinCleaner.ViewModels
         public ICommand UninstallCommand { get; }
         public ICommand CleanResidualsCommand { get; }
         public ICommand CloseResidualsCardCommand { get; }
+        public ICommand UninstallSelectedBloatwareCommand { get; }
+        public ICommand ToggleAllBloatwareSelectionCommand { get; }
 
         public UninstallerViewModel(IAppUninstallerService uninstallerService)
         {
@@ -138,6 +157,8 @@ namespace WinCleaner.ViewModels
             UninstallCommand = new AsyncRelayCommand<InstalledApp>(UninstallAsync);
             CleanResidualsCommand = new AsyncRelayCommand(CleanResidualsAsync);
             CloseResidualsCardCommand = new RelayCommand(() => ShowResidualsCard = false);
+            UninstallSelectedBloatwareCommand = new AsyncRelayCommand(UninstallSelectedBloatwareAsync);
+            ToggleAllBloatwareSelectionCommand = new RelayCommand<string>(ToggleAllBloatwareSelection);
 
             _ = LoadAppsAsync();
         }
@@ -156,7 +177,8 @@ namespace WinCleaner.ViewModels
                 var list = await _uninstallerService.GetInstalledAppsAsync(CancellationToken.None);
                 _apps = list;
                 OnPropertyChanged(nameof(FilteredApps));
-                StatusMessage = $"Se encontraron {_apps.Count} aplicaciones en el equipo.";
+                OnPropertyChanged(nameof(BloatwareApps));
+                StatusMessage = $"Se encontraron {_apps.Count(a => !a.IsBloatware)} aplicaciones y {_apps.Count(a => a.IsBloatware)} componentes de bloatware.";
             }
             catch (Exception ex)
             {
@@ -296,6 +318,60 @@ namespace WinCleaner.ViewModels
                 StatusMessage = $"Error al limpiar residuos: {ex.Message}";
                 MessageBox.Show($"Error al intentar limpiar los residuos.\nDetalle: {ex.Message}", 
                                 "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private void ToggleAllBloatwareSelection(string? isSelectedStr)
+        {
+            if (bool.TryParse(isSelectedStr, out bool isSelected))
+            {
+                foreach (var app in BloatwareApps)
+                {
+                    app.IsSelected = isSelected;
+                }
+            }
+        }
+
+        private async Task UninstallSelectedBloatwareAsync()
+        {
+            var selected = BloatwareApps.Where(x => x.IsSelected).ToList();
+            if (selected.Count == 0)
+            {
+                MessageBox.Show("No has seleccionado ninguna aplicación de bloatware.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                $"¿Desinstalar las {selected.Count} aplicaciones de bloatware seleccionadas?\n\nEsta acción removerá estas aplicaciones de tu sistema de forma segura.",
+                "Confirmar Desinstalación en Lote", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (confirm != MessageBoxResult.Yes) return;
+
+            IsLoading = true;
+            int successCount = 0;
+
+            try
+            {
+                for (int i = 0; i < selected.Count; i++)
+                {
+                    var app = selected[i];
+                    StatusMessage = $"[ {i + 1} / {selected.Count} ] Desinstalando {app.DisplayName}...";
+                    bool success = await _uninstallerService.UninstallAppAsync(app, CancellationToken.None);
+                    if (success) successCount++;
+                }
+
+                StatusMessage = $"Desinstalación completada. Se eliminaron {successCount} de {selected.Count} apps de bloatware.";
+                MessageBox.Show($"Se han desinstalado {successCount} de {selected.Count} aplicaciones de bloatware con éxito.", 
+                                "Desinstalación por Lotes Completa", MessageBoxButton.OK, MessageBoxImage.Information);
+                await LoadAppsAsync();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "Error al desinstalar bloatware.";
+                Serilog.Log.Error(ex, "Error en UninstallerViewModel.UninstallSelectedBloatwareAsync");
             }
             finally
             {
