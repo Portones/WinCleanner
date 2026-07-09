@@ -16,6 +16,15 @@ namespace WinCleaner.Services.Interfaces
         bool GetErrorReportingState();
         Task SetErrorReportingStateAsync(bool disableErrorReporting);
         
+        bool GetAdvertisingIdState();
+        Task SetAdvertisingIdStateAsync(bool disableAdvertisingId);
+
+        bool GetCortanaState();
+        Task SetCortanaStateAsync(bool disableCortana);
+
+        bool GetSharedExperiencesState();
+        Task SetSharedExperiencesStateAsync(bool disableSharedExperiences);
+
         Task<bool> SetGameModeStateAsync(bool enableGameMode);
         Task<string> GetActivePowerSchemeAsync();
 

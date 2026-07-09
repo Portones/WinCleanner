@@ -144,7 +144,7 @@
                         <Separator Background="#334155" Margin="0,0,0,15"/>
 
                         <!-- Switch Informes de Error -->
-                        <Grid Margin="0,0,0,5">
+                        <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
@@ -154,6 +154,51 @@
                                 <TextBlock Text="Bloquea las notificaciones automáticas de errores de software a los servidores de Windows." FontSize="10.5" Foreground="#64748B" TextWrapping="Wrap" Margin="0,2,0,0"/>
                             </StackPanel>
                             <CheckBox Grid.Column="1" IsChecked="{Binding IsErrorReportingDisabled}" Command="{Binding ToggleErrorReportingCommand}" Style="{StaticResource ToggleSwitchStyle}"/>
+                        </Grid>
+
+                        <Separator Background="#334155" Margin="0,0,0,15"/>
+
+                        <!-- Switch ID de Publicidad -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Desactivar ID de Publicidad" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Bloquea los anuncios dirigidos y personalizados basados en las aplicaciones instaladas." FontSize="10.5" Foreground="#64748B" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding IsAdvertisingIdDisabled}" Command="{Binding ToggleAdvertisingIdCommand}" Style="{StaticResource ToggleSwitchStyle}"/>
+                        </Grid>
+
+                        <Separator Background="#334155" Margin="0,0,0,15"/>
+
+                        <!-- Switch Cortana -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Desactivar Cortana Search" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Deshabilita las directivas del asistente Cortana y reduce búsquedas invasivas de fondo." FontSize="10.5" Foreground="#64748B" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding IsCortanaDisabled}" Command="{Binding ToggleCortanaCommand}" Style="{StaticResource ToggleSwitchStyle}"/>
+                        </Grid>
+
+                        <Separator Background="#334155" Margin="0,0,0,15"/>
+
+                        <!-- Switch Experiencias Compartidas -->
+                        <Grid Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Desactivar Experiencias Compartidas" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Detiene la comunicación local en segundo plano (Rome SDK) con otros dispositivos." FontSize="10.5" Foreground="#64748B" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding IsSharedExperiencesDisabled}" Command="{Binding ToggleSharedExperiencesCommand}" Style="{StaticResource ToggleSwitchStyle}"/>
                         </Grid>
                     </StackPanel>
                 </Border>

@@ -276,6 +276,153 @@ namespace WinCleaner.Services.Implementations
             });
         }
 
+        public bool GetAdvertisingIdState()
+        {
+            try
+            {
+                using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo", false))
+                {
+                    if (key != null)
+                    {
+                        var val = key.GetValue("DisabledByGroupPolicy");
+                        if (val != null && (int)val == 1)
+                        {
+                            return true; // Desactivado
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        public async Task SetAdvertisingIdStateAsync(bool disableAdvertisingId)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo", true))
+                    {
+                        if (disableAdvertisingId)
+                        {
+                            key.SetValue("DisabledByGroupPolicy", 1, RegistryValueKind.DWord);
+                            Log.Information("Directiva DisabledByGroupPolicy activada (1) en HKLM.");
+                        }
+                        else
+                        {
+                            key.DeleteValue("DisabledByGroupPolicy", false);
+                            Log.Information("Directiva DisabledByGroupPolicy desactivada/eliminada en HKLM.");
+                        }
+                    }
+
+                    // También en HKCU por si acaso
+                    using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo", true))
+                    {
+                        key.SetValue("Enabled", disableAdvertisingId ? 0 : 1, RegistryValueKind.DWord);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error al configurar ID de publicidad.");
+                }
+            });
+        }
+
+        public bool GetCortanaState()
+        {
+            try
+            {
+                using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Windows Search", false))
+                {
+                    if (key != null)
+                    {
+                        var val = key.GetValue("AllowCortana");
+                        if (val != null && (int)val == 0)
+                        {
+                            return true; // Desactivado (AllowCortana = 0)
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        public async Task SetCortanaStateAsync(bool disableCortana)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\Windows Search", true))
+                    {
+                        if (disableCortana)
+                        {
+                            key.SetValue("AllowCortana", 0, RegistryValueKind.DWord);
+                            Log.Information("Directiva AllowCortana desactivada (0) en HKLM.");
+                        }
+                        else
+                        {
+                            key.DeleteValue("AllowCortana", false);
+                            Log.Information("Directiva AllowCortana restaurada en HKLM.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error al configurar Cortana.");
+                }
+            });
+        }
+
+        public bool GetSharedExperiencesState()
+        {
+            try
+            {
+                using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System", false))
+                {
+                    if (key != null)
+                    {
+                        var val = key.GetValue("EnableRomeSdk");
+                        if (val != null && (int)val == 0)
+                        {
+                            return true; // Desactivado
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        public async Task SetSharedExperiencesStateAsync(bool disableSharedExperiences)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System", true))
+                    {
+                        if (disableSharedExperiences)
+                        {
+                            key.SetValue("EnableRomeSdk", 0, RegistryValueKind.DWord);
+                            Log.Information("Rome SDK (Shared Experiences) desactivado (0) en HKLM.");
+                        }
+                        else
+                        {
+                            key.DeleteValue("EnableRomeSdk", false);
+                            Log.Information("Rome SDK (Shared Experiences) restaurado en HKLM.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error al configurar Experiencias Compartidas.");
+                }
+            });
+        }
+
         public async Task<bool> SetGameModeStateAsync(bool enableGameMode)
         {
             return await Task.Run(() =>

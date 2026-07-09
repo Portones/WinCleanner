@@ -18,6 +18,9 @@ namespace WinCleaner.ViewModels
 
         private bool _isTelemetryDisabled;
         private bool _isErrorReportingDisabled;
+        private bool _isAdvertisingIdDisabled;
+        private bool _isCortanaDisabled;
+        private bool _isSharedExperiencesDisabled;
         private bool _isGameModeEnabled;
         private string _activePowerScheme = "Cargando...";
         private string _activeDns = "Cargando...";
@@ -38,6 +41,24 @@ namespace WinCleaner.ViewModels
         {
             get => _isErrorReportingDisabled;
             set => SetProperty(ref _isErrorReportingDisabled, value);
+        }
+
+        public bool IsAdvertisingIdDisabled
+        {
+            get => _isAdvertisingIdDisabled;
+            set => SetProperty(ref _isAdvertisingIdDisabled, value);
+        }
+
+        public bool IsCortanaDisabled
+        {
+            get => _isCortanaDisabled;
+            set => SetProperty(ref _isCortanaDisabled, value);
+        }
+
+        public bool IsSharedExperiencesDisabled
+        {
+            get => _isSharedExperiencesDisabled;
+            set => SetProperty(ref _isSharedExperiencesDisabled, value);
         }
 
         public bool IsGameModeEnabled
@@ -96,6 +117,9 @@ namespace WinCleaner.ViewModels
 
         public ICommand ToggleTelemetryCommand { get; }
         public ICommand ToggleErrorReportingCommand { get; }
+        public ICommand ToggleAdvertisingIdCommand { get; }
+        public ICommand ToggleCortanaCommand { get; }
+        public ICommand ToggleSharedExperiencesCommand { get; }
         public ICommand ToggleGameModeCommand { get; }
         public ICommand RunDnsTestCommand { get; }
         public ICommand ApplyDnsCommand { get; }
@@ -109,6 +133,9 @@ namespace WinCleaner.ViewModels
 
             ToggleTelemetryCommand = new AsyncRelayCommand(ToggleTelemetryAsync);
             ToggleErrorReportingCommand = new AsyncRelayCommand(ToggleErrorReportingAsync);
+            ToggleAdvertisingIdCommand = new AsyncRelayCommand(ToggleAdvertisingIdAsync);
+            ToggleCortanaCommand = new AsyncRelayCommand(ToggleCortanaAsync);
+            ToggleSharedExperiencesCommand = new AsyncRelayCommand(ToggleSharedExperiencesAsync);
             ToggleGameModeCommand = new AsyncRelayCommand(ToggleGameModeAsync);
             RunDnsTestCommand = new AsyncRelayCommand(RunDnsTestAsync);
             ApplyDnsCommand = new AsyncRelayCommand<DnsServerItem>(ApplyDnsAsync);
@@ -134,6 +161,9 @@ namespace WinCleaner.ViewModels
             {
                 IsTelemetryDisabled = _performanceService.GetTelemetryState();
                 IsErrorReportingDisabled = _performanceService.GetErrorReportingState();
+                IsAdvertisingIdDisabled = _performanceService.GetAdvertisingIdState();
+                IsCortanaDisabled = _performanceService.GetCortanaState();
+                IsSharedExperiencesDisabled = _performanceService.GetSharedExperiencesState();
                 ActivePowerScheme = await _performanceService.GetActivePowerSchemeAsync();
                 ActiveDns = await _performanceService.GetActiveDnsAsync(CancellationToken.None);
 
@@ -168,6 +198,48 @@ namespace WinCleaner.ViewModels
             {
                 await _performanceService.SetErrorReportingStateAsync(IsErrorReportingDisabled);
                 StatusMessage = IsErrorReportingDisabled ? "Informes de error desactivados." : "Informes de error activados.";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
+            }
+        }
+
+        private async Task ToggleAdvertisingIdAsync()
+        {
+            StatusMessage = "Modificando directivas de ID de publicidad...";
+            try
+            {
+                await _performanceService.SetAdvertisingIdStateAsync(IsAdvertisingIdDisabled);
+                StatusMessage = IsAdvertisingIdDisabled ? "ID de publicidad desactivado." : "ID de publicidad activado.";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
+            }
+        }
+
+        private async Task ToggleCortanaAsync()
+        {
+            StatusMessage = "Modificando políticas de Cortana...";
+            try
+            {
+                await _performanceService.SetCortanaStateAsync(IsCortanaDisabled);
+                StatusMessage = IsCortanaDisabled ? "Cortana desactivada con éxito." : "Cortana activada con éxito.";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
+            }
+        }
+
+        private async Task ToggleSharedExperiencesAsync()
+        {
+            StatusMessage = "Modificando políticas de experiencias compartidas...";
+            try
+            {
+                await _performanceService.SetSharedExperiencesStateAsync(IsSharedExperiencesDisabled);
+                StatusMessage = IsSharedExperiencesDisabled ? "Experiencias compartidas desactivadas." : "Experiencias compartidas activadas.";
             }
             catch (Exception ex)
             {
