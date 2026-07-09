@@ -67,6 +67,13 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 * **Capturas Obsoletas**: Escaneo en directorios comunes (Imágenes, Escritorio, Descargas) para encontrar capturas de pantalla de antigüedad configurable (ej. > 30 días) con previsualización eficiente en miniaturas.
 * **Fotos Duplicadas (SHA-256)**: Algoritmo de doble filtro (agrupamiento rápido por peso y posterior coincidencia de firma SHA-256) para identificar y comparar imágenes idénticas lado a lado con casillas de acción.
 
+### 7. Desinstalador por Lotes y Debloater de Windows
+* **Doble Pestaña**: Separación clara entre aplicaciones instaladas comunes y aplicaciones UWP nativas preinstaladas por el fabricante (Bloatware de Windows).
+* **Desinstalación por Lotes**: Selección de múltiples aplicaciones a la vez mediante casillas de verificación para ejecutarlas secuencialmente en segundo plano con indicadores de progreso dinámicos.
+
+### 8. Desactivador de Telemetría y Privacidad (Privacy Tweaker)
+* **Control Completo**: Interruptores modernos tipo ToggleSwitch en el apartado de Rendimiento para desactivar la telemetría corporativa (DiagTrack), los informes de error de Windows (WER), el ID de publicidad invasivo para anuncios personalizados, el asistente de Cortana y las conexiones entre dispositivos en segundo plano (Rome SDK).
+
 ---
 
 ## 🛠️ Configuración y Logs
