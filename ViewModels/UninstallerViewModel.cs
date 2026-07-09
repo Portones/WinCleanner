@@ -370,7 +370,6 @@ namespace WinCleaner.ViewModels
                 StatusMessage = $"Desinstalación completada. Se eliminaron {successCount} de {selected.Count} apps de bloatware.";
                 MessageBox.Show($"Se han desinstalado {successCount} de {selected.Count} aplicaciones de bloatware con éxito.", 
                                 "Desinstalación por Lotes Completa", MessageBoxButton.OK, MessageBoxImage.Information);
-                await LoadAppsAsync();
             }
             catch (Exception ex)
             {
@@ -381,6 +380,8 @@ namespace WinCleaner.ViewModels
             {
                 IsLoading = false;
             }
+
+            await LoadAppsAsync();
         }
 
         private void ToggleAllAppsSelection(string? isSelectedStr)
@@ -424,7 +425,6 @@ namespace WinCleaner.ViewModels
                 StatusMessage = $"Desinstalación completada. Se procesaron {successCount} de {selected.Count} aplicaciones.";
                 MessageBox.Show($"Se han procesado {successCount} de {selected.Count} desinstalaciones con éxito.", 
                                 "Desinstalación por Lotes Completa", MessageBoxButton.OK, MessageBoxImage.Information);
-                await LoadAppsAsync();
             }
             catch (Exception ex)
             {
@@ -435,6 +435,8 @@ namespace WinCleaner.ViewModels
             {
                 IsLoading = false;
             }
+
+            await LoadAppsAsync();
         }
     }
 }
