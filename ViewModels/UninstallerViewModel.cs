@@ -148,6 +148,8 @@ namespace WinCleaner.ViewModels
         public ICommand CloseResidualsCardCommand { get; }
         public ICommand UninstallSelectedBloatwareCommand { get; }
         public ICommand ToggleAllBloatwareSelectionCommand { get; }
+        public ICommand UninstallSelectedAppsCommand { get; }
+        public ICommand ToggleAllAppsSelectionCommand { get; }
 
         public UninstallerViewModel(IAppUninstallerService uninstallerService)
         {
@@ -159,6 +161,8 @@ namespace WinCleaner.ViewModels
             CloseResidualsCardCommand = new RelayCommand(() => ShowResidualsCard = false);
             UninstallSelectedBloatwareCommand = new AsyncRelayCommand(UninstallSelectedBloatwareAsync);
             ToggleAllBloatwareSelectionCommand = new RelayCommand<string>(ToggleAllBloatwareSelection);
+            UninstallSelectedAppsCommand = new AsyncRelayCommand(UninstallSelectedAppsAsync);
+            ToggleAllAppsSelectionCommand = new RelayCommand<string>(ToggleAllAppsSelection);
 
             _ = LoadAppsAsync();
         }
@@ -372,6 +376,60 @@ namespace WinCleaner.ViewModels
             {
                 StatusMessage = "Error al desinstalar bloatware.";
                 Serilog.Log.Error(ex, "Error en UninstallerViewModel.UninstallSelectedBloatwareAsync");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private void ToggleAllAppsSelection(string? isSelectedStr)
+        {
+            if (bool.TryParse(isSelectedStr, out bool isSelected))
+            {
+                foreach (var app in FilteredApps)
+                {
+                    app.IsSelected = isSelected;
+                }
+            }
+        }
+
+        private async Task UninstallSelectedAppsAsync()
+        {
+            var selected = FilteredApps.Where(x => x.IsSelected).ToList();
+            if (selected.Count == 0)
+            {
+                MessageBox.Show("No has seleccionado ninguna aplicación para desinstalar.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                $"¿Desinstalar las {selected.Count} aplicaciones seleccionadas?\n\nEsta acción ejecutará sus desinstaladores secuencialmente de forma silenciosa o asistida.",
+                "Confirmar Desinstalación en Lote", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (confirm != MessageBoxResult.Yes) return;
+
+            IsLoading = true;
+            int successCount = 0;
+
+            try
+            {
+                for (int i = 0; i < selected.Count; i++)
+                {
+                    var app = selected[i];
+                    StatusMessage = $"[ {i + 1} / {selected.Count} ] Desinstalando {app.DisplayName}...";
+                    bool success = await _uninstallerService.UninstallAppAsync(app, CancellationToken.None);
+                    if (success) successCount++;
+                }
+
+                StatusMessage = $"Desinstalación completada. Se procesaron {successCount} de {selected.Count} aplicaciones.";
+                MessageBox.Show($"Se han procesado {successCount} de {selected.Count} desinstalaciones con éxito.", 
+                                "Desinstalación por Lotes Completa", MessageBoxButton.OK, MessageBoxImage.Information);
+                await LoadAppsAsync();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "Error al desinstalar aplicaciones en lote.";
+                Serilog.Log.Error(ex, "Error en UninstallerViewModel.UninstallSelectedAppsAsync");
             }
             finally
             {
