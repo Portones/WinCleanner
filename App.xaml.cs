@@ -41,6 +41,14 @@ namespace WinCleaner
 
                 ServiceProvider = services.BuildServiceProvider();
 
+                // Comprobar modo de limpieza silenciosa
+                if (e.Args.Contains("--silent-clean", StringComparer.OrdinalIgnoreCase))
+                {
+                    Log.Information("Iniciando en modo silencioso (--silent-clean)...");
+                    _ = RunSilentCleanAsync();
+                    return;
+                }
+
                 // Configurar icono en la bandeja de sistema (SysTray)
                 SetupSystemTray();
 
@@ -125,6 +133,7 @@ namespace WinCleaner
             services.AddSingleton<IAppUpdaterService, AppUpdaterService>();
             services.AddSingleton<IPhotosCleanupService, PhotosCleanupService>();
             services.AddSingleton<ITemperatureService, TemperatureService>();
+            services.AddSingleton<IScheduledMaintenanceService, ScheduledMaintenanceService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
@@ -282,6 +291,38 @@ namespace WinCleaner
             var mainWindow = ServiceProvider.GetService<MainWindow>();
             mainWindow?.Close();
             Shutdown();
+        }
+
+        private async Task RunSilentCleanAsync()
+        {
+            try
+            {
+                var cleanupManager = ServiceProvider.GetRequiredService<ICleanupManagerService>();
+
+                Log.Information("Modo Silencioso: Iniciando escaneo de archivos temporales...");
+                var scanResult = await cleanupManager.ScanAllAsync(new Progress<double>(), CancellationToken.None);
+
+                if (scanResult.Items.Count > 0)
+                {
+                    Log.Information("Modo Silencioso: Se encontraron {Count} elementos para limpiar. Liberando espacio...", scanResult.Items.Count);
+                    int cleanedCount = await cleanupManager.CleanItemsAsync(scanResult.Items, new Progress<double>(), CancellationToken.None);
+                    Log.Information("Modo Silencioso: Limpieza finalizada. Se limpiaron {Count} de {Total} elementos ({Size} bytes liberados).", 
+                                    cleanedCount, scanResult.Items.Count, scanResult.TotalSize);
+                }
+                else
+                {
+                    Log.Information("Modo Silencioso: No se encontraron elementos para limpiar.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error crítico durante la limpieza silenciosa en segundo plano.");
+            }
+            finally
+            {
+                Log.Information("Modo Silencioso: Finalizando aplicación.");
+                Shutdown();
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)

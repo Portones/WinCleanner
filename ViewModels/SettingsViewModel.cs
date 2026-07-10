@@ -10,6 +10,9 @@ namespace WinCleaner.ViewModels
     public class SettingsViewModel : ViewModelBase
     {
         private readonly IConfigurationService _configurationService;
+        private readonly IScheduledMaintenanceService _maintenanceService;
+
+        private string _maintenanceNextRunText = "Cargando...";
 
         private ObservableCollection<string> _excludedDirectories = null!;
         private ObservableCollection<string> _customScanDirectories = null!;
@@ -54,14 +57,79 @@ namespace WinCleaner.ViewModels
             set => SetProperty(ref _customScanDirectories, value);
         }
 
+        public bool MaintenanceTaskEnabled
+        {
+            get => _configurationService.CurrentSettings.MaintenanceTaskEnabled;
+            set
+            {
+                if (_configurationService.CurrentSettings.MaintenanceTaskEnabled != value)
+                {
+                    _configurationService.CurrentSettings.MaintenanceTaskEnabled = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                    UpdateMaintenanceTaskState();
+                }
+            }
+        }
+
+        public string MaintenanceFrequency
+        {
+            get => _configurationService.CurrentSettings.MaintenanceFrequency;
+            set
+            {
+                if (_configurationService.CurrentSettings.MaintenanceFrequency != value)
+                {
+                    _configurationService.CurrentSettings.MaintenanceFrequency = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string MaintenanceDay
+        {
+            get => _configurationService.CurrentSettings.MaintenanceDay;
+            set
+            {
+                if (_configurationService.CurrentSettings.MaintenanceDay != value)
+                {
+                    _configurationService.CurrentSettings.MaintenanceDay = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string MaintenanceTime
+        {
+            get => _configurationService.CurrentSettings.MaintenanceTime;
+            set
+            {
+                if (_configurationService.CurrentSettings.MaintenanceTime != value)
+                {
+                    _configurationService.CurrentSettings.MaintenanceTime = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string MaintenanceNextRunText
+        {
+            get => _maintenanceNextRunText;
+            set => SetProperty(ref _maintenanceNextRunText, value);
+        }
+
         public ICommand AddExcludedDirectoryCommand { get; }
         public ICommand RemoveExcludedDirectoryCommand { get; }
         public ICommand AddCustomDirectoryCommand { get; }
         public ICommand RemoveCustomDirectoryCommand { get; }
+        public ICommand SaveMaintenanceCommand { get; }
 
-        public SettingsViewModel(IConfigurationService configurationService)
+        public SettingsViewModel(IConfigurationService configurationService, IScheduledMaintenanceService maintenanceService)
         {
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
+            _maintenanceService = maintenanceService ?? throw new ArgumentNullException(nameof(maintenanceService));
 
             // Vincular colecciones observables y responder a cambios de colección automáticamente
             InitializeCollections();
@@ -70,6 +138,9 @@ namespace WinCleaner.ViewModels
             RemoveExcludedDirectoryCommand = new RelayCommand<string>(RemoveExcludedDirectory);
             AddCustomDirectoryCommand = new RelayCommand(AddCustomDirectory);
             RemoveCustomDirectoryCommand = new RelayCommand<string>(RemoveCustomDirectory);
+            SaveMaintenanceCommand = new RelayCommand(SaveMaintenanceSettings);
+
+            RefreshMaintenanceStatus();
         }
 
         private void InitializeCollections()
@@ -138,6 +209,78 @@ namespace WinCleaner.ViewModels
             if (!string.IsNullOrEmpty(path) && _customScanDirectories.Contains(path))
             {
                 _customScanDirectories.Remove(path);
+            }
+        }
+
+        private void RefreshMaintenanceStatus()
+        {
+            bool realEnabled = _maintenanceService.IsTaskEnabled();
+            if (realEnabled != _configurationService.CurrentSettings.MaintenanceTaskEnabled)
+            {
+                _configurationService.CurrentSettings.MaintenanceTaskEnabled = realEnabled;
+                _configurationService.SaveSettings();
+                OnPropertyChanged(nameof(MaintenanceTaskEnabled));
+            }
+
+            MaintenanceNextRunText = realEnabled ? _maintenanceService.GetTaskNextRunTime() : "Desactivada";
+        }
+
+        private void UpdateMaintenanceTaskState()
+        {
+            try
+            {
+                if (MaintenanceTaskEnabled)
+                {
+                    _maintenanceService.EnableMaintenanceTask(
+                        MaintenanceFrequency,
+                        MaintenanceDay,
+                        MaintenanceTime
+                    );
+                    System.Windows.MessageBox.Show("Tarea de mantenimiento programada correctamente en el sistema.", 
+                                                    "Mantenimiento Programado", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+                else
+                {
+                    _maintenanceService.DisableMaintenanceTask();
+                    System.Windows.MessageBox.Show("Tarea de mantenimiento eliminada del sistema.", 
+                                                    "Mantenimiento Programado", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                }
+                RefreshMaintenanceStatus();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error al conmutar el estado de la tarea:\n{ex.Message}", 
+                                                "Error de Programación", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                _configurationService.CurrentSettings.MaintenanceTaskEnabled = !MaintenanceTaskEnabled;
+                _configurationService.SaveSettings();
+                OnPropertyChanged(nameof(MaintenanceTaskEnabled));
+            }
+        }
+
+        private void SaveMaintenanceSettings()
+        {
+            if (!MaintenanceTaskEnabled)
+            {
+                System.Windows.MessageBox.Show("Active la casilla de habilitación para programar la tarea.", 
+                                                "Mantenimiento Programado", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                _maintenanceService.EnableMaintenanceTask(
+                    MaintenanceFrequency,
+                    MaintenanceDay,
+                    MaintenanceTime
+                );
+                System.Windows.MessageBox.Show("Configuración de mantenimiento automático guardada y aplicada en Windows.", 
+                                                "Configuración Guardada", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                RefreshMaintenanceStatus();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error al guardar la tarea programada:\n{ex.Message}", 
+                                                "Error de Configuración", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
     }

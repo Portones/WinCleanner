@@ -161,7 +161,7 @@
                 </Border>
 
                 <!-- CARD 3: CARPETAS PERSONALIZADAS DE ESCANEO -->
-                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="18" Margin="0,0,0,10">
+                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="18" Margin="0,0,0,15">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -193,6 +193,147 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Grid>
+                </Border>
+
+                <!-- CARD 4: PROGRAMAR MANTENIMIENTO AUTOMÁTICO -->
+                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="18" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="Mantenimiento Programado" FontSize="16" FontWeight="Bold" Foreground="#818CF8" Margin="0,0,0,15"/>
+
+                        <!-- Habilitar Checkbox -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Habilitar Limpieza Automática en Segundo Plano" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Registra una tarea silenciosa en Windows para limpiar archivos temporales automáticamente según la frecuencia programada." FontSize="11" Foreground="#64748B" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            
+                            <CheckBox Grid.Column="1" IsChecked="{Binding MaintenanceTaskEnabled, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#334155" Margin="0,0,0,15"/>
+
+                        <!-- Panel de Parámetros (Habilitado solo si la tarea está activa) -->
+                        <StackPanel IsEnabled="{Binding MaintenanceTaskEnabled}">
+                            
+                            <!-- Frecuencia -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Frecuencia de Ejecución" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                    <TextBlock Text="Elija con qué frecuencia Windows debe disparar la limpieza automática." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                
+                                <ComboBox Grid.Column="1" SelectedValue="{Binding MaintenanceFrequency, Mode=TwoWay}" SelectedValuePath="Tag" Height="28" VerticalAlignment="Center" Background="#0F172A" BorderBrush="#334155" Foreground="#F8FAFC">
+                                    <ComboBoxItem Content="Semanal" Tag="weekly"/>
+                                    <ComboBoxItem Content="Mensual" Tag="monthly"/>
+                                    <ComboBoxItem Content="Al iniciar sesión" Tag="onlogon"/>
+                                    <ComboBoxItem Content="Al estar inactivo (Idle)" Tag="idle"/>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- Parámetros Semanal (Día de la semana) -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MaintenanceFrequency}" Value="weekly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Día de la Semana" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                    <TextBlock Text="Seleccione el día en que se ejecutará la tarea." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <ComboBox Grid.Column="1" SelectedValue="{Binding MaintenanceDay, Mode=TwoWay}" SelectedValuePath="Tag" Height="28" VerticalAlignment="Center" Background="#0F172A" BorderBrush="#334155" Foreground="#F8FAFC">
+                                    <ComboBoxItem Content="Lunes" Tag="MON"/>
+                                    <ComboBoxItem Content="Martes" Tag="TUE"/>
+                                    <ComboBoxItem Content="Miércoles" Tag="WED"/>
+                                    <ComboBoxItem Content="Jueves" Tag="THU"/>
+                                    <ComboBoxItem Content="Viernes" Tag="FRI"/>
+                                    <ComboBoxItem Content="Sábado" Tag="SAT"/>
+                                    <ComboBoxItem Content="Domingo" Tag="SUN"/>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- Parámetros Mensual (Día del mes) -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MaintenanceFrequency}" Value="monthly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Día del Mes" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                    <TextBlock Text="Ingrese el día del mes (1 al 31)." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <TextBox Grid.Column="1" Text="{Binding MaintenanceDay, Mode=TwoWay}" Height="28" VerticalAlignment="Center" Background="#0F172A" BorderBrush="#334155" Foreground="#F8FAFC" Padding="5,3"/>
+                            </Grid>
+
+                            <!-- Hora de inicio (Para semanal y mensual) -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MaintenanceFrequency}" Value="weekly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding MaintenanceFrequency}" Value="monthly">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Hora de Inicio" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                    <TextBlock Text="Especifique la hora en formato 24h (ej: 03:00)." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <TextBox Grid.Column="1" Text="{Binding MaintenanceTime, Mode=TwoWay}" Height="28" VerticalAlignment="Center" Background="#0F172A" BorderBrush="#334155" Foreground="#F8FAFC" Padding="5,3"/>
+                            </Grid>
+
+                            <!-- Estado de la Próxima Ejecución -->
+                            <Grid Margin="0,5,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Próxima Ejecución Programada:" FontSize="12.5" FontWeight="SemiBold" Foreground="#94A3B8"/>
+                                <TextBlock Grid.Column="1" Text="{Binding MaintenanceNextRunText}" FontSize="12.5" FontWeight="Bold" Foreground="#10B981"/>
+                            </Grid>
+
+                            <!-- Guardar Configuración -->
+                            <Button Content="Guardar y Aplicar Programación" Command="{Binding SaveMaintenanceCommand}" Style="{StaticResource ActionButton}" HorizontalAlignment="Stretch" Height="34" Padding="0"/>
+                        </StackPanel>
+                    </StackPanel>
                 </Border>
             </StackPanel>
         </ScrollViewer>

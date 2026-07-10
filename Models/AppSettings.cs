@@ -26,10 +26,11 @@ namespace WinCleaner.Models
         // Directorios personalizados para analizar
         public List<string> CustomScanDirectories { get; set; } = new();
 
-        // Configuración de análisis automáticos
-        public bool EnableScheduledScan { get; set; } = false;
-        public string ScanFrequency { get; set; } = "Weekly"; // Daily, Weekly, Monthly
-        public TimeSpan ScheduledScanTime { get; set; } = new TimeSpan(12, 0, 0); // 12:00 PM
+        // Configuración de mantenimiento automático programado
+        public bool MaintenanceTaskEnabled { get; set; } = false;
+        public string MaintenanceFrequency { get; set; } = "weekly"; // weekly, monthly, onlogon, idle
+        public string MaintenanceDay { get; set; } = "SUN"; // SUN, MON, etc. o número de día del mes
+        public string MaintenanceTime { get; set; } = "03:00";
 
         // Backup de registros de inicio desactivados
         public List<StartupRegistryBackup> DisabledStartupRegistryApps { get; set; } = new();
