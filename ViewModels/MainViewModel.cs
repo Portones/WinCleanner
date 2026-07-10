@@ -22,6 +22,7 @@ namespace WinCleaner.ViewModels
         private readonly SettingsViewModel _settingsViewModel;
         private readonly RamOptimizerViewModel _ramOptimizerViewModel;
         private readonly TemperatureViewModel _temperatureViewModel;
+        private readonly BatteryViewModel _batteryViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -51,7 +52,8 @@ namespace WinCleaner.ViewModels
             PhotosCleanupViewModel photosCleanupViewModel,
             SettingsViewModel settingsViewModel,
             RamOptimizerViewModel ramOptimizerViewModel,
-            TemperatureViewModel temperatureViewModel)
+            TemperatureViewModel temperatureViewModel,
+            BatteryViewModel batteryViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -67,6 +69,7 @@ namespace WinCleaner.ViewModels
             _settingsViewModel = settingsViewModel ?? throw new ArgumentNullException(nameof(settingsViewModel));
             _ramOptimizerViewModel = ramOptimizerViewModel ?? throw new ArgumentNullException(nameof(ramOptimizerViewModel));
             _temperatureViewModel = temperatureViewModel ?? throw new ArgumentNullException(nameof(temperatureViewModel));
+            _batteryViewModel = batteryViewModel ?? throw new ArgumentNullException(nameof(batteryViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -86,6 +89,10 @@ namespace WinCleaner.ViewModels
             else if (ActivePage.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
             {
                 _temperatureViewModel.StopTimer();
+            }
+            else if (ActivePage.Equals("Battery", StringComparison.OrdinalIgnoreCase))
+            {
+                _batteryViewModel.StopTimer();
             }
 
             ActivePage = destination;
@@ -143,6 +150,11 @@ namespace WinCleaner.ViewModels
             {
                 _temperatureViewModel.StartTimer();
                 CurrentPage = _temperatureViewModel;
+            }
+            else if (destination.Equals("Battery", StringComparison.OrdinalIgnoreCase))
+            {
+                _batteryViewModel.StartTimer();
+                CurrentPage = _batteryViewModel;
             }
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {

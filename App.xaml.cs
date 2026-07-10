@@ -134,6 +134,7 @@ namespace WinCleaner
             services.AddSingleton<IPhotosCleanupService, PhotosCleanupService>();
             services.AddSingleton<ITemperatureService, TemperatureService>();
             services.AddSingleton<IScheduledMaintenanceService, ScheduledMaintenanceService>();
+            services.AddSingleton<IBatteryService, BatteryService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
@@ -158,6 +159,7 @@ namespace WinCleaner
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<RamOptimizerViewModel>();
             services.AddSingleton<TemperatureViewModel>();
+            services.AddSingleton<BatteryViewModel>();
 
             // Vistas
             services.AddSingleton<MainWindow>();

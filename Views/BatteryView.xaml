@@ -1,0 +1,232 @@
+<UserControl x:Class="WinCleaner.Views.BatteryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             x:Name="BatteryRoot">
+
+    <UserControl.Resources>
+        <!-- Estilos para alternar visibilidad según HasBattery sin usar conversores -->
+        <Style x:Key="HasBatteryPanelStyle" TargetType="Grid">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasBattery}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="NoBatteryPanelStyle" TargetType="Grid">
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasBattery}" Value="False">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Estilo de cabecera de columna -->
+        <Style x:Key="ColumnHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- Cabecera -->
+            <RowDefinition Height="Auto"/>
+            <!-- Área de Contenido Swappable -->
+            <RowDefinition Height="*"/>
+            <!-- Pie de Estado -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="Gestión de Batería y Energía" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+                <TextBlock Text="Supervise el estado físico de su batería, calcule el desgaste de celdas y configure perfiles de energía para optimizar la autonomía." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- PANEL 1: SI NO HAY BATERÍA (EQUIPO DE ESCRITORIO) -->
+        <Grid Grid.Row="1" Style="{StaticResource NoBatteryPanelStyle}">
+            <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="40" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="500">
+                <StackPanel HorizontalAlignment="Center">
+                    <Path Data="M15.5 1h-7C7.67 1 7 1.67 7 2.5v1C7 4.33 7.67 5 8.5 5h7c.83 0 1.5-.67 1.5-1.5v-1c0-.83-.67-1.5-1.5-1.5zm.5 8.7L12.5 13H15c.55 0 1 .45 1 1v4c0 .55-.45 1-1 1h-2v2c0 .55-.45 1-1 1h-1c-.55 0-1-.45-1-1v-2H8c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h2.5L7 11.3V7.5c0-.83.67-1.5 1.5-1.5h7c.83 0 1.5.67 1.5 1.5v2.2z" 
+                          Fill="#64748B" Width="48" Height="48" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                    <TextBlock Text="Equipo de Escritorio / CA" FontSize="18" FontWeight="Bold" Foreground="#F8FAFC" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="No se detectó ninguna batería interna en este equipo. Las opciones de optimización de batería y niveles de desgaste solo están habilitados para dispositivos portátiles." 
+                               FontSize="12" Foreground="#94A3B8" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                    
+                    <Border Height="1" Background="#334155" Margin="0,5,0,15"/>
+                    <TextBlock Text="Alimentación activa: Corriente alterna estable de red eléctrica." FontSize="11.5" Foreground="#10B981" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- PANEL 2: SI HAY BATERÍA (PORTÁTIL) -->
+        <Grid Grid.Row="1" Style="{StaticResource HasBatteryPanelStyle}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="1.8*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- COLUMNA IZQUIERDA: GAUGE DE CARGA Y AUTONOMÍA -->
+            <Border Grid.Column="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Estado de Carga" FontSize="15" FontWeight="Bold" Foreground="#F8FAFC" HorizontalAlignment="Center"/>
+
+                    <!-- Progreso Circular -->
+                    <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,15">
+                        <Grid Width="140" Height="140">
+                            <Ellipse Stroke="#152033" StrokeThickness="11" Width="130" Height="130"/>
+                            <Ellipse Stroke="{Binding CurrentBattery.StatusColor}" StrokeThickness="11" Width="130" Height="130"
+                                     StrokeDashCap="Round" RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <RotateTransform Angle="-90"/>
+                                </Ellipse.RenderTransform>
+                                <Ellipse.StrokeDashArray>
+                                    <Binding Path="CurrentBattery.ChargePercentage" Converter="{StaticResource CircularProgressConverter}" ConverterParameter="100"/>
+                                </Ellipse.StrokeDashArray>
+                            </Ellipse>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentBattery.ChargePercentage, StringFormat='{}{0:F0}%'}" FontSize="28" FontWeight="Bold" Foreground="#F8FAFC" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding CurrentBattery.ChargeStatusText}" FontSize="10.5" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                    <!-- Detalle de autonomía -->
+                    <StackPanel Grid.Row="2">
+                        <Border Height="1" Background="#334155" Margin="0,0,0,12"/>
+                        <TextBlock Text="Autonomía Estimada Restante:" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding CurrentBattery.EstimatedTimeRemainingText}" FontSize="20" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- COLUMNA DERECHA: PLANES, SALUD Y CONSEJOS -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- CARD 1: SELECCIONAR PLAN DE ENERGÍA -->
+                <Border Grid.Row="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="220"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="Plan de Energía Activo" FontSize="14.5" FontWeight="Bold" Foreground="#F8FAFC"/>
+                            <TextBlock Text="Cambie el plan para optimizar consumo." FontSize="11.5" Foreground="#64748B" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding PowerPlans}" SelectedItem="{Binding SelectedPowerPlan, Mode=TwoWay}" DisplayMemberPath="Name" Height="30" VerticalAlignment="Center" Background="#0F172A" BorderBrush="#334155" Foreground="#F8FAFC"/>
+                    </Grid>
+                </Border>
+
+                <!-- CARD 2: SALUD Y CAPACIDAD -->
+                <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Estado Físico de la Batería" FontSize="14.5" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,10"/>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Capacidad Original -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Capacidad Original" FontSize="10.5" Foreground="#64748B"/>
+                                <TextBlock Text="{Binding CurrentBattery.DesignedCapacity, StringFormat='{}{0:F0} mWh'}" FontSize="14.5" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <!-- Capacidad Actual -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Capacidad Actual" FontSize="10.5" Foreground="#64748B"/>
+                                <TextBlock Text="{Binding CurrentBattery.FullChargedCapacity, StringFormat='{}{0:F0} mWh'}" FontSize="14.5" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <!-- Desgaste / Salud -->
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Salud de la Celda" FontSize="10.5" Foreground="#64748B"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                    <TextBlock Text="{Binding CurrentBattery.BatteryHealthState}" FontSize="14" FontWeight="Bold" Foreground="{Binding CurrentBattery.StatusColor}"/>
+                                    <TextBlock Text=" (" FontSize="12" Foreground="#64748B"/>
+                                    <TextBlock Text="{Binding CurrentBattery.WearLevel, StringFormat='{}{0:F1}% desg.'}" FontSize="11" Foreground="#64748B" FontWeight="SemiBold"/>
+                                    <TextBlock Text=")" FontSize="12" Foreground="#64748B"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- CARD 3: RECOMENDACIONES DE ENERGÍA -->
+                <Border Grid.Row="2" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Consejos de Optimización Energética" FontSize="14.5" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,0,8"/>
+
+                        <!-- Listado de consejos -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding Tips}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="0,6" BorderBrush="#1A2540" BorderThickness="0,0,0,1">
+                                            <TextBlock Text="{Binding}" FontSize="11.5" Foreground="#94A3B8" TextWrapping="Wrap"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- PIE DE ESTADO -->
+        <Border Grid.Row="2" Background="#0B0F19" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="12,10" Margin="0,10,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="Refrescar" Command="{Binding RefreshCommand}" Style="{StaticResource SidebarButton}" Height="26" Padding="10,0" Margin="10,0,0,0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
