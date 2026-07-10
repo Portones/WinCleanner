@@ -145,6 +145,7 @@ namespace WinCleaner
             services.AddSingleton<UpdaterViewModel>();
             services.AddSingleton<PhotosCleanupViewModel>();
             services.AddSingleton<SettingsViewModel>();
+            services.AddSingleton<RamOptimizerViewModel>();
 
             // Vistas
             services.AddSingleton<MainWindow>();

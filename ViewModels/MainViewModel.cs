@@ -20,6 +20,7 @@ namespace WinCleaner.ViewModels
         private readonly UpdaterViewModel _updaterViewModel;
         private readonly PhotosCleanupViewModel _photosCleanupViewModel;
         private readonly SettingsViewModel _settingsViewModel;
+        private readonly RamOptimizerViewModel _ramOptimizerViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -47,7 +48,8 @@ namespace WinCleaner.ViewModels
             PerformanceViewModel performanceViewModel,
             UpdaterViewModel updaterViewModel,
             PhotosCleanupViewModel photosCleanupViewModel,
-            SettingsViewModel settingsViewModel)
+            SettingsViewModel settingsViewModel,
+            RamOptimizerViewModel ramOptimizerViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -61,6 +63,7 @@ namespace WinCleaner.ViewModels
             _updaterViewModel = updaterViewModel ?? throw new ArgumentNullException(nameof(updaterViewModel));
             _photosCleanupViewModel = photosCleanupViewModel ?? throw new ArgumentNullException(nameof(photosCleanupViewModel));
             _settingsViewModel = settingsViewModel ?? throw new ArgumentNullException(nameof(settingsViewModel));
+            _ramOptimizerViewModel = ramOptimizerViewModel ?? throw new ArgumentNullException(nameof(ramOptimizerViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -71,6 +74,12 @@ namespace WinCleaner.ViewModels
         private void Navigate(string? destination)
         {
             if (string.IsNullOrEmpty(destination)) return;
+
+            // Detener refresco automático de procesos si salimos de Optimizar RAM
+            if (ActivePage.Equals("RamOptimizer", StringComparison.OrdinalIgnoreCase))
+            {
+                _ramOptimizerViewModel.StopTimer();
+            }
 
             ActivePage = destination;
 
@@ -117,6 +126,11 @@ namespace WinCleaner.ViewModels
             else if (destination.Equals("PhotosCleanup", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _photosCleanupViewModel;
+            }
+            else if (destination.Equals("RamOptimizer", StringComparison.OrdinalIgnoreCase))
+            {
+                _ramOptimizerViewModel.StartTimer();
+                CurrentPage = _ramOptimizerViewModel;
             }
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {
