@@ -1,4 +1,4 @@
-# WinCleaner - Panel de Control y Limpieza Profesional (v1.3.0)
+# WinCleaner - Panel de Control y Limpieza Profesional (v1.4.0)
 
 Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 desarrollado con .NET 9, WPF y arquitectura MVVM.
 
@@ -73,6 +73,15 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 
 ### 8. Desactivador de Telemetría y Privacidad (Privacy Tweaker)
 * **Control Completo**: Interruptores modernos tipo ToggleSwitch en el apartado de Rendimiento para desactivar la telemetría corporativa (DiagTrack), los informes de error de Windows (WER), el ID de publicidad invasivo para anuncios personalizados, el asistente de Cortana y las conexiones entre dispositivos en segundo plano (Rome SDK).
+
+### 9. Optimizador de RAM e Inicio
+* **Limpieza de RAM**: Compactación inteligente de la memoria física activa con un solo clic.
+* **Procesos en Tiempo Real**: Lista interactiva de procesos activos que permite buscar y finalizar tareas consumidoras.
+* **Tiempos de Arranque**: Análisis histórico de velocidad de inicio basado en el Visor de Eventos nativo de Windows.
+
+### 10. Monitoreo Térmico y Mantenimiento Programado
+* **Temperaturas**: Dashboard térmico en tiempo real para CPU, GPU y Almacenamiento con Gauges circulares y alertas de calor.
+* **Programación**: Configuración de tareas de limpieza silenciosas en segundo plano (`--silent-clean`) registradas de forma segura en Windows Task Scheduler.
 
 ---
 
