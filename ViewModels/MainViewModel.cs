@@ -21,6 +21,7 @@ namespace WinCleaner.ViewModels
         private readonly PhotosCleanupViewModel _photosCleanupViewModel;
         private readonly SettingsViewModel _settingsViewModel;
         private readonly RamOptimizerViewModel _ramOptimizerViewModel;
+        private readonly TemperatureViewModel _temperatureViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -49,7 +50,8 @@ namespace WinCleaner.ViewModels
             UpdaterViewModel updaterViewModel,
             PhotosCleanupViewModel photosCleanupViewModel,
             SettingsViewModel settingsViewModel,
-            RamOptimizerViewModel ramOptimizerViewModel)
+            RamOptimizerViewModel ramOptimizerViewModel,
+            TemperatureViewModel temperatureViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -64,6 +66,7 @@ namespace WinCleaner.ViewModels
             _photosCleanupViewModel = photosCleanupViewModel ?? throw new ArgumentNullException(nameof(photosCleanupViewModel));
             _settingsViewModel = settingsViewModel ?? throw new ArgumentNullException(nameof(settingsViewModel));
             _ramOptimizerViewModel = ramOptimizerViewModel ?? throw new ArgumentNullException(nameof(ramOptimizerViewModel));
+            _temperatureViewModel = temperatureViewModel ?? throw new ArgumentNullException(nameof(temperatureViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -79,6 +82,10 @@ namespace WinCleaner.ViewModels
             if (ActivePage.Equals("RamOptimizer", StringComparison.OrdinalIgnoreCase))
             {
                 _ramOptimizerViewModel.StopTimer();
+            }
+            else if (ActivePage.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
+            {
+                _temperatureViewModel.StopTimer();
             }
 
             ActivePage = destination;
@@ -131,6 +138,11 @@ namespace WinCleaner.ViewModels
             {
                 _ramOptimizerViewModel.StartTimer();
                 CurrentPage = _ramOptimizerViewModel;
+            }
+            else if (destination.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
+            {
+                _temperatureViewModel.StartTimer();
+                CurrentPage = _temperatureViewModel;
             }
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {
