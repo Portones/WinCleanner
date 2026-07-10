@@ -115,6 +115,7 @@ namespace WinCleaner
             services.AddSingleton<ICleanupManagerService, CleanupManagerService>();
             services.AddSingleton<IDuplicateFinderService, DuplicateFinderService>();
             services.AddSingleton<IStartupManagerService, StartupManagerService>();
+            services.AddSingleton<IBootAnalyzerService, BootAnalyzerService>();
             services.AddSingleton<IRamBoosterService, RamBoosterService>();
             services.AddSingleton<IWindowsServicesService, WindowsServicesService>();
             services.AddSingleton<IContextMenuService, ContextMenuService>();

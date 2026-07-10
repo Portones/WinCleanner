@@ -70,7 +70,7 @@
                             <TextBlock Text="{Binding RamUsagePercentage, StringFormat={}{0}%}" FontSize="11" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Right"/>
                         </Grid>
                         <!-- ProgressBar usando estilo premium del sistema -->
-                        <ProgressBar Value="{Binding RamUsagePercentage}" Style="{StaticResource RamPhysicalProgressBar}" Height="10" Margin="0,0,0,12"/>
+                        <ProgressBar Value="{Binding RamUsagePercentage, Mode=OneWay}" Minimum="0" Maximum="100" Style="{StaticResource RamPhysicalProgressBar}" Height="10" Margin="0,0,0,12"/>
                         <TextBlock Text="{Binding RamUsageText}" FontSize="12" Foreground="#64748B" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
