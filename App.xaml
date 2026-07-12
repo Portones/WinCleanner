@@ -87,6 +87,8 @@
         <helpers:CircularProgressConverter x:Key="CircularProgressConverter"/>
         <!-- Convertidor de Botón de Pestaña Activa -->
         <helpers:ActiveTabBrushConverter x:Key="ActiveTabBrushConverter"/>
+        <!-- Convertidor de Igualdad genérico -->
+        <helpers:EqualityConverter x:Key="EqualityConverter"/>
 
         <!-- Estilo para Botón del Panel Lateral con Enlace Activo -->
         <Style x:Key="SidebarNavButton" TargetType="Button" BasedOn="{StaticResource SidebarButton}">

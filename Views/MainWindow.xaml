@@ -55,7 +55,8 @@
                         <Button Content="Dashboard" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" Tag="Dashboard" Margin="0,0,0,4"/>
                         <Button Content="Analizador de Disco" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="DiskAnalyzer" Tag="DiskAnalyzer" Margin="0,0,0,4"/>
                         <Button Content="Temperaturas" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Temperature" Tag="Temperature" Margin="0,0,0,4"/>
-                        <Button Content="Energía y Batería" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Battery" Tag="Battery" Margin="0,0,0,18"/>
+                        <Button Content="Energía y Batería" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Battery" Tag="Battery" Margin="0,0,0,4"/>
+                        <Button Content="Controladores" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Drivers" Tag="Drivers" Margin="0,0,0,18"/>
 
                         <!-- SECCIÓN 2: LIMPIEZA DE ESPACIO -->
                         <TextBlock Text="LIMPIEZA DE ESPACIO" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,0,0,6"/>
@@ -132,6 +133,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:BatteryViewModel}">
                     <local:BatteryView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:DriverViewModel}">
+                    <local:DriverView/>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                     <local:SettingsView/>

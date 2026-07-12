@@ -23,6 +23,7 @@ namespace WinCleaner.ViewModels
         private readonly RamOptimizerViewModel _ramOptimizerViewModel;
         private readonly TemperatureViewModel _temperatureViewModel;
         private readonly BatteryViewModel _batteryViewModel;
+        private readonly DriverViewModel _driverViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -53,7 +54,8 @@ namespace WinCleaner.ViewModels
             SettingsViewModel settingsViewModel,
             RamOptimizerViewModel ramOptimizerViewModel,
             TemperatureViewModel temperatureViewModel,
-            BatteryViewModel batteryViewModel)
+            BatteryViewModel batteryViewModel,
+            DriverViewModel driverViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -70,6 +72,7 @@ namespace WinCleaner.ViewModels
             _ramOptimizerViewModel = ramOptimizerViewModel ?? throw new ArgumentNullException(nameof(ramOptimizerViewModel));
             _temperatureViewModel = temperatureViewModel ?? throw new ArgumentNullException(nameof(temperatureViewModel));
             _batteryViewModel = batteryViewModel ?? throw new ArgumentNullException(nameof(batteryViewModel));
+            _driverViewModel = driverViewModel ?? throw new ArgumentNullException(nameof(driverViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -155,6 +158,10 @@ namespace WinCleaner.ViewModels
             {
                 _batteryViewModel.StartTimer();
                 CurrentPage = _batteryViewModel;
+            }
+            else if (destination.Equals("Drivers", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _driverViewModel;
             }
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {
