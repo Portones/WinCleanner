@@ -24,6 +24,7 @@ Desktop.ini
 WinCleanerSetup.exe
 WinCleanerSetup.zip
 *.zip
-Releases/
+Releases/*.exe
+Releases/*.zip
 
 

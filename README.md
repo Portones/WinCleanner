@@ -1,4 +1,4 @@
-# WinCleaner - Panel de Control y Limpieza Profesional (v1.4.0)
+# WinCleaner - Panel de Control y Limpieza Profesional (v1.5.0)
 
 Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 desarrollado con .NET 9, WPF y arquitectura MVVM.
 
@@ -82,6 +82,16 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 ### 10. Monitoreo Térmico y Mantenimiento Programado
 * **Temperaturas**: Dashboard térmico en tiempo real para CPU, GPU y Almacenamiento con Gauges circulares y alertas de calor.
 * **Programación**: Configuración de tareas de limpieza silenciosas en segundo plano (`--silent-clean`) registradas de forma segura en Windows Task Scheduler.
+
+### 11. Gestión de Batería y Energía
+* **Gráfica de Carga**: Gauge circular e indicador dinámico de tiempo de autonomía restante.
+* **Salud Física de Celdas**: Contraste entre la capacidad nominal original y la máxima de carga actual (en mWh) para reportar desgaste del hardware.
+* **Planes de Energía**: Listado y conmutación de esquemas de energía (Equilibrado, Economizador, Alto Rendimiento) mediante `powercfg.exe`.
+
+### 12. Gestor de Controladores (Driver Inspector)
+* **Escaneo Local**: Consulta WMI de controladores firmados clasificados por categorías con indicador de antigüedad (> 3 años).
+* **Actualizaciones Oficiales**: Detección dinámica de controladores pendientes mediante la API COM nativa del agente de Windows Update.
+* **Herramientas de Windows**: Acceso directo al Administrador de Dispositivos (`devmgmt.msc`) y ventana de actualización de controladores opcionales.
 
 ---
 
