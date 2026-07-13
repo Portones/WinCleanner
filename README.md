@@ -99,3 +99,12 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 
 * **Ajustes (`settings.json`)**: Ubicado en `%APPDATA%\WinCleaner\settings.json`. Permite cambiar el idioma ("es"/"en"), tema ("Dark"/"Light") y directorios excluidos (lista negra de sistema como System32).
 * **Diagnósticos (Logs)**: Historial detallado del sistema en `%APPDATA%\WinCleaner\Logs\cleaner_log.txt` gestionado por **Serilog**.
+
+---
+
+## ⚠️ Descargo de Responsabilidad (Disclaimer)
+
+Esta herramienta realiza tareas de limpieza, optimización y modificación del sistema, incluyendo la eliminación permanente de archivos (evitando la Papelera de reciclaje) y la gestión de procesos o servicios. 
+
+El uso de **WinCleaner** es bajo su propia responsabilidad. Los desarrolladores no se hacen responsables de pérdidas de datos, fallos en el sistema o cualquier otro perjuicio derivado de la ejecución de esta aplicación. Se recomienda encarecidamente realizar copias de seguridad de sus datos importantes antes de proceder con limpiezas profundas o modificaciones críticas.
+
