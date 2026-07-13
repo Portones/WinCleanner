@@ -54,6 +54,8 @@
             <RowDefinition Height="Auto"/>
             <!-- Dashboard de Resumen -->
             <RowDefinition Height="Auto"/>
+            <!-- Sugerencia Inteligente -->
+            <RowDefinition Height="Auto"/>
             <!-- Barra de Acciones e Inicios -->
             <RowDefinition Height="Auto"/>
             <!-- Selector de Filtros -->
@@ -110,8 +112,22 @@
             </Border>
         </Grid>
 
+        <!-- ALERTA DE SUGERENCIA DE CONTROLADORES CONTEXTUAL -->
+        <Border Grid.Row="2" Background="#1E293B" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,15"
+                Visibility="{Binding ShowDriverSuggestion, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="{Binding DriverSuggestionText}" FontSize="12.5" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="Buscar Actualizaciones" Style="{StaticResource ActionButton}" Command="{Binding OpenWindowsUpdateCommand}" Height="30" Padding="15,0" Margin="15,0,0,0" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
         <!-- BARRA DE ACCIONES E INICIOS -->
-        <Border Grid.Row="2" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+        <Border Grid.Row="3" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="250"/>
@@ -136,7 +152,7 @@
         </Border>
 
         <!-- SELECTOR DE FILTROS (CATEGORÍAS) -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="5,0,0,10">
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="5,0,0,10">
             <RadioButton Content="Todos" IsChecked="{Binding SelectedCategory, ConverterParameter=TODOS, Converter={StaticResource EqualityConverter}}" Style="{StaticResource FilterRadioButton}"/>
             <RadioButton Content="Vídeo" IsChecked="{Binding SelectedCategory, ConverterParameter=DISPLAY, Converter={StaticResource EqualityConverter}}" Style="{StaticResource FilterRadioButton}"/>
             <RadioButton Content="Red / Wi-Fi" IsChecked="{Binding SelectedCategory, ConverterParameter=NET, Converter={StaticResource EqualityConverter}}" Style="{StaticResource FilterRadioButton}"/>
@@ -146,7 +162,7 @@
         </StackPanel>
 
         <!-- TAB CONTROL PARA DIVISION ENTRE INSTALADOS Y ACTUALIZACIONES -->
-        <TabControl Grid.Row="4" Background="Transparent" BorderThickness="0" Padding="0">
+        <TabControl Grid.Row="5" Background="Transparent" BorderThickness="0" Padding="0">
             <TabControl.Resources>
                 <!-- Ocultar cabeceras por defecto para usar un estilo plano segmentado -->
                 <Style TargetType="TabItem">
@@ -231,7 +247,7 @@
         </TabControl>
 
         <!-- PIE DE ESTADO -->
-        <Border Grid.Row="5" Background="#0B0F19" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="12,10" Margin="0,10,0,0">
+        <Border Grid.Row="6" Background="#0B0F19" BorderBrush="#334155" BorderThickness="0,1,0,0" Padding="12,10" Margin="0,10,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

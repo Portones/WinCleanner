@@ -20,6 +20,20 @@ namespace WinCleaner.ViewModels
         private List<StartupApp> _startupApps = new();
         private string _statusMessage = "Listo para escanear programas de inicio.";
         private BootInfo? _bootInfo;
+        private string _startupSuggestionText = string.Empty;
+        private bool _hasStartupSuggestions;
+
+        public string StartupSuggestionText
+        {
+            get => _startupSuggestionText;
+            set => SetProperty(ref _startupSuggestionText, value);
+        }
+
+        public bool HasStartupSuggestions
+        {
+            get => _hasStartupSuggestions;
+            set => SetProperty(ref _hasStartupSuggestions, value);
+        }
 
         public bool IsLoading
         {
@@ -62,6 +76,7 @@ namespace WinCleaner.ViewModels
 
         public ICommand LoadAppsCommand { get; }
         public ICommand ToggleAppCommand { get; }
+        public ICommand DisableRecommendedCommand { get; }
 
         public StartupViewModel(IStartupManagerService startupManager, IBootAnalyzerService bootAnalyzer)
         {
@@ -70,6 +85,7 @@ namespace WinCleaner.ViewModels
 
             LoadAppsCommand = new AsyncRelayCommand(LoadAppsAsync);
             ToggleAppCommand = new AsyncRelayCommand<StartupApp>(ToggleAppAsync);
+            DisableRecommendedCommand = new AsyncRelayCommand(DisableRecommendedAsync);
 
             // Carga automática inicial
             _ = LoadAppsAsync();
@@ -99,6 +115,20 @@ namespace WinCleaner.ViewModels
                 var apps = await _startupManager.GetStartupAppsAsync(token);
                 StartupApps = apps.OrderBy(x => x.Name).ToList();
                 StatusMessage = $"Se encontraron {StartupApps.Count} aplicaciones en el inicio.";
+
+                var highImpactApps = StartupApps.Where(x => x.IsEnabled && x.Impact.Equals("Alto", StringComparison.OrdinalIgnoreCase)).ToList();
+                if (highImpactApps.Any())
+                {
+                    HasStartupSuggestions = true;
+                    string names = string.Join(", ", highImpactApps.Take(3).Select(x => x.Name));
+                    if (highImpactApps.Count > 3) names += "...";
+                    StartupSuggestionText = $"💡 Sugerencia: Hay programas de alto impacto como {names} configurados para iniciarse automáticamente. Desactívalos para reducir el tiempo de arranque.";
+                }
+                else
+                {
+                    HasStartupSuggestions = false;
+                    StartupSuggestionText = string.Empty;
+                }
             }
             catch (Exception ex)
             {
@@ -145,6 +175,37 @@ namespace WinCleaner.ViewModels
                                 "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Log.Error(ex, "Error al conmutar inicio de {Name}.", app.Name);
             }
+        }
+
+        private async Task DisableRecommendedAsync()
+        {
+            var highImpactApps = StartupApps.Where(x => x.IsEnabled && x.Impact.Equals("Alto", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (!highImpactApps.Any()) return;
+
+            StatusMessage = "Desactivando programas recomendados...";
+            int disabledCount = 0;
+            var token = CancellationToken.None;
+
+            foreach (var app in highImpactApps)
+            {
+                try
+                {
+                    bool success = await _startupManager.ToggleStartupAppAsync(app, false, token);
+                    if (success)
+                    {
+                        app.IsEnabled = false;
+                        disabledCount++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error al desactivar {Name} en la optimización recomendada.", app.Name);
+                }
+            }
+
+            StatusMessage = $"Optimización completada. Se desactivaron {disabledCount} programas de alto impacto.";
+            HasStartupSuggestions = false;
+            StartupSuggestionText = string.Empty;
         }
     }
 }

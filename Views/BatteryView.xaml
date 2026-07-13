@@ -10,6 +10,7 @@
              x:Name="BatteryRoot">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <!-- Estilos para alternar visibilidad según HasBattery sin usar conversores -->
         <Style x:Key="HasBatteryPanelStyle" TargetType="Grid">
             <Setter Property="Visibility" Value="Visible"/>
@@ -125,11 +126,26 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
+                <!-- ALERTA DE SUGERENCIA DE BATERÍA CONTEXTUAL -->
+                <Border Grid.Row="0" Background="#1E293B" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12"
+                        Visibility="{Binding ShowBatterySuggestion, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="{Binding BatterySuggestionText}" FontSize="12" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Activar Ahorro" Style="{StaticResource ActionButton}" Command="{Binding ApplyBatteryOptimizationCommand}" Height="28" Padding="12,0" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
                 <!-- CARD 1: SELECCIONAR PLAN DE ENERGÍA -->
-                <Border Grid.Row="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12">
+                <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -146,7 +162,7 @@
                 </Border>
 
                 <!-- CARD 2: SALUD Y CAPACIDAD -->
-                <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12">
+                <Border Grid.Row="2" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15" Margin="0,0,0,12">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -191,7 +207,7 @@
                 </Border>
 
                 <!-- CARD 3: RECOMENDACIONES DE ENERGÍA -->
-                <Border Grid.Row="2" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15">
+                <Border Grid.Row="3" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="15">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>

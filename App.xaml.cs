@@ -143,6 +143,8 @@ namespace WinCleaner
             services.AddSingleton<ICleanupModule, RecycleBinCleanupModule>();
             services.AddSingleton<ICleanupModule, LargeFilesCleanupModule>();
             services.AddSingleton<ICleanupModule, BrowserCacheCleanupModule>();
+            services.AddSingleton<ICleanupModule, RedundantInstallersCleanupModule>();
+            services.AddSingleton<ICleanupModule, UnusedDownloadsCleanupModule>();
 
             // ViewModels
             services.AddSingleton<MainViewModel>();

@@ -23,6 +23,22 @@ namespace WinCleaner.ViewModels
         private string _statusMessage = "Listo";
         private bool _isLoading;
         private ObservableCollection<string> _tips = new();
+        private string _batterySuggestionText = string.Empty;
+        private bool _showBatterySuggestion;
+
+        public string BatterySuggestionText
+        {
+            get => _batterySuggestionText;
+            set => SetProperty(ref _batterySuggestionText, value);
+        }
+
+        public bool ShowBatterySuggestion
+        {
+            get => _showBatterySuggestion;
+            set => SetProperty(ref _showBatterySuggestion, value);
+        }
+
+        public ICommand ApplyBatteryOptimizationCommand { get; }
 
         public BatteryInfo CurrentBattery
         {
@@ -81,6 +97,7 @@ namespace WinCleaner.ViewModels
             _batteryService = batteryService ?? throw new ArgumentNullException(nameof(batteryService));
 
             RefreshCommand = new AsyncRelayCommand(LoadDataAsync);
+            ApplyBatteryOptimizationCommand = new AsyncRelayCommand(ApplyBatteryOptimizationAsync);
 
             _timer = new DispatcherTimer
             {
@@ -209,6 +226,45 @@ namespace WinCleaner.ViewModels
             list.Add("💡 Desactiva Bluetooth, Wi-Fi (si no se usa) y periféricos innecesarios para extender la autonomía útil.");
 
             Tips = new ObservableCollection<string>(list);
+
+            // Sugerencia inteligente contextual
+            if (!info.IsCharging && info.ChargePercentage < 40)
+            {
+                var activePlan = PowerPlans.FirstOrDefault(p => p.IsActive);
+                if (activePlan != null && !activePlan.Guid.Equals("a1841308-3541-4fab-bc81-f71556f20b4a", StringComparison.OrdinalIgnoreCase))
+                {
+                    ShowBatterySuggestion = true;
+                    BatterySuggestionText = "💡 Ahorro Recomendado: La batería está por debajo del 40% con un plan de alto consumo. Sugerimos cambiar al plan 'Economizador'.";
+                }
+                else
+                {
+                    ShowBatterySuggestion = false;
+                    BatterySuggestionText = string.Empty;
+                }
+            }
+            else
+            {
+                ShowBatterySuggestion = false;
+                BatterySuggestionText = string.Empty;
+            }
+        }
+
+        private async Task ApplyBatteryOptimizationAsync()
+        {
+            var ecoPlan = PowerPlans.FirstOrDefault(p => p.Guid.Equals("a1841308-3541-4fab-bc81-f71556f20b4a", StringComparison.OrdinalIgnoreCase));
+            if (ecoPlan != null)
+            {
+                SelectedPowerPlan = ecoPlan;
+            }
+            else
+            {
+                var fallbackEco = PowerPlans.FirstOrDefault(p => p.Name.Contains("Economi", StringComparison.OrdinalIgnoreCase) || p.Name.Contains("Ahorro", StringComparison.OrdinalIgnoreCase));
+                if (fallbackEco != null)
+                {
+                    SelectedPowerPlan = fallbackEco;
+                }
+            }
+            await Task.CompletedTask;
         }
 
         public void StopTimer()

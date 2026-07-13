@@ -114,6 +114,21 @@ namespace WinCleaner.ViewModels
             set => SetProperty(ref _statusMessage, value);
         }
 
+        private string _driverSuggestionText = string.Empty;
+        private bool _showDriverSuggestion;
+
+        public string DriverSuggestionText
+        {
+            get => _driverSuggestionText;
+            set => SetProperty(ref _driverSuggestionText, value);
+        }
+
+        public bool ShowDriverSuggestion
+        {
+            get => _showDriverSuggestion;
+            set => SetProperty(ref _showDriverSuggestion, value);
+        }
+
         public ICommand ScanCommand { get; }
         public ICommand OpenDeviceManagerCommand { get; }
         public ICommand OpenWindowsUpdateCommand { get; }
@@ -149,6 +164,17 @@ namespace WinCleaner.ViewModels
                 var updates = await _driverService.GetAvailableDriverUpdatesAsync();
                 AvailableUpdates = new ObservableCollection<DriverUpdateItem>(updates);
                 AvailableUpdatesCount = updates.Count;
+
+                if (OutdatedDriversCount > 0)
+                {
+                    ShowDriverSuggestion = true;
+                    DriverSuggestionText = $"💡 Estabilidad Recomendada: Tienes {OutdatedDriversCount} controlador(es) antiguo(s) en el sistema. Recomendamos verificar actualizaciones.";
+                }
+                else
+                {
+                    ShowDriverSuggestion = false;
+                    DriverSuggestionText = string.Empty;
+                }
 
                 StatusMessage = $"Análisis completado: {DateTime.Now:HH:mm:ss}";
             }
