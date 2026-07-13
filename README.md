@@ -1,4 +1,4 @@
-# WinCleaner - Panel de Control y Limpieza Profesional (v1.5.0)
+# WinCleaner - Panel de Control y Limpieza Profesional (v1.6.0)
 
 Sistema de Diagnóstico, Limpieza y Optimización para Windows 10 y Windows 11 desarrollado con .NET 9, WPF y arquitectura MVVM.
 
@@ -92,6 +92,12 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 * **Escaneo Local**: Consulta WMI de controladores firmados clasificados por categorías con indicador de antigüedad (> 3 años).
 * **Actualizaciones Oficiales**: Detección dinámica de controladores pendientes mediante la API COM nativa del agente de Windows Update.
 * **Herramientas de Windows**: Acceso directo al Administrador de Dispositivos (`devmgmt.msc`) y ventana de actualización de controladores opcionales.
+
+### 13. Motor de Sugerencias Contextuales Inteligentes
+* **Limpieza Avanzada**: Detección inteligente de instaladores redundantes (programas que ya tienes instalados en el sistema) y descargas pesadas obsoletas de más de 6 meses.
+* **Optimización de Arranque**: Banner de alerta superior que identifica programas habilitados con impacto de inicio "Alto" y permite desactivarlos en lote de un solo clic.
+* **Eficiencia en Portátiles**: Detección activa si el equipo funciona en batería con carga baja y perfil de alto consumo, habilitando el botón rápido "Activar Ahorro" para alternar al plan economizador.
+* **Diagnósticos de Estabilidad**: Alerta si el hardware principal cuenta con controladores desactualizados, facilitando su puesta al día oficial.
 
 ---
 
