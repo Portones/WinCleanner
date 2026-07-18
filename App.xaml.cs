@@ -19,10 +19,6 @@ namespace WinCleaner
     {
         public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
-        private System.Windows.Forms.NotifyIcon? _notifyIcon;
-        private bool _isExiting;
-        private bool _firstMinimizeAlertShown;
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -193,136 +189,6 @@ namespace WinCleaner
             services.AddSingleton<MainWindow>();
         }
 
-        private void SetupSystemTray()
-        {
-            _notifyIcon = new System.Windows.Forms.NotifyIcon();
-            
-            // Cargar de forma dinámica el icono principal compilado en el ejecutable
-            if (!string.IsNullOrEmpty(Environment.ProcessPath))
-            {
-                try
-                {
-                    _notifyIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath);
-                }
-                catch
-                {
-                    _notifyIcon.Icon = System.Drawing.SystemIcons.Shield;
-                }
-            }
-            else
-            {
-                _notifyIcon.Icon = System.Drawing.SystemIcons.Shield;
-            }
-
-            _notifyIcon.Text = "WinCleaner - Suite de Optimización";
-            _notifyIcon.Visible = true;
-
-            var contextMenu = new System.Windows.Forms.ContextMenuStrip();
-            contextMenu.Items.Add("Optimizar RAM", null, Tray_OptimizeRam);
-            contextMenu.Items.Add("Limpieza Rápida", null, Tray_QuickCleanup);
-            contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-            contextMenu.Items.Add("Mostrar WinCleaner", null, Tray_ShowApp);
-            contextMenu.Items.Add("Salir", null, Tray_Exit);
-
-            _notifyIcon.ContextMenuStrip = contextMenu;
-            _notifyIcon.DoubleClick += (s, e) => ShowMainWindow();
-        }
-
-        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (!_isExiting)
-            {
-                e.Cancel = true; // Prevenir cierre
-                var mainWindow = ServiceProvider.GetService<MainWindow>();
-                mainWindow?.Hide(); // Ocultar ventana principal
-
-                if (!_firstMinimizeAlertShown)
-                {
-                    _notifyIcon?.ShowBalloonTip(3000, 
-                        "WinCleaner sigue activo", 
-                        "La aplicación se ha minimizado en segundo plano para seguir protegiendo su equipo.", 
-                        System.Windows.Forms.ToolTipIcon.Info);
-                    _firstMinimizeAlertShown = true;
-                }
-            }
-        }
-
-        private void ShowMainWindow()
-        {
-            var mainWindow = ServiceProvider.GetService<MainWindow>();
-            if (mainWindow != null)
-            {
-                mainWindow.Show();
-                if (mainWindow.WindowState == WindowState.Minimized)
-                {
-                    mainWindow.WindowState = WindowState.Normal;
-                }
-                mainWindow.Activate();
-            }
-        }
-
-        private async void Tray_OptimizeRam(object? sender, EventArgs e)
-        {
-            Log.Information("Iniciando optimización de RAM desde la bandeja del sistema...");
-            try
-            {
-                var ramBooster = ServiceProvider.GetRequiredService<IRamBoosterService>();
-                var progress = new Progress<double>();
-                long bytesFreed = await ramBooster.OptimizeRamAsync(progress, CancellationToken.None);
-
-                string sizeText = CleanableItem.FormatSize(bytesFreed);
-                _notifyIcon?.ShowBalloonTip(3000, "Optimización de RAM", $"Se liberaron {sizeText} de memoria RAM.", System.Windows.Forms.ToolTipIcon.Info);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error al optimizar RAM desde la bandeja del sistema.");
-                _notifyIcon?.ShowBalloonTip(3000, "Optimización de RAM", "Ocurrió un error al liberar memoria.", System.Windows.Forms.ToolTipIcon.Error);
-            }
-        }
-
-        private async void Tray_QuickCleanup(object? sender, EventArgs e)
-        {
-            Log.Information("Iniciando limpieza rápida desde la bandeja del sistema...");
-            try
-            {
-                var modules = ServiceProvider.GetServices<ICleanupModule>();
-                long totalFreed = 0;
-
-                foreach (var module in modules)
-                {
-                    var progress = new Progress<double>();
-                    var scanResult = await module.ScanAsync(progress, CancellationToken.None);
-                    long sizeToFree = scanResult.TotalSize;
-                    if (sizeToFree > 0)
-                    {
-                        await module.CleanAsync(scanResult.Items, progress, CancellationToken.None);
-                        totalFreed += sizeToFree;
-                    }
-                }
-
-                string sizeText = CleanableItem.FormatSize(totalFreed);
-                _notifyIcon?.ShowBalloonTip(3000, "Limpieza Rápida", $"Limpieza rápida completada. Se liberaron {sizeText}.", System.Windows.Forms.ToolTipIcon.Info);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error durante la limpieza rápida desde la bandeja del sistema.");
-                _notifyIcon?.ShowBalloonTip(3000, "Limpieza Rápida", "Ocurrió un error al realizar la limpieza.", System.Windows.Forms.ToolTipIcon.Error);
-            }
-        }
-
-        private void Tray_ShowApp(object? sender, EventArgs e)
-        {
-            ShowMainWindow();
-        }
-
-        private void Tray_Exit(object? sender, EventArgs e)
-        {
-            _isExiting = true;
-            var mainWindow = ServiceProvider.GetService<MainWindow>();
-            mainWindow?.Close();
-            Shutdown();
-        }
-
         private async Task RunSilentCleanAsync()
         {
             try
@@ -358,11 +224,6 @@ namespace WinCleaner
         protected override void OnExit(ExitEventArgs e)
         {
             Log.Information("Cerrando WinCleaner.");
-            if (_notifyIcon != null)
-            {
-                _notifyIcon.Visible = false;
-                _notifyIcon.Dispose();
-            }
             Log.CloseAndFlush();
             base.OnExit(e);
         }

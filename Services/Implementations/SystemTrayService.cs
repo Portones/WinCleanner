@@ -130,6 +130,7 @@ namespace WinCleaner.Services.Implementations
 
             // Interceptar evento de minimizado/cierre de la ventana principal
             _mainWindow.StateChanged += MainWindow_StateChanged;
+            _mainWindow.Closing += MainWindow_Closing;
 
             // Iniciar monitoreo silencioso en segundo plano cada 30 segundos
             _monitorTimer = new DispatcherTimer
@@ -138,6 +139,24 @@ namespace WinCleaner.Services.Implementations
             };
             _monitorTimer.Tick += async (s, e) => await PerformBackgroundCheckAsync();
             _monitorTimer.Start();
+        }
+
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (_mainWindow == null) return;
+            var settings = _configurationService.CurrentSettings;
+
+            // Si está habilitada la opción de minimizar a la bandeja al cerrar, cancelamos el cierre y ocultamos
+            if (settings.MinimizeToTray)
+            {
+                e.Cancel = true;
+                HideToTray();
+            }
+            else
+            {
+                // Si no, destruimos el tray icon y permitimos cerrar de verdad
+                Dispose();
+            }
         }
 
         private void MainWindow_StateChanged(object? sender, EventArgs e)
