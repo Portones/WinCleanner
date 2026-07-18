@@ -18,6 +18,9 @@ namespace WinCleaner.ViewModels
         private readonly ISystemDiagnosticService _diagnosticService;
         private readonly IRamBoosterService _ramBooster;
         private readonly IReportGeneratorService _reportGenerator;
+        private readonly ISmartAssistantService _smartAssistant;
+        private readonly INetworkDiagnosticService _networkService;
+        private readonly ISystemRestoreService _restoreService;
         private readonly DispatcherTimer _timer;
 
         private string _statusMessage = "WinCleaner - Diagnóstico en Tiempo Real Activo";
@@ -136,12 +139,18 @@ namespace WinCleaner.ViewModels
             IConfigurationService configurationService, 
             ISystemDiagnosticService diagnosticService,
             IRamBoosterService ramBooster,
-            IReportGeneratorService reportGenerator)
+            IReportGeneratorService reportGenerator,
+            ISmartAssistantService smartAssistant,
+            INetworkDiagnosticService networkService,
+            ISystemRestoreService restoreService)
         {
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
             _diagnosticService = diagnosticService ?? throw new ArgumentNullException(nameof(diagnosticService));
             _ramBooster = ramBooster ?? throw new ArgumentNullException(nameof(ramBooster));
             _reportGenerator = reportGenerator ?? throw new ArgumentNullException(nameof(reportGenerator));
+            _smartAssistant = smartAssistant ?? throw new ArgumentNullException(nameof(smartAssistant));
+            _networkService = networkService ?? throw new ArgumentNullException(nameof(networkService));
+            _restoreService = restoreService ?? throw new ArgumentNullException(nameof(restoreService));
 
             OptimizeRamCommand = new AsyncRelayCommand(OptimizeRamAsync);
             ExecuteRecommendationCommand = new AsyncRelayCommand<OptimizationRecommendation>(ExecuteRecommendationAsync);
@@ -212,7 +221,7 @@ namespace WinCleaner.ViewModels
             }
         }
 
-        private void GenerateRecommendations()
+        private async void GenerateRecommendations()
         {
             var recs = new List<OptimizationRecommendation>();
 
@@ -276,6 +285,14 @@ namespace WinCleaner.ViewModels
                 }
             }
 
+            // 5. Recomendaciones inteligentes del Asistente
+            try
+            {
+                var smartRecs = await _smartAssistant.GetSmartRecommendationsAsync();
+                recs.AddRange(smartRecs);
+            }
+            catch { }
+
             Recommendations = recs;
         }
 
@@ -308,6 +325,46 @@ namespace WinCleaner.ViewModels
             {
                 var mainVm = Application.Current.MainWindow?.DataContext as MainViewModel;
                 mainVm?.NavigateCommand.Execute("Cleanup");
+            }
+            else if (rec.ActionType == "FlushDns")
+            {
+                StatusMessage = "Vaciando caché DNS de Windows...";
+                bool success = await _networkService.FlushDnsAsync();
+                if (success)
+                {
+                    StatusMessage = "Caché DNS vaciada con éxito.";
+                    MessageBox.Show("La caché de resolución de nombres DNS se ha vaciado correctamente.", 
+                                    "Vaciado de DNS", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    StatusMessage = "No se pudo vaciar la caché DNS.";
+                }
+            }
+            else if (rec.ActionType == "CleanRestorePoints")
+            {
+                StatusMessage = "Eliminando puntos de restauración antiguos...";
+                bool success = await _restoreService.DeleteOldRestorePointsAsync();
+                if (success)
+                {
+                    StatusMessage = "Puntos de restauración antiguos eliminados.";
+                    MessageBox.Show("Se han eliminado los puntos de restauración antiguos, conservando la copia más reciente.", 
+                                    "Limpieza de Restauración", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    StatusMessage = "No se pudieron eliminar las copias de sombra antiguas.";
+                }
+            }
+            else if (rec.ActionType == "CleanOldDownloads")
+            {
+                var mainVm = Application.Current.MainWindow?.DataContext as MainViewModel;
+                mainVm?.NavigateCommand.Execute("Cleanup");
+            }
+            else if (rec.ActionType == "CleanScreenshots")
+            {
+                var mainVm = Application.Current.MainWindow?.DataContext as MainViewModel;
+                mainVm?.NavigateCommand.Execute("PhotosCleanup");
             }
         }
 

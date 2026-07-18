@@ -149,6 +149,9 @@ namespace WinCleaner
             services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<IReportGeneratorService, ReportGeneratorService>();
             services.AddSingleton<ISystemTrayService, SystemTrayService>();
+            services.AddSingleton<INetworkDiagnosticService, NetworkDiagnosticService>();
+            services.AddSingleton<ISystemRestoreService, SystemRestoreService>();
+            services.AddSingleton<ISmartAssistantService, SmartAssistantService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
