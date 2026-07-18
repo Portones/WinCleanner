@@ -24,4 +24,11 @@
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Copiar el icono al directorio de salida para que el SystemTrayService lo cargue en runtime -->
+    <Content Include="Assets\WinCleanerLogo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
