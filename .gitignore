@@ -24,3 +24,7 @@ Desktop.ini
 *.zip
 Releases/**/*.exe
 Releases/**/*.zip
+
+## Local agent documentation
+.agents/publishing_guide.md
+
