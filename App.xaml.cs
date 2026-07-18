@@ -56,6 +56,10 @@ namespace WinCleaner
                 var trayService = ServiceProvider.GetRequiredService<ISystemTrayService>();
                 trayService.Initialize(mainWindow);
 
+                // Iniciar el guardián de desinstalaciones en segundo plano
+                var uninstallWatcher = ServiceProvider.GetRequiredService<IUninstallWatcherService>();
+                uninstallWatcher.StartWatching();
+
                 if (e.Args.Contains("--minimized", StringComparer.OrdinalIgnoreCase))
                 {
                     Log.Information("Iniciando minimizado en la bandeja del sistema (--minimized)...");
@@ -152,6 +156,9 @@ namespace WinCleaner
             services.AddSingleton<INetworkDiagnosticService, NetworkDiagnosticService>();
             services.AddSingleton<ISystemRestoreService, SystemRestoreService>();
             services.AddSingleton<ISmartAssistantService, SmartAssistantService>();
+            services.AddSingleton<IBrowserCleanupService, BrowserCleanupService>();
+            services.AddSingleton<IEventLogCleanerService, EventLogCleanerService>();
+            services.AddSingleton<IUninstallWatcherService, UninstallWatcherService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
@@ -180,6 +187,7 @@ namespace WinCleaner
             services.AddSingleton<TemperatureViewModel>();
             services.AddSingleton<BatteryViewModel>();
             services.AddSingleton<DriverViewModel>();
+            services.AddSingleton<BrowserCleanupViewModel>();
 
             // Vistas
             services.AddSingleton<MainWindow>();

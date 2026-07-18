@@ -63,6 +63,7 @@
                         <Button Content="Limpieza Avanzada" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Cleanup" Tag="Cleanup" Margin="0,0,0,4"/>
                         <Button Content="Archivos Duplicados" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Duplicates" Tag="Duplicates" Margin="0,0,0,4"/>
                         <Button Content="Limpiador de Fotos" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="PhotosCleanup" Tag="PhotosCleanup" Margin="0,0,0,4"/>
+                        <Button Content="Navegadores y Logs" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="BrowserCleanup" Tag="BrowserCleanup" Margin="0,0,0,4"/>
                         <Button Content="Desinstalador" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Uninstaller" Tag="Uninstaller" Margin="0,0,0,18"/>
 
                         <!-- SECCIÓN 3: OPTIMIZACIÓN Y SISTEMA -->
@@ -142,6 +143,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:DriverViewModel}">
                     <local:DriverView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:BrowserCleanupViewModel}">
+                    <local:BrowserCleanupView/>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                     <local:SettingsView/>

@@ -4,6 +4,9 @@
              xmlns:local="clr-namespace:WinCleaner"
              xmlns:helpers="clr-namespace:WinCleaner.Helpers">
     <Application.Resources>
+        <!-- Convertidores globales -->
+        <helpers:BytesToSizeConverter x:Key="BytesToSizeConverter"/>
+
         <!-- Estilo de Barra de Progreso Moderna -->
         <Style x:Key="ModernProgressBar" TargetType="ProgressBar">
             <Setter Property="Background" Value="#334155"/>

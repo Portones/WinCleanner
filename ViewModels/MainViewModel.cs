@@ -24,6 +24,7 @@ namespace WinCleaner.ViewModels
         private readonly TemperatureViewModel _temperatureViewModel;
         private readonly BatteryViewModel _batteryViewModel;
         private readonly DriverViewModel _driverViewModel;
+        private readonly BrowserCleanupViewModel _browserCleanupViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -55,7 +56,8 @@ namespace WinCleaner.ViewModels
             RamOptimizerViewModel ramOptimizerViewModel,
             TemperatureViewModel temperatureViewModel,
             BatteryViewModel batteryViewModel,
-            DriverViewModel driverViewModel)
+            DriverViewModel driverViewModel,
+            BrowserCleanupViewModel browserCleanupViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -73,6 +75,7 @@ namespace WinCleaner.ViewModels
             _temperatureViewModel = temperatureViewModel ?? throw new ArgumentNullException(nameof(temperatureViewModel));
             _batteryViewModel = batteryViewModel ?? throw new ArgumentNullException(nameof(batteryViewModel));
             _driverViewModel = driverViewModel ?? throw new ArgumentNullException(nameof(driverViewModel));
+            _browserCleanupViewModel = browserCleanupViewModel ?? throw new ArgumentNullException(nameof(browserCleanupViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -166,6 +169,10 @@ namespace WinCleaner.ViewModels
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _settingsViewModel;
+            }
+            else if (destination.Equals("BrowserCleanup", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _browserCleanupViewModel;
             }
         }
     }
