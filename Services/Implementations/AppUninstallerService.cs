@@ -410,6 +410,10 @@ namespace WinCleaner.Services.Implementations
                 ScanRegistryResiduals(Registry.CurrentUser, @"Software", cleanKeywords, publisher, residuals);
                 ScanRegistryResiduals(Registry.LocalMachine, @"Software", cleanKeywords, publisher, residuals);
 
+                // 3. Residuos en el Inicio de Windows (Registro y Carpetas Startup)
+                cancellationToken.ThrowIfCancellationRequested();
+                ScanStartupResiduals(cleanKeywords, residuals);
+
                 return residuals;
             }, cancellationToken);
         }
@@ -468,6 +472,78 @@ namespace WinCleaner.Services.Implementations
             catch { }
         }
 
+        private void ScanStartupResiduals(List<string> keywords, List<ResidualItem> residuals)
+        {
+            var startupRegKeys = new (RegistryKey root, string path)[]
+            {
+                (Registry.CurrentUser, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"),
+                (Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"),
+                (Registry.LocalMachine, @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run"),
+                (Registry.CurrentUser, @"SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce"),
+                (Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce")
+            };
+
+            foreach (var (root, path) in startupRegKeys)
+            {
+                try
+                {
+                    using (var key = root.OpenSubKey(path, false))
+                    {
+                        if (key == null) continue;
+                        foreach (var valueName in key.GetValueNames())
+                        {
+                            string valData = key.GetValue(valueName)?.ToString() ?? string.Empty;
+                            string nameLower = valueName.ToLowerInvariant();
+                            string dataLower = valData.ToLowerInvariant();
+
+                            if (keywords.Any(k => nameLower.Contains(k) || dataLower.Contains(k)))
+                            {
+                                string rootName = root == Registry.CurrentUser ? "HKEY_CURRENT_USER" : "HKEY_LOCAL_MACHINE";
+                                residuals.Add(new ResidualItem
+                                {
+                                    Path = $@"{rootName}\{path} -> {valueName}",
+                                    Type = "Inicio de Windows",
+                                    Size = 0
+                                });
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            var startupFolderPaths = new[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.Startup),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonStartup)
+            };
+
+            foreach (var folder in startupFolderPaths)
+            {
+                try
+                {
+                    if (!Directory.Exists(folder)) continue;
+                    var files = Directory.GetFiles(folder);
+                    foreach (var file in files)
+                    {
+                        string fileName = Path.GetFileName(file).ToLowerInvariant();
+                        if (keywords.Any(k => fileName.Contains(k)))
+                        {
+                            long size = 0;
+                            try { size = new FileInfo(file).Length; } catch { }
+                            residuals.Add(new ResidualItem
+                            {
+                                Path = file,
+                                Type = "Inicio de Windows",
+                                Size = size
+                            });
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
         public async Task<bool> CleanResidualsAsync(List<ResidualItem> residuals, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
@@ -507,6 +583,36 @@ namespace WinCleaner.Services.Implementations
                                 
                                 rootKey.DeleteSubKeyTree(subKeyPath, false);
                                 Log.Information("Clave de registro residual eliminada: {Path}", item.Path);
+                            }
+                        }
+                        else if (item.Type == "Inicio de Windows")
+                        {
+                            if (item.Path.Contains(" -> "))
+                            {
+                                string[] split = item.Path.Split(new[] { " -> " }, StringSplitOptions.None);
+                                string fullRegPath = split[0];
+                                string valName = split[1];
+
+                                string[] parts = fullRegPath.Split('\\');
+                                if (parts.Length > 1)
+                                {
+                                    var rootKey = parts[0] == "HKEY_CURRENT_USER" ? Registry.CurrentUser : Registry.LocalMachine;
+                                    string subKeyPath = string.Join('\\', parts.Skip(1));
+
+                                    using (var key = rootKey.OpenSubKey(subKeyPath, true))
+                                    {
+                                        if (key != null && key.GetValue(valName) != null)
+                                        {
+                                            key.DeleteValue(valName, false);
+                                            Log.Information("Valor de inicio residual eliminado del Registro: {Path}", item.Path);
+                                        }
+                                    }
+                                }
+                            }
+                            else if (File.Exists(item.Path))
+                            {
+                                File.Delete(item.Path);
+                                Log.Information("Acceso directo de inicio residual eliminado: {Path}", item.Path);
                             }
                         }
                     }

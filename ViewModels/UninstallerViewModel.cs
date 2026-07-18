@@ -212,29 +212,45 @@ namespace WinCleaner.ViewModels
             try
             {
                 bool success = await _uninstallerService.UninstallAppAsync(appToUninstall, CancellationToken.None);
+                await LoadAppsAsync();
+
                 if (success)
                 {
-                    StatusMessage = $"Desinstalador completado para {appToUninstall.DisplayName}. Escaneando residuos...";
-                    var leftovers = await _uninstallerService.ScanResidualsAsync(appToUninstall, CancellationToken.None);
-                    await LoadAppsAsync();
+                    StatusMessage = $"Desinstalador completado para {appToUninstall.DisplayName}.";
 
-                    if (leftovers != null && leftovers.Count > 0)
+                    var askScan = MessageBox.Show(
+                        $"'{appToUninstall.DisplayName}' se ha desinstalado correctamente.\n\n¿Desea realizar un escaneo de seguridad en busca de archivos, carpetas, claves de Registro o entradas en el Inicio de Windows huérfanas residuales?",
+                        "Escaneo de Elementos Huérfanos",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (askScan == MessageBoxResult.Yes)
                     {
-                        Residuals = leftovers;
-                        ShowResidualsCard = true;
-                        StatusMessage = $"Se encontraron {leftovers.Count} residuos de {appToUninstall.DisplayName}.";
+                        StatusMessage = $"Escaneando residuos huérfanos de {appToUninstall.DisplayName}...";
+                        var leftovers = await _uninstallerService.ScanResidualsAsync(appToUninstall, CancellationToken.None);
+
+                        if (leftovers != null && leftovers.Count > 0)
+                        {
+                            Residuals = leftovers;
+                            ShowResidualsCard = true;
+                            StatusMessage = $"Se encontraron {leftovers.Count} residuos huérfanos de {appToUninstall.DisplayName}.";
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                $"No se detectaron archivos, claves de registro ni entradas en el inicio residuales de '{appToUninstall.DisplayName}'. Tu equipo está completamente limpio.",
+                                "Análisis de Residuos Finalizado", MessageBoxButton.OK, MessageBoxImage.Information);
+                            StatusMessage = "Desinstalación y escaneo completados. No se encontraron residuos.";
+                        }
                     }
                     else
                     {
-                        MessageBox.Show(
-                            $"'{appToUninstall.DisplayName}' se desinstaló correctamente.\nNo se detectaron archivos ni registros residuales.",
-                            "Desinstalación Completada", MessageBoxButton.OK, MessageBoxImage.Information);
-                        StatusMessage = "Desinstalación completada. No se encontraron residuos.";
+                        StatusMessage = $"Desinstalación de {appToUninstall.DisplayName} completada.";
                     }
                 }
                 else
                 {
-                    StatusMessage = $"La desinstalación de {appToUninstall.DisplayName} fue cancelada o falló.";
+                    StatusMessage = $"La desinstalación de {appToUninstall.DisplayName} fue cancelada o no se completó.";
                 }
             }
             catch (Exception ex)
@@ -316,6 +332,8 @@ namespace WinCleaner.ViewModels
                     MessageBox.Show("Algunos residuos no se pudieron eliminar (pueden estar bloqueados por el sistema).", 
                                     "Limpieza Finalizada", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
+
+                await LoadAppsAsync();
             }
             catch (Exception ex)
             {
