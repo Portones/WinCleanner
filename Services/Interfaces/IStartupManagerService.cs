@@ -9,5 +9,6 @@ namespace WinCleaner.Services.Interfaces
     {
         Task<List<StartupApp>> GetStartupAppsAsync(CancellationToken cancellationToken);
         Task<bool> ToggleStartupAppAsync(StartupApp app, bool enable, CancellationToken cancellationToken);
+        void SetWindowsAutoStart(bool enable, bool minimized);
     }
 }

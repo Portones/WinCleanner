@@ -55,7 +55,17 @@ namespace WinCleaner
                 // Mostrar la ventana principal inyectada
                 var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
                 mainWindow.Closing += MainWindow_Closing;
-                mainWindow.Show();
+
+                if (e.Args.Contains("--minimized", StringComparer.OrdinalIgnoreCase))
+                {
+                    Log.Information("Iniciando minimizado en la bandeja del sistema (--minimized)...");
+                    mainWindow.WindowState = WindowState.Minimized;
+                    mainWindow.Hide();
+                }
+                else
+                {
+                    mainWindow.Show();
+                }
             }
             catch (Exception ex)
             {

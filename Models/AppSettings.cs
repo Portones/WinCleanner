@@ -8,6 +8,8 @@ namespace WinCleaner.Models
         public string Theme { get; set; } = "Dark"; // "Dark" or "Light"
         public string Language { get; set; } = "es"; // "es" or "en"
         public bool BypassRecycleBin { get; set; } = false; // Requiere confirmación doble si es true
+        public bool StartWithWindows { get; set; } = false;
+        public bool StartMinimized { get; set; } = false;
         
         // Configuración de Archivos Grandes
         public long MinLargeFileSizeMb { get; set; } = 100; // Por defecto 100MB

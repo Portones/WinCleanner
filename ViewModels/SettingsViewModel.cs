@@ -11,6 +11,7 @@ namespace WinCleaner.ViewModels
     {
         private readonly IConfigurationService _configurationService;
         private readonly IScheduledMaintenanceService _maintenanceService;
+        private readonly IStartupManagerService _startupManager;
 
         private string _maintenanceNextRunText = "Cargando...";
 
@@ -26,6 +27,39 @@ namespace WinCleaner.ViewModels
                 {
                     _configurationService.CurrentSettings.BypassRecycleBin = value;
                     _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool StartWithWindows
+        {
+            get => _configurationService.CurrentSettings.StartWithWindows;
+            set
+            {
+                if (_configurationService.CurrentSettings.StartWithWindows != value)
+                {
+                    _configurationService.CurrentSettings.StartWithWindows = value;
+                    _configurationService.SaveSettings();
+                    _startupManager.SetWindowsAutoStart(value, StartMinimized);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool StartMinimized
+        {
+            get => _configurationService.CurrentSettings.StartMinimized;
+            set
+            {
+                if (_configurationService.CurrentSettings.StartMinimized != value)
+                {
+                    _configurationService.CurrentSettings.StartMinimized = value;
+                    _configurationService.SaveSettings();
+                    if (StartWithWindows)
+                    {
+                        _startupManager.SetWindowsAutoStart(true, value);
+                    }
                     OnPropertyChanged();
                 }
             }
@@ -126,10 +160,14 @@ namespace WinCleaner.ViewModels
         public ICommand RemoveCustomDirectoryCommand { get; }
         public ICommand SaveMaintenanceCommand { get; }
 
-        public SettingsViewModel(IConfigurationService configurationService, IScheduledMaintenanceService maintenanceService)
+        public SettingsViewModel(
+            IConfigurationService configurationService, 
+            IScheduledMaintenanceService maintenanceService,
+            IStartupManagerService startupManager)
         {
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
             _maintenanceService = maintenanceService ?? throw new ArgumentNullException(nameof(maintenanceService));
+            _startupManager = startupManager ?? throw new ArgumentNullException(nameof(startupManager));
 
             // Vincular colecciones observables y responder a cambios de colección automáticamente
             InitializeCollections();

@@ -9,6 +9,7 @@
              d:DesignHeight="650" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <!-- Estilo para la lista de directorios -->
         <Style x:Key="DirectoryListBox" TargetType="ListBox">
             <Setter Property="Background" Value="#151F32"/>
@@ -121,6 +122,45 @@
                             </StackPanel>
 
                             <Slider Grid.Row="1" Grid.ColumnSpan="2" Minimum="10" Maximum="2000" TickFrequency="50" IsSnapToTickEnabled="True" Value="{Binding MinLargeFileSizeMb, Mode=TwoWay}" Margin="0,4,0,0"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- CARD 2: INICIO DE LA APLICACIÓN -->
+                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="18" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="Inicio de la Aplicación" FontSize="16" FontWeight="Bold" Foreground="#818CF8" Margin="0,0,0,15"/>
+                        
+                        <!-- Toggle Iniciar con Windows -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Iniciar WinCleaner al arrancar Windows" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Ejecuta automáticamente la aplicación al iniciar sesión en el equipo para disponer de diagnósticos e inicio rápido." FontSize="11" Foreground="#64748B" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            
+                            <CheckBox Grid.Column="1" IsChecked="{Binding StartWithWindows, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <!-- Toggle Iniciar Minimizado (Solo visible si StartWithWindows es true) -->
+                        <Grid Visibility="{Binding StartWithWindows, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Height="1" Background="#334155" Margin="0,0,0,15" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
+                            
+                            <StackPanel Grid.Column="0" Margin="0,15,0,0">
+                                <TextBlock Text="Iniciar minimizado en la bandeja del sistema (SysTray)" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="WinCleaner se iniciará silenciosamente en segundo plano sin desplegar la ventana principal." FontSize="11" Foreground="#64748B" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            
+                            <CheckBox Grid.Column="1" IsChecked="{Binding StartMinimized, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,15,0,0"/>
                         </Grid>
                     </StackPanel>
                 </Border>

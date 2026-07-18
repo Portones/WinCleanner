@@ -358,5 +358,39 @@ namespace WinCleaner.Services.Implementations
             }
             catch { /* Ignorar errores de acceso a disco */ }
         }
+
+        public void SetWindowsAutoStart(bool enable, bool minimized)
+        {
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                {
+                    if (key != null)
+                    {
+                        if (enable)
+                        {
+                            string exePath = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
+                            string command = $"\"{exePath}\"";
+                            if (minimized)
+                            {
+                                command += " --minimized";
+                            }
+                            key.SetValue("WinCleaner", command);
+                        }
+                        else
+                        {
+                            if (key.GetValue("WinCleaner") != null)
+                            {
+                                key.DeleteValue("WinCleaner", false);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error al configurar el inicio automático con Windows en el Registro.");
+            }
+        }
     }
 }
