@@ -53,6 +53,7 @@
                         <!-- SECCIÓN 1: ESTADO Y DIAGNÓSTICO -->
                         <TextBlock Text="DIAGNÓSTICO Y ESTADO" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,0,0,6"/>
                         <Button Content="Dashboard" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" Tag="Dashboard" Margin="0,0,0,4"/>
+                        <Button Content="Inspector de Fallos" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="CrashInspector" Tag="CrashInspector" Margin="0,0,0,4"/>
                         <Button Content="Analizador de Disco" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="DiskAnalyzer" Tag="DiskAnalyzer" Margin="0,0,0,4"/>
                         <Button Content="Temperaturas" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Temperature" Tag="Temperature" Margin="0,0,0,4"/>
                         <Button Content="Energía y Batería" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Battery" Tag="Battery" Margin="0,0,0,4"/>
@@ -68,6 +69,7 @@
 
                         <!-- SECCIÓN 3: OPTIMIZACIÓN Y SISTEMA -->
                         <TextBlock Text="OPTIMIZACIÓN Y SISTEMA" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,0,0,6"/>
+                        <Button Content="Reparar Sistema (SFC/DISM)" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="SystemRepair" Tag="SystemRepair" Margin="0,0,0,4"/>
                         <Button Content="Rendimiento y Red" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Performance" Tag="Performance" Margin="0,0,0,4"/>
                         <Button Content="Optimizar RAM" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="RamOptimizer" Tag="RamOptimizer" Margin="0,0,0,4"/>
                         <Button Content="Actualizar Apps" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Updater" Tag="Updater" Margin="0,0,0,4"/>
@@ -146,6 +148,12 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:BrowserCleanupViewModel}">
                     <local:BrowserCleanupView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:SystemRepairViewModel}">
+                    <local:SystemRepairView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:CrashInspectorViewModel}">
+                    <local:CrashInspectorView/>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                     <local:SettingsView/>

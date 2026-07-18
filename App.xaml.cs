@@ -182,6 +182,8 @@ namespace WinCleaner
             services.AddSingleton<IEventLogCleanerService, EventLogCleanerService>();
             services.AddSingleton<IUninstallWatcherService, UninstallWatcherService>();
             services.AddSingleton<IWinCleanerUpdateService, WinCleanerUpdateService>();
+            services.AddSingleton<ISystemRepairService, SystemRepairService>();
+            services.AddSingleton<ICrashInspectorService, CrashInspectorService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
@@ -191,6 +193,7 @@ namespace WinCleaner
             services.AddSingleton<ICleanupModule, BrowserCacheCleanupModule>();
             services.AddSingleton<ICleanupModule, RedundantInstallersCleanupModule>();
             services.AddSingleton<ICleanupModule, UnusedDownloadsCleanupModule>();
+            services.AddSingleton<ICleanupModule, DevAndAppCacheCleanupModule>();
 
             // ViewModels
             services.AddSingleton<MainViewModel>();
@@ -211,6 +214,8 @@ namespace WinCleaner
             services.AddSingleton<BatteryViewModel>();
             services.AddSingleton<DriverViewModel>();
             services.AddSingleton<BrowserCleanupViewModel>();
+            services.AddSingleton<SystemRepairViewModel>();
+            services.AddSingleton<CrashInspectorViewModel>();
 
             // Vistas
             services.AddSingleton<MainWindow>();

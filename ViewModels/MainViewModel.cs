@@ -25,6 +25,8 @@ namespace WinCleaner.ViewModels
         private readonly BatteryViewModel _batteryViewModel;
         private readonly DriverViewModel _driverViewModel;
         private readonly BrowserCleanupViewModel _browserCleanupViewModel;
+        private readonly SystemRepairViewModel _systemRepairViewModel;
+        private readonly CrashInspectorViewModel _crashInspectorViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -57,7 +59,9 @@ namespace WinCleaner.ViewModels
             TemperatureViewModel temperatureViewModel,
             BatteryViewModel batteryViewModel,
             DriverViewModel driverViewModel,
-            BrowserCleanupViewModel browserCleanupViewModel)
+            BrowserCleanupViewModel browserCleanupViewModel,
+            SystemRepairViewModel systemRepairViewModel,
+            CrashInspectorViewModel crashInspectorViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -76,6 +80,8 @@ namespace WinCleaner.ViewModels
             _batteryViewModel = batteryViewModel ?? throw new ArgumentNullException(nameof(batteryViewModel));
             _driverViewModel = driverViewModel ?? throw new ArgumentNullException(nameof(driverViewModel));
             _browserCleanupViewModel = browserCleanupViewModel ?? throw new ArgumentNullException(nameof(browserCleanupViewModel));
+            _systemRepairViewModel = systemRepairViewModel ?? throw new ArgumentNullException(nameof(systemRepairViewModel));
+            _crashInspectorViewModel = crashInspectorViewModel ?? throw new ArgumentNullException(nameof(crashInspectorViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -173,6 +179,14 @@ namespace WinCleaner.ViewModels
             else if (destination.Equals("BrowserCleanup", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _browserCleanupViewModel;
+            }
+            else if (destination.Equals("SystemRepair", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _systemRepairViewModel;
+            }
+            else if (destination.Equals("CrashInspector", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _crashInspectorViewModel;
             }
         }
     }

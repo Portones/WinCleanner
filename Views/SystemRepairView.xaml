@@ -1,0 +1,94 @@
+<UserControl x:Class="WinCleaner.Views.SystemRepairView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:SystemRepairViewModel}"
+             d:DesignHeight="600" d:DesignWidth="850">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="🛠️ Reparación del Sistema (SFC &amp; DISM)" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+            <TextBlock Text="Diagnostica y repara archivos dañados o corruptos de la imagen del sistema operativo Windows." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- PANEL DE ACCIONES -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding CurrentOperation}" FontSize="14" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                    <ProgressBar Style="{StaticResource ModernProgressBar}" Value="{Binding ProgressValue}" Maximum="100" Margin="0,10,20,0" Height="8"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="🔍 Comprobar SFC"
+                            Command="{Binding RunSfcCommand}"
+                            Style="{StaticResource ActionButton}"
+                            Margin="0,0,10,0"/>
+
+                    <Button Content="⚡ Reparar DISM"
+                            Command="{Binding RunDismCommand}"
+                            Style="{StaticResource ActionButton}"
+                            Background="#8B5CF6"
+                            Margin="0,0,10,0"/>
+
+                    <Button Content="🛑 Cancelar"
+                            Command="{Binding CancelCommand}"
+                            Style="{StaticResource ActionButton}"
+                            Background="#EF4444"
+                            Margin="0,0,10,0"/>
+
+                    <Button Content="🗑️ Limpiar Consola"
+                            Command="{Binding ClearOutputCommand}"
+                            Style="{StaticResource SidebarButton}"
+                            Background="#334155"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- TERMINAL DE SALIDA -->
+        <Border Grid.Row="2" Background="#0B0F19" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="10" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                    <Ellipse Width="10" Height="10" Fill="#EF4444" Margin="0,0,6,0"/>
+                    <Ellipse Width="10" Height="10" Fill="#F59E0B" Margin="0,0,6,0"/>
+                    <Ellipse Width="10" Height="10" Fill="#10B981" Margin="0,0,10,0"/>
+                    <TextBlock Text="Consola de Reparación de Windows" FontSize="11" FontWeight="Bold" Foreground="#64748B" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <TextBox x:Name="ConsoleOutput"
+                         Grid.Row="1"
+                         Text="{Binding OutputLog, Mode=OneWay}"
+                         TextChanged="ConsoleOutput_TextChanged"
+                         IsReadOnly="True"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="Transparent"
+                         Foreground="#10B981"
+                         FontFamily="Consolas, Cascadia Code, Courier New"
+                         FontSize="12"
+                         BorderThickness="0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
