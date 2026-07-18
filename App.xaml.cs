@@ -21,6 +21,9 @@ namespace WinCleaner
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Registrar proveedor de codificaciones para dar soporte a codificaciones heredadas como CodePage 850 (usada en consolas Windows)
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
             base.OnStartup(e);
 
             ConfigureLogging();
