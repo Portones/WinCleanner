@@ -206,7 +206,7 @@ namespace WinCleaner.Services.Implementations
             {
                 // Ignorar
             }
-            return "1.8.0";
+            return "1.9.0";
         }
     }
 }
