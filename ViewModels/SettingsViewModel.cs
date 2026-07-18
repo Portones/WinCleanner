@@ -328,6 +328,25 @@ namespace WinCleaner.ViewModels
             InstallUpdateCommand = new AsyncRelayCommand(InstallUpdateAsync);
 
             RefreshMaintenanceStatus();
+
+            // Cargar información de actualización previamente buscada (ej. comprobación automática al arrancar)
+            if (_winCleanerUpdateService.LastUpdateInfo != null)
+            {
+                var result = _winCleanerUpdateService.LastUpdateInfo;
+                LatestVersionText = result.LatestVersion;
+                ReleaseNotesText = result.ReleaseNotes;
+                UpdateDownloadUrl = result.DownloadUrl;
+                IsUpdateAvailable = result.IsUpdateAvailable;
+
+                if (result.IsUpdateAvailable)
+                {
+                    UpdateStatusText = $"¡Nueva versión v{result.LatestVersion} disponible!";
+                }
+                else if (!string.IsNullOrEmpty(result.LatestVersion))
+                {
+                    UpdateStatusText = $"WinCleaner está actualizado (v{result.CurrentVersion}).";
+                }
+            }
         }
 
         public async System.Threading.Tasks.Task CheckForUpdatesAsync()

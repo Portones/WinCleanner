@@ -24,6 +24,8 @@ namespace WinCleaner.Services.Implementations
             _httpClient.Timeout = TimeSpan.FromSeconds(20);
         }
 
+        public WinCleanerUpdateInfo? LastUpdateInfo { get; private set; }
+
         public async Task<WinCleanerUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
         {
             var info = new WinCleanerUpdateInfo
@@ -102,6 +104,7 @@ namespace WinCleaner.Services.Implementations
                 Log.Error(ex, "Error al comprobar actualizaciones de WinCleaner desde GitHub.");
             }
 
+            LastUpdateInfo = info;
             return info;
         }
 

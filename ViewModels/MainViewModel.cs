@@ -89,6 +89,8 @@ namespace WinCleaner.ViewModels
             NavigateCommand = new RelayCommand<string>(Navigate);
         }
 
+        public SettingsViewModel SettingsViewModel => _settingsViewModel;
+
         private void Navigate(string? destination)
         {
             if (string.IsNullOrEmpty(destination)) return;
