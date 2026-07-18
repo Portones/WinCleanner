@@ -23,7 +23,7 @@
 
         <!-- CABECERA -->
         <StackPanel Grid.Row="0" Margin="0,0,0,15">
-            <TextBlock Text="🚨 Inspector de Fallos (Crash Inspector)" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+            <TextBlock Text="🚨 Inspector de Fallos" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
             <TextBlock Text="Analiza el registro de eventos de Windows para identificar cierres inesperados de aplicaciones, pantallas azules y fallos críticos." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
         </StackPanel>
 
@@ -99,7 +99,7 @@
         <!-- LISTA DE INCIDENTES -->
         <Border Grid.Row="3" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="10">
             <ListView ItemsSource="{Binding Crashes}" SelectedItem="{Binding SelectedCrash}"
-                      Background="Transparent" BorderThickness="0" Foreground="#F8FAFC">
+                      Style="{StaticResource ModernListView}" ItemContainerStyle="{StaticResource ModernListViewItem}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Fecha / Hora" Width="140" DisplayMemberBinding="{Binding TimestampText}"/>
