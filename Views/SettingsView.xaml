@@ -519,7 +519,7 @@
                                 <Button Grid.Row="2" Content="⬇️ Descargar e Instalar Ahora"
                                         Style="{StaticResource ActionButton}"
                                         Command="{Binding InstallUpdateCommand}"
-                                        Height="36" HorizontalAlignment="Stretch"/>
+                                        Padding="15,10" HorizontalAlignment="Stretch"/>
                             </Grid>
                         </Border>
                     </StackPanel>

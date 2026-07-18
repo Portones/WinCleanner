@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -361,35 +362,82 @@ namespace WinCleaner.Services.Implementations
 
         public void SetWindowsAutoStart(bool enable, bool minimized)
         {
+            const string taskName = "WinCleaner_Startup";
             try
             {
+                // Limpiar residuo en el registro de Windows si existía
                 using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
                 {
-                    if (key != null)
+                    if (key != null && key.GetValue("WinCleaner") != null)
                     {
-                        if (enable)
-                        {
-                            string exePath = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
-                            string command = $"\"{exePath}\"";
-                            if (minimized)
-                            {
-                                command += " --minimized";
-                            }
-                            key.SetValue("WinCleaner", command);
-                        }
-                        else
-                        {
-                            if (key.GetValue("WinCleaner") != null)
-                            {
-                                key.DeleteValue("WinCleaner", false);
-                            }
-                        }
+                        key.DeleteValue("WinCleaner", false);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error al configurar el inicio automático con Windows en el Registro.");
+                Log.Warning(ex, "Error al limpiar clave de registro antigua 'WinCleaner'.");
+            }
+
+            try
+            {
+                if (enable)
+                {
+                    string exePath = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    if (exePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string possibleExe = Path.ChangeExtension(exePath, ".exe");
+                        if (File.Exists(possibleExe))
+                        {
+                            exePath = possibleExe;
+                        }
+                    }
+
+                    string arguments = $"/create /tn \"{taskName}\" /tr \"\\\"{exePath}\\\"{(minimized ? " --minimized" : "")}\" /sc onlogon /rl highest /f";
+
+                    var startInfo = new ProcessStartInfo
+                    {
+                        FileName = "schtasks.exe",
+                        Arguments = arguments,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    };
+
+                    using (var process = Process.Start(startInfo))
+                    {
+                        process?.WaitForExit();
+                        if (process?.ExitCode != 0)
+                        {
+                            string error = process?.StandardError.ReadToEnd() ?? "Desconocido";
+                            throw new Exception($"schtasks falló con código {process?.ExitCode}: {error}");
+                        }
+                    }
+                    Log.Information("Inicio automático configurado correctamente mediante Tarea Programada.");
+                }
+                else
+                {
+                    var startInfo = new ProcessStartInfo
+                    {
+                        FileName = "schtasks.exe",
+                        Arguments = $"/delete /tn \"{taskName}\" /f",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true
+                    };
+
+                    using (var process = Process.Start(startInfo))
+                    {
+                        process?.WaitForExit();
+                    }
+                    Log.Information("Inicio automático desactivado (Tarea Programada eliminada).");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error al configurar el inicio automático con Windows.");
             }
         }
     }

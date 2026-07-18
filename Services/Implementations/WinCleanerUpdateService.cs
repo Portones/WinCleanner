@@ -176,6 +176,26 @@ namespace WinCleaner.Services.Implementations
         {
             try
             {
+                var uri = new Uri("/WinCleaner;component/Views/MainWindow.xaml", UriKind.Relative);
+                var streamInfo = System.Windows.Application.GetResourceStream(uri);
+                if (streamInfo != null)
+                {
+                    using var reader = new StreamReader(streamInfo.Stream);
+                    string content = reader.ReadToEnd();
+                    var match = System.Text.RegularExpressions.Regex.Match(content, @"Versión\s+(\d+\.\d+\.\d+)");
+                    if (match.Success)
+                    {
+                        return match.Groups[1].Value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "No se pudo leer la versión de MainWindow.xaml en runtime.");
+            }
+
+            try
+            {
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
                 if (version != null)
                 {
