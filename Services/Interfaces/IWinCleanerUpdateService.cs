@@ -20,5 +20,6 @@ namespace WinCleaner.Services.Interfaces
         Task<WinCleanerUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default);
         Task<bool> DownloadAndInstallUpdateAsync(string downloadUrl, IProgress<double> progress, CancellationToken cancellationToken = default);
         WinCleanerUpdateInfo? LastUpdateInfo { get; }
+        event Action<WinCleanerUpdateInfo>? UpdateChecked;
     }
 }

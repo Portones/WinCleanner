@@ -329,6 +329,8 @@ namespace WinCleaner.ViewModels
 
             RefreshMaintenanceStatus();
 
+            _winCleanerUpdateService.UpdateChecked += OnUpdateChecked;
+
             // Cargar información de actualización previamente buscada (ej. comprobación automática al arrancar)
             if (_winCleanerUpdateService.LastUpdateInfo != null)
             {
@@ -347,6 +349,26 @@ namespace WinCleaner.ViewModels
                     UpdateStatusText = $"WinCleaner está actualizado (v{result.CurrentVersion}).";
                 }
             }
+        }
+
+        private void OnUpdateChecked(WinCleaner.Services.Interfaces.WinCleanerUpdateInfo result)
+        {
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                LatestVersionText = result.LatestVersion;
+                ReleaseNotesText = result.ReleaseNotes;
+                UpdateDownloadUrl = result.DownloadUrl;
+                IsUpdateAvailable = result.IsUpdateAvailable;
+
+                if (result.IsUpdateAvailable)
+                {
+                    UpdateStatusText = $"¡Nueva versión v{result.LatestVersion} disponible!";
+                }
+                else if (!string.IsNullOrEmpty(result.LatestVersion))
+                {
+                    UpdateStatusText = $"WinCleaner está actualizado (v{result.CurrentVersion}).";
+                }
+            });
         }
 
         public async System.Threading.Tasks.Task CheckForUpdatesAsync()
@@ -386,14 +408,22 @@ namespace WinCleaner.ViewModels
 
         public async System.Threading.Tasks.Task InstallUpdateAsync()
         {
-            if (string.IsNullOrEmpty(UpdateDownloadUrl)) return;
+            if (string.IsNullOrEmpty(UpdateDownloadUrl))
+            {
+                UpdateStatusText = "Error: No se pudo obtener la URL de descarga para la actualización.";
+                return;
+            }
 
             IsDownloadingUpdate = true;
             DownloadProgress = 0;
-            UpdateStatusText = "Descargando instalador de la actualización...";
+            UpdateStatusText = "Iniciando descarga de la actualización...";
             try
             {
-                var progress = new Progress<double>(p => DownloadProgress = p);
+                var progress = new Progress<double>(p =>
+                {
+                    DownloadProgress = p;
+                    UpdateStatusText = $"Descargando actualización... {p:0.0}%";
+                });
                 bool success = await _winCleanerUpdateService.DownloadAndInstallUpdateAsync(UpdateDownloadUrl, progress);
                 
                 if (!success)
