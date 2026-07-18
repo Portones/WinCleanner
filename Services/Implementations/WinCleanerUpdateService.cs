@@ -65,13 +65,13 @@ namespace WinCleaner.Services.Implementations
                     info.PublishedAt = pubDate;
                 }
 
-                // Buscar asset ejecutable de instalación (.exe)
+                // Buscar asset ejecutable de instalación (.exe) o archivo comprimido (.zip)
                 if (root.TryGetProperty("assets", out var assetsProp) && assetsProp.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var asset in assetsProp.EnumerateArray())
                     {
                         string name = asset.GetProperty("name").GetString() ?? "";
-                        if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                        if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
                         {
                             info.DownloadUrl = asset.GetProperty("browser_download_url").GetString() ?? "";
                             if (asset.TryGetProperty("size", out var sizeProp))
@@ -116,7 +116,9 @@ namespace WinCleaner.Services.Implementations
                 return false;
             }
 
-            string tempPath = Path.Combine(Path.GetTempPath(), "WinCleanerSetup_Update.exe");
+            bool isZip = downloadUrl.EndsWith(".zip", StringComparison.OrdinalIgnoreCase);
+            string tempFileName = isZip ? "WinCleanerSetup_Update.zip" : "WinCleanerSetup_Update.exe";
+            string tempPath = Path.Combine(Path.GetTempPath(), tempFileName);
 
             try
             {
@@ -149,11 +151,34 @@ namespace WinCleaner.Services.Implementations
                 fileStream.Close();
                 Log.Information("Descarga de la actualización completada en: {Path}", tempPath);
 
+                string exeToRun = tempPath;
+
+                if (isZip)
+                {
+                    Log.Information("Descomprimiendo actualización...");
+                    string extractPath = Path.Combine(Path.GetTempPath(), "WinCleanerUpdateExtracted");
+                    if (Directory.Exists(extractPath))
+                    {
+                        Directory.Delete(extractPath, true);
+                    }
+                    Directory.CreateDirectory(extractPath);
+
+                    System.IO.Compression.ZipFile.ExtractToDirectory(tempPath, extractPath);
+
+                    // Buscar el primer .exe en el directorio extraído
+                    var files = Directory.GetFiles(extractPath, "*.exe", SearchOption.AllDirectories);
+                    if (files.Length == 0)
+                    {
+                        throw new Exception("No se encontró ningún instalador ejecutable (.exe) dentro del archivo ZIP descargado.");
+                    }
+                    exeToRun = files[0];
+                }
+
                 // Iniciar instalador de Inno Setup
-                Log.Information("Ejecutando instalador para actualizar WinCleaner...");
+                Log.Information("Ejecutando instalador ({Path}) para actualizar WinCleaner...", exeToRun);
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = tempPath,
+                    FileName = exeToRun,
                     Arguments = "/SILENT /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS",
                     UseShellExecute = true
                 };
