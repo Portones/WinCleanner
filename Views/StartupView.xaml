@@ -140,12 +140,23 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" Content="Recargar Lista" Style="{StaticResource ActionButton}" Command="{Binding LoadAppsCommand}" Margin="0,0,10,0"/>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock Text="Escaneando el registro y carpetas de inicio de Windows..." FontSize="11" Foreground="#94A3B8"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Ordenar por:" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox Style="{StaticResource ModernComboBox}" SelectedValuePath="Content" SelectedValue="{Binding SelectedSortOption, Mode=TwoWay}" Width="240" Height="32">
+                        <ComboBoxItem Content="Estado (Habilitados primero)"/>
+                        <ComboBoxItem Content="Estado (Deshabilitados primero)"/>
+                        <ComboBoxItem Content="Nombre"/>
+                        <ComboBoxItem Content="Impacto"/>
+                    </ComboBox>
                 </StackPanel>
             </Grid>
         </Border>

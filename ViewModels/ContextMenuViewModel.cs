@@ -14,14 +14,28 @@ namespace WinCleaner.ViewModels
     {
         private readonly IContextMenuService _contextMenuService;
 
-        private List<ContextMenuItem> _items = new();
+        private List<ContextMenuItem> _allItems = new();
+        private List<ContextMenuItem> _displayItems = new();
+        private string _searchText = string.Empty;
         private bool _isLoading;
         private string _statusMessage = "Listo";
 
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                {
+                    ApplyFilter();
+                }
+            }
+        }
+
         public List<ContextMenuItem> ContextMenuItems
         {
-            get => _items;
-            set => SetProperty(ref _items, value);
+            get => _displayItems;
+            set => SetProperty(ref _displayItems, value);
         }
 
         public bool IsLoading
@@ -59,9 +73,9 @@ namespace WinCleaner.ViewModels
 
             try
             {
-                var list = await _contextMenuService.GetContextMenuItemsAsync(CancellationToken.None);
-                ContextMenuItems = list;
-                StatusMessage = $"Se encontraron {ContextMenuItems.Count} elementos en el menú contextual.";
+                _allItems = await _contextMenuService.GetContextMenuItemsAsync(CancellationToken.None);
+                ApplyFilter();
+                StatusMessage = $"Se encontraron {_allItems.Count} elementos en el menú contextual.";
             }
             catch (Exception ex)
             {
@@ -71,6 +85,20 @@ namespace WinCleaner.ViewModels
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private void ApplyFilter()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                ContextMenuItems = _allItems.ToList();
+            }
+            else
+            {
+                ContextMenuItems = _allItems.Where(x => x.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                                         x.Category.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                                                         x.HandlerGuid.Contains(SearchText, StringComparison.OrdinalIgnoreCase)).ToList();
             }
         }
 

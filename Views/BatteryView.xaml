@@ -157,7 +157,7 @@
                             <TextBlock Text="Cambie el plan para optimizar consumo." FontSize="11.5" Foreground="#64748B" Margin="0,2,0,0"/>
                         </StackPanel>
 
-                        <ComboBox Grid.Column="1" ItemsSource="{Binding PowerPlans}" SelectedItem="{Binding SelectedPowerPlan, Mode=TwoWay}" DisplayMemberPath="Name" Height="30" VerticalAlignment="Center" Background="#0F172A" BorderBrush="#334155" Foreground="#F8FAFC"/>
+                        <ComboBox Grid.Column="1" Style="{StaticResource ModernComboBox}" ItemsSource="{Binding PowerPlans}" SelectedItem="{Binding SelectedPowerPlan, Mode=TwoWay}" DisplayMemberPath="Name" Height="32" VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
 

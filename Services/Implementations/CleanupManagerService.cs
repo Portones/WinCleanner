@@ -75,10 +75,10 @@ namespace WinCleaner.Services.Implementations
 
             Log.Information("Iniciando proceso de limpieza para {Count} elementos.", items.Count);
 
-            // Agrupar elementos por ID de módulo
             var itemsByModule = items.GroupBy(x => x.ModuleId).ToList();
             int totalCleaned = 0;
-            int processedGroups = 0;
+            int totalItemsCount = items.Count;
+            int processedItemsCount = 0;
 
             foreach (var group in itemsByModule)
             {
@@ -87,25 +87,30 @@ namespace WinCleaner.Services.Implementations
                 {
                     try
                     {
-                        Log.Information("Iniciando limpieza en módulo: {ModuleName} ({Count} elementos)", module.Name, group.Count());
-                        
+                        var groupList = group.ToList();
                         var groupProgress = new Progress<double>(val =>
                         {
-                            double baseProgress = (double)processedGroups / itemsByModule.Count * 100;
-                            double currentProgress = baseProgress + (val / itemsByModule.Count);
-                            progress.Report(currentProgress);
+                            double currentGroupItems = (val / 100.0) * groupList.Count;
+                            double overallProgress = ((processedItemsCount + currentGroupItems) / totalItemsCount) * 100.0;
+                            progress.Report(overallProgress);
                         });
 
-                        var cleanedCount = await module.CleanAsync(group.ToList(), groupProgress, cancellationToken);
+                        var cleanedCount = await module.CleanAsync(groupList, groupProgress, cancellationToken);
                         totalCleaned += cleanedCount;
+                        processedItemsCount += groupList.Count;
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex, "Error al limpiar elementos del módulo {ModuleId}", group.Key);
+                        processedItemsCount += group.Count();
                     }
                 }
-                processedGroups++;
-                progress.Report((double)processedGroups / itemsByModule.Count * 100);
+                else
+                {
+                    processedItemsCount += group.Count();
+                }
+
+                progress.Report((double)processedItemsCount / totalItemsCount * 100.0);
             }
 
             Log.Information("Limpieza completada. Total elementos eliminados/procesados: {TotalCleaned}", totalCleaned);

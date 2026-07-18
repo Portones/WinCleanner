@@ -37,21 +37,21 @@ namespace WinCleaner.Services.Implementations
 
                 try
                 {
-                    var files = await Task.Run(() => Directory.GetFiles(path, "*.*", SearchOption.AllDirectories), cancellationToken);
-                    foreach (var file in files)
+                    await Task.Run(() =>
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        try
+                        foreach (var fi in SafeDirectoryEnumerator.EnumerateFilesSafe(path))
                         {
-                            var fi = new FileInfo(file);
-                            // Omitir archivos menores de 1 KB para evitar ruido de logs o vacíos repetitivos
-                            if (fi.Exists && fi.Length > 1024)
+                            cancellationToken.ThrowIfCancellationRequested();
+                            try
                             {
-                                allFiles.Add(fi);
+                                if (fi.Exists && fi.Length > 1024)
+                                {
+                                    allFiles.Add(fi);
+                                }
                             }
+                            catch { }
                         }
-                        catch { /* Ignorar bloqueados */ }
-                    }
+                    }, cancellationToken);
                 }
                 catch (Exception ex)
                 {

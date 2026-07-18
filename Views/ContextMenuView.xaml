@@ -37,13 +37,17 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="220"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Recargar Lista" Style="{StaticResource ActionButton}" Command="{Binding LoadItemsCommand}" Margin="0,0,10,0"/>
+                <Button Grid.Column="0" Content="Recargar Lista" Style="{StaticResource ActionButton}" Command="{Binding LoadItemsCommand}" Margin="0,0,15,0"/>
 
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <TextBlock Text="Escaneando el registro de extensiones de shell de Windows..." FontSize="11" Foreground="#94A3B8"/>
+                <TextBox Grid.Column="1" Style="{StaticResource ModernTextBox}" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="15,0,0,0" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="Escaneando el registro de extensiones de shell..." FontSize="11" Foreground="#94A3B8" Margin="0,0,0,4"/>
+                    <ProgressBar IsIndeterminate="True" Height="4" Style="{StaticResource ModernProgressBar}"/>
                 </StackPanel>
             </Grid>
         </Border>

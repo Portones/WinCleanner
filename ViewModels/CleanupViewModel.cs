@@ -286,11 +286,12 @@ namespace WinCleaner.ViewModels
                     _configurationService.SaveSettings();
                 }
 
+                var cleanedSet = new HashSet<CleanableItem>(itemsToClean);
                 foreach (var cleanedItem in itemsToClean)
                 {
                     cleanedItem.PropertyChanged -= Item_PropertyChanged;
-                    _allItems.Remove(cleanedItem);
                 }
+                _allItems.RemoveAll(x => cleanedSet.Contains(x));
 
                 ApplyFilterAndSort();
                 _totalFoundSize = _allItems.Sum(x => x.Size);
@@ -333,8 +334,9 @@ namespace WinCleaner.ViewModels
 
         private void UpdateSelectedSize()
         {
-            _selectedSize = _allItems.Where(x => x.IsSelected).Sum(x => x.Size);
-            SelectedSizeText = CleanableItem.FormatSize(_selectedSize);
+            var selectedItems = _allItems.Where(x => x.IsSelected).ToList();
+            _selectedSize = selectedItems.Sum(x => x.Size);
+            SelectedSizeText = $"{CleanableItem.FormatSize(_selectedSize)} ({selectedItems.Count} elementos)";
         }
 
         private void ApplyFilterAndSort()

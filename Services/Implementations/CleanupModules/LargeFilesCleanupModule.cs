@@ -52,51 +52,36 @@ namespace WinCleaner.Services.Implementations.CleanupModules
 
                 try
                 {
-                    // Obtener lista de archivos en segundo plano
-                    var files = await Task.Run(() => Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories), cancellationToken);
-                    
-                    int fileIndex = 0;
-                    foreach (var file in files)
+                    await Task.Run(() =>
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        if (exDirs.Any(ex => file.StartsWith(ex, StringComparison.OrdinalIgnoreCase)))
+                        foreach (var fileInfo in SafeDirectoryEnumerator.EnumerateFilesSafe(folder, exDirs))
                         {
-                            continue;
-                        }
-
-                        try
-                        {
-                            var fileInfo = new FileInfo(file);
-                            if (fileInfo.Exists && fileInfo.Length >= minSizeLimit)
+                            cancellationToken.ThrowIfCancellationRequested();
+                            try
                             {
-                                var item = new CleanableItem
+                                if (fileInfo.Exists && fileInfo.Length >= minSizeLimit)
                                 {
-                                    Path = file,
-                                    Name = fileInfo.Name,
-                                    Size = fileInfo.Length,
-                                    LastModified = fileInfo.LastWriteTime,
-                                    FileType = "Archivo Grande",
-                                    ModuleId = Id
-                                };
-                                result.Items.Add(item);
-                                result.TotalSize += item.Size;
+                                    var item = new CleanableItem
+                                    {
+                                        Path = fileInfo.FullName,
+                                        Name = fileInfo.Name,
+                                        Size = fileInfo.Length,
+                                        LastModified = fileInfo.LastWriteTime,
+                                        FileType = "Archivo Grande",
+                                        ModuleId = Id
+                                    };
+                                    lock (result)
+                                    {
+                                        result.Items.Add(item);
+                                        result.TotalSize += item.Size;
+                                    }
+                                }
                             }
+                            catch { }
                         }
-                        catch (FileNotFoundException) { /* Archivo borrado sobre la marcha */ }
-                        catch (UnauthorizedAccessException) { /* Sin acceso */ }
-                        catch (IOException) { /* Bloqueado */ }
-
-                        fileIndex++;
-                        if (fileIndex % 100 == 0)
-                        {
-                            double folderProgress = (double)processedFolders / targetFolders.Count * 100;
-                            double innerProgress = ((double)fileIndex / files.Length) * (100.0 / targetFolders.Count);
-                            progress.Report(folderProgress + innerProgress);
-                        }
-                    }
+                    }, cancellationToken);
                 }
-                catch (UnauthorizedAccessException) { /* Omitir carpeta sin permisos */ }
+                catch (UnauthorizedAccessException) { }
                 catch (Exception ex)
                 {
                     Log.Error(ex, "Error al buscar archivos grandes en {Path}", folder);

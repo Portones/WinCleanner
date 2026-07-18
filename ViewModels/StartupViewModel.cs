@@ -91,6 +91,21 @@ namespace WinCleaner.ViewModels
             _ = LoadAppsAsync();
         }
 
+        private List<StartupApp> _allLoadedApps = new();
+        private string _selectedSortOption = "Estado (Habilitados primero)";
+
+        public string SelectedSortOption
+        {
+            get => _selectedSortOption;
+            set
+            {
+                if (SetProperty(ref _selectedSortOption, value))
+                {
+                    ApplySort();
+                }
+            }
+        }
+
         private async Task LoadAppsAsync()
         {
             if (IsLoading) return;
@@ -113,7 +128,8 @@ namespace WinCleaner.ViewModels
                 OnPropertyChanged(nameof(BootStatusColor));
 
                 var apps = await _startupManager.GetStartupAppsAsync(token);
-                StartupApps = apps.OrderBy(x => x.Name).ToList();
+                _allLoadedApps = apps;
+                ApplySort();
                 StatusMessage = $"Se encontraron {StartupApps.Count} aplicaciones en el inicio.";
 
                 var highImpactApps = StartupApps.Where(x => x.IsEnabled && x.Impact.Equals("Alto", StringComparison.OrdinalIgnoreCase)).ToList();
@@ -139,6 +155,41 @@ namespace WinCleaner.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        private void ApplySort()
+        {
+            if (_allLoadedApps == null) return;
+            IEnumerable<StartupApp> query = _allLoadedApps;
+
+            switch (SelectedSortOption)
+            {
+                case "Estado (Habilitados primero)":
+                    query = query.OrderByDescending(x => x.IsEnabled).ThenBy(x => x.Name);
+                    break;
+                case "Estado (Deshabilitados primero)":
+                    query = query.OrderBy(x => x.IsEnabled).ThenBy(x => x.Name);
+                    break;
+                case "Nombre":
+                    query = query.OrderBy(x => x.Name);
+                    break;
+                case "Impacto":
+                    query = query.OrderByDescending(x => GetImpactRank(x.Impact)).ThenBy(x => x.Name);
+                    break;
+            }
+
+            StartupApps = query.ToList();
+        }
+
+        private static int GetImpactRank(string impact)
+        {
+            return impact switch
+            {
+                "Alto" => 3,
+                "Medio" => 2,
+                "Bajo" => 1,
+                _ => 0
+            };
         }
 
         private async Task ToggleAppAsync(StartupApp? app)
