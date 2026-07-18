@@ -29,6 +29,8 @@ namespace WinCleaner.ViewModels
         private readonly CrashInspectorViewModel _crashInspectorViewModel;
         private readonly RuntimeInstallerViewModel _runtimeInstallerViewModel;
         private readonly TcpTweakerViewModel _tcpTweakerViewModel;
+        private readonly CleanupHistoryViewModel _cleanupHistoryViewModel;
+        private readonly SsdOptimizerViewModel _ssdOptimizerViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -65,7 +67,9 @@ namespace WinCleaner.ViewModels
             SystemRepairViewModel systemRepairViewModel,
             CrashInspectorViewModel crashInspectorViewModel,
             RuntimeInstallerViewModel runtimeInstallerViewModel,
-            TcpTweakerViewModel tcpTweakerViewModel)
+            TcpTweakerViewModel tcpTweakerViewModel,
+            CleanupHistoryViewModel cleanupHistoryViewModel,
+            SsdOptimizerViewModel ssdOptimizerViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -88,6 +92,8 @@ namespace WinCleaner.ViewModels
             _crashInspectorViewModel = crashInspectorViewModel ?? throw new ArgumentNullException(nameof(crashInspectorViewModel));
             _runtimeInstallerViewModel = runtimeInstallerViewModel ?? throw new ArgumentNullException(nameof(runtimeInstallerViewModel));
             _tcpTweakerViewModel = tcpTweakerViewModel ?? throw new ArgumentNullException(nameof(tcpTweakerViewModel));
+            _cleanupHistoryViewModel = cleanupHistoryViewModel ?? throw new ArgumentNullException(nameof(cleanupHistoryViewModel));
+            _ssdOptimizerViewModel = ssdOptimizerViewModel ?? throw new ArgumentNullException(nameof(ssdOptimizerViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -203,6 +209,15 @@ namespace WinCleaner.ViewModels
             else if (destination.Equals("TcpTweaker", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _tcpTweakerViewModel;
+            }
+            else if (destination.Equals("CleanupHistory", StringComparison.OrdinalIgnoreCase))
+            {
+                _cleanupHistoryViewModel.LoadHistory();
+                CurrentPage = _cleanupHistoryViewModel;
+            }
+            else if (destination.Equals("SsdOptimizer", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _ssdOptimizerViewModel;
             }
         }
     }

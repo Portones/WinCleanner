@@ -1,0 +1,112 @@
+<UserControl x:Class="WinCleaner.Views.SsdOptimizerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:SsdOptimizerViewModel}"
+             d:DesignHeight="650" d:DesignWidth="900">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="160"/>
+        </Grid.RowDefinitions>
+
+        <!-- CABECERA -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="💽 Optimizador de Unidades SSD (TRIM)" FontSize="26" FontWeight="Bold" Foreground="#F8FAFC"/>
+            <TextBlock Text="Identifica unidades de estado sólido (SSD) y ejecuta re-TRIM asíncrono para mantener la velocidad de lectura y escritura." FontSize="12" Foreground="#888888" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- BARRA DE ESTADO Y ACCIONES -->
+        <Border Grid.Row="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="15" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="🔄 Escanear Discos" Command="{Binding ScanDrivesCommand}" Style="{StaticResource SidebarButton}" Margin="0,0,8,0"/>
+                    <Button Content="⚡ Optimizar Unidad Seleccionada" Command="{Binding OptimizeDriveCommand}" Style="{StaticResource ActionButton}" Margin="0,0,8,0"/>
+                    <Button Content="🚀 Optimizar Todos los SSD" Command="{Binding OptimizeAllSsdCommand}" Style="{StaticResource ActionButton}" Background="#8B5CF6" Margin="0,0,8,0"/>
+                    <Button Content="🛑 Cancelar" Command="{Binding CancelCommand}" Style="{StaticResource ActionButton}" Background="#EF4444"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- LISTA DE UNIDADES -->
+        <Border Grid.Row="2" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,15">
+            <ListView ItemsSource="{Binding Drives}" SelectedItem="{Binding SelectedDrive}" Background="Transparent" BorderThickness="0" Foreground="#F8FAFC">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Letra / Nombre" Width="140">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding DriveLetter}" FontWeight="Bold" Foreground="#F8FAFC" Margin="0,0,6,0"/>
+                                        <TextBlock Text="{Binding VolumeLabel}" Foreground="#94A3B8"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Tipo de Medio" Width="140">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="#312E81" BorderBrush="#4F46E5" BorderThickness="1" CornerRadius="4" Padding="6,2">
+                                        <TextBlock Text="{Binding DriveType}" FontSize="11" FontWeight="Bold" Foreground="#A5B4FC"/>
+                                    </Border>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Capacidad Total" Width="140" DisplayMemberBinding="{Binding TotalSizeText}"/>
+                        <GridViewColumn Header="Espacio Libre" Width="140" DisplayMemberBinding="{Binding FreeSpaceText}"/>
+                        <GridViewColumn Header="Estado / Acción" Width="260" DisplayMemberBinding="{Binding Status}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Border>
+
+        <!-- TERMINAL DE SALIDA POWERSHELL -->
+        <Border Grid.Row="3" Background="#0B0F19" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="10" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,6">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="10" Height="10" Fill="#EF4444" Margin="0,0,6,0"/>
+                        <Ellipse Width="10" Height="10" Fill="#F59E0B" Margin="0,0,6,0"/>
+                        <Ellipse Width="10" Height="10" Fill="#10B981" Margin="0,0,10,0"/>
+                        <TextBlock Text="Consola de Optimización PowerShell (Optimize-Volume -ReTrim)" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+                    </StackPanel>
+                    <Button Content="Limpiar" Command="{Binding ClearLogCommand}" HorizontalAlignment="Right" Style="{StaticResource SidebarButton}" Padding="8,2" FontSize="11"/>
+                </Grid>
+
+                <TextBox x:Name="ConsoleLog"
+                         Grid.Row="1"
+                         Text="{Binding ConsoleLog, Mode=OneWay}"
+                         TextChanged="ConsoleLog_TextChanged"
+                         IsReadOnly="True"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         Background="Transparent"
+                         Foreground="#10B981"
+                         FontFamily="Consolas, Cascadia Code, Courier New"
+                         FontSize="11.5"
+                         BorderThickness="0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

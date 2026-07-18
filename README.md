@@ -14,7 +14,7 @@ Si solo deseas utilizar WinCleaner en tu ordenador, no necesitas compilar códig
 3. Ejecuta el instalador. Este colocará la aplicación de forma segura en tu sistema, creará un acceso directo en el Escritorio e integrará la utilidad de desinstalación de Windows.
 
 > [!IMPORTANT]
-> **Privilegios de Administrador**: WinCleaner realiza análisis profundos de disco, optimizaciones de RAM, vaciado de DNS, control de servicios de sistema y actualizaciones silenciosas mediante Winget. Por ello, la aplicación solicitará **ejecutarse como Administrador** al abrirse. Esto es totalmente normal y necesario para el correcto funcionamiento de todas las herramientas.
+> **Privilegios de Administrador**: WinCleaner realiza análisis profundos de disco, optimizaciones de RAM, vaciado de DNS, control de servicios de sistema, reparaciones SFC/DISM y actualizaciones silenciosas mediante Winget. Por ello, la aplicación solicitará **ejecutarse como Administrador** al abrirse. Esto es totalmente normal y necesario para el correcto funcionamiento de todas las herramientas.
 
 ---
 
@@ -43,9 +43,9 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 
 ### 2. Navegación Categorizada
 * Acceso organizado mediante un panel lateral dividido en 4 categorías:
-  * **Diagnóstico y Estado**: Dashboard, Analizador de Disco.
-  * **Limpieza de Espacio**: Limpieza Avanzada, Buscador de Duplicados, Limpiador de Fotos, Desinstalador de Apps.
-  * **Optimización y Sistema**: Rendimiento y Red, Actualizar Apps, Gestión de Inicio, Servicios, Menú Contextual.
+  * **Diagnóstico y Estado**: Dashboard, Inspector de Fallos, Optimizador SSD (TRIM), Analizador de Disco, Temperaturas, Energía y Batería, Controladores.
+  * **Limpieza de Espacio**: Limpieza Avanzada, Archivos Duplicados, Limpiador de Fotos, Historial Gráfico, Navegadores y Logs, Desinstalador de Apps.
+  * **Optimización y Sistema**: Reparar Sistema (SFC/DISM), Instalador de Runtimes, Ajustes TCP/IP, Rendimiento y Red, Optimizar RAM, Actualizar Apps, Gestión de Inicio, Servicios de Windows, Menú Contextual.
   * **Opciones**: Configuración de tema/idioma.
 * **Indicador de Página Activa**: Resaltado en azul índigo del apartado abierto actualmente.
 
@@ -94,10 +94,33 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 * **Herramientas de Windows**: Acceso directo al Administrador de Dispositivos (`devmgmt.msc`) y ventana de actualización de controladores opcionales.
 
 ### 13. Motor de Sugerencias Contextuales Inteligentes
-* **Limpieza Avanzada**: Detección inteligente de instaladores redundantes (programas que ya tienes instalados en el sistema) y descargas pesadas obsoletas de más de 6 meses.
-* **Optimización de Arranque**: Banner de alerta superior que identifica programas habilitados con impacto de inicio "Alto" y permite desactivarlos en lote de un solo clic.
-* **Eficiencia en Portátiles**: Detección activa si el equipo funciona en batería con carga baja y perfil de alto consumo, habilitando el botón rápido "Activar Ahorro" para alternar al plan economizador.
-* **Diagnósticos de Estabilidad**: Alerta si el hardware principal cuenta con controladores desactualizados, facilitando su puesta al día oficial.
+* **Limpieza Avanzada**: Detección inteligente de instaladores redundantes y descargas pesadas obsoletas de más de 6 meses.
+* **Optimización de Arranque**: Banner de alerta superior que identifica programas habilitados con impacto de inicio "Alto".
+* **Eficiencia en Portátiles**: Detección activa si el equipo funciona en batería con carga baja y perfil de alto consumo.
+
+### 14. Reparador de Archivos de Sistema (SFC & DISM GUI)
+* **Escaneo y Reparación**: Interfaz gráfica para ejecutar `sfc /scannow` y `dism /online /cleanup-image /restorehealth`.
+* **Consola en Vivo**: Transmisión de salida estándar línea por línea en tiempo real con codificación OEM 850 para caracteres en español y soporte de cancelación asíncrona.
+
+### 15. Inspector de Fallos (Crash Inspector)
+* **Análisis de Eventos**: Lectura optimizada del Registro de Eventos de Windows (`Application` y `System`).
+* **Detección de Pantallas Azules y Cuelgues**: Identifica incidentes críticos (BSOD ID 1001, Kernel-Power ID 41) y cierres inesperados de aplicaciones (ID 1000/1001) ofreciendo resúmenes legibles y detalles completos.
+
+### 16. Instalador de Runtimes Comunes (Winget)
+* **Instalación por Lotes**: Instalación silenciosa de librerías esenciales (Visual C++ 2015-2022 x64/x86, .NET 8/9 Desktop Runtimes, DirectX, Java JRE y XNA Framework).
+* **Gestión Desatendida**: Selección múltiple con checkboxes e historial de descarga de Winget en vivo.
+
+### 17. Optimizador de Red TCP/IP (TCP Tweaker)
+* **Optimización de Gaming (Ping)**: Desactiva el Algoritmo de Nagle (`TcpAckFrequency` y `TCPNoDelay` = 1) para enviar paquetes de datos de juegos inmediatamente sin buffering.
+* **Auto-Tuning y Offload**: Ajusta dinámicamente la ventana de recepción TCP y habilita TCP Chimney Offload para descargar de trabajo al procesador.
+
+### 18. Historial Gráfico de Limpieza
+* **Gráfica de Barras WPF Nativa**: Visualización interactiva del ahorro de almacenamiento acumulado por días sin dependencias de librerías externas.
+* **Estadísticas Acumuladas**: Reporte del total liberado, número de operaciones realizadas y promedio de limpieza.
+
+### 19. Optimizador de SSD (TRIM Manual)
+* **Detección de Tipo de Medio (WMI)**: Identifica si los discos conectados son unidades de estado sólido (SSD) o discos magnéticos (HDD).
+* **Re-TRIM Asíncrono**: Ejecuta el comando de optimización `Optimize-Volume -ReTrim` de forma transparente y segura.
 
 ---
 
@@ -113,4 +136,3 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 Esta herramienta realiza tareas de limpieza, optimización y modificación del sistema, incluyendo la eliminación permanente de archivos (evitando la Papelera de reciclaje) y la gestión de procesos o servicios. 
 
 El uso de **WinCleaner** es bajo su propia responsabilidad. Los desarrolladores no se hacen responsables de pérdidas de datos, fallos en el sistema o cualquier otro perjuicio derivado de la ejecución de esta aplicación. Se recomienda encarecidamente realizar copias de seguridad de sus datos importantes antes de proceder con limpiezas profundas o modificaciones críticas.
-
