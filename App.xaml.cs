@@ -187,6 +187,8 @@ namespace WinCleaner
             services.AddSingleton<IWinCleanerUpdateService, WinCleanerUpdateService>();
             services.AddSingleton<ISystemRepairService, SystemRepairService>();
             services.AddSingleton<ICrashInspectorService, CrashInspectorService>();
+            services.AddSingleton<IRuntimeInstallerService, RuntimeInstallerService>();
+            services.AddSingleton<ITcpTweakerService, TcpTweakerService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
@@ -219,6 +221,8 @@ namespace WinCleaner
             services.AddSingleton<BrowserCleanupViewModel>();
             services.AddSingleton<SystemRepairViewModel>();
             services.AddSingleton<CrashInspectorViewModel>();
+            services.AddSingleton<RuntimeInstallerViewModel>();
+            services.AddSingleton<TcpTweakerViewModel>();
 
             // Vistas
             services.AddSingleton<MainWindow>();

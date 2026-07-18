@@ -27,6 +27,8 @@ namespace WinCleaner.ViewModels
         private readonly BrowserCleanupViewModel _browserCleanupViewModel;
         private readonly SystemRepairViewModel _systemRepairViewModel;
         private readonly CrashInspectorViewModel _crashInspectorViewModel;
+        private readonly RuntimeInstallerViewModel _runtimeInstallerViewModel;
+        private readonly TcpTweakerViewModel _tcpTweakerViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -61,7 +63,9 @@ namespace WinCleaner.ViewModels
             DriverViewModel driverViewModel,
             BrowserCleanupViewModel browserCleanupViewModel,
             SystemRepairViewModel systemRepairViewModel,
-            CrashInspectorViewModel crashInspectorViewModel)
+            CrashInspectorViewModel crashInspectorViewModel,
+            RuntimeInstallerViewModel runtimeInstallerViewModel,
+            TcpTweakerViewModel tcpTweakerViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
             _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
@@ -82,6 +86,8 @@ namespace WinCleaner.ViewModels
             _browserCleanupViewModel = browserCleanupViewModel ?? throw new ArgumentNullException(nameof(browserCleanupViewModel));
             _systemRepairViewModel = systemRepairViewModel ?? throw new ArgumentNullException(nameof(systemRepairViewModel));
             _crashInspectorViewModel = crashInspectorViewModel ?? throw new ArgumentNullException(nameof(crashInspectorViewModel));
+            _runtimeInstallerViewModel = runtimeInstallerViewModel ?? throw new ArgumentNullException(nameof(runtimeInstallerViewModel));
+            _tcpTweakerViewModel = tcpTweakerViewModel ?? throw new ArgumentNullException(nameof(tcpTweakerViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -189,6 +195,14 @@ namespace WinCleaner.ViewModels
             else if (destination.Equals("CrashInspector", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _crashInspectorViewModel;
+            }
+            else if (destination.Equals("RuntimeInstaller", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _runtimeInstallerViewModel;
+            }
+            else if (destination.Equals("TcpTweaker", StringComparison.OrdinalIgnoreCase))
+            {
+                CurrentPage = _tcpTweakerViewModel;
             }
         }
     }

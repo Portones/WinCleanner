@@ -13,6 +13,31 @@
     
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!-- Estilo para el Botón de Notificación de Actualización -->
+        <Style x:Key="UpdateNotifyButton" TargetType="Button">
+            <Setter Property="Background" Value="#10B981"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="6" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#059669"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -71,6 +96,8 @@
                         <!-- SECCIÓN 3: OPTIMIZACIÓN Y SISTEMA -->
                         <TextBlock Text="OPTIMIZACIÓN Y SISTEMA" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,0,0,6"/>
                         <Button Content="Reparar Sistema (SFC/DISM)" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="SystemRepair" Tag="SystemRepair" Margin="0,0,0,4"/>
+                        <Button Content="Instalador de Runtimes" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="RuntimeInstaller" Tag="RuntimeInstaller" Margin="0,0,0,4"/>
+                        <Button Content="Ajustes TCP/IP" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="TcpTweaker" Tag="TcpTweaker" Margin="0,0,0,4"/>
                         <Button Content="Rendimiento y Red" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Performance" Tag="Performance" Margin="0,0,0,4"/>
                         <Button Content="Optimizar RAM" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="RamOptimizer" Tag="RamOptimizer" Margin="0,0,0,4"/>
                         <Button Content="Actualizar Apps" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Updater" Tag="Updater" Margin="0,0,0,4"/>
@@ -84,6 +111,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
+                <!-- Footer del Sidebar -->
                 <StackPanel Grid.Row="2" Margin="10,0,0,10">
                     <!-- Botón de Notificación de Actualización -->
                     <Button Content="📥 Actualización Disponible" 
@@ -163,6 +191,12 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:CrashInspectorViewModel}">
                     <local:CrashInspectorView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RuntimeInstallerViewModel}">
+                    <local:RuntimeInstallerView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:TcpTweakerViewModel}">
+                    <local:TcpTweakerView/>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                     <local:SettingsView/>
