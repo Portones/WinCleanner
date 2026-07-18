@@ -125,7 +125,7 @@ namespace WinCleaner.ViewModels
                 var gpuItem = temps.FirstOrDefault(t => t.ComponentName.Contains("GPU"));
                 if (gpuItem != null) GpuTemp = gpuItem.CurrentValue;
 
-                var diskItem = temps.FirstOrDefault(t => t.ComponentName.Contains("SSD/HDD"));
+                var diskItem = temps.FirstOrDefault(t => t.ComponentCategory == "DISK");
                 if (diskItem != null) DiskTemp = diskItem.CurrentValue;
 
                 // Validar si hay algún componente sobrecalentado

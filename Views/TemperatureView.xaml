@@ -230,8 +230,11 @@
                                             <ColumnDefinition Width="1.5*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Componente -->
-                                        <TextBlock Grid.Column="0" Text="{Binding ComponentName}" FontSize="13" FontWeight="SemiBold" Foreground="#F1F5F9" VerticalAlignment="Center"/>
+                                        <!-- Componente y Modelo de Disco/Hardware -->
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding ComponentName}" FontSize="13" FontWeight="SemiBold" Foreground="#F1F5F9"/>
+                                            <TextBlock Text="{Binding ModelName}" FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                                        </StackPanel>
 
                                         <!-- Temperatura -->
                                         <TextBlock Grid.Column="1" Text="{Binding ValueText}" FontSize="13" Foreground="{Binding StatusColor}" FontWeight="Bold" VerticalAlignment="Center"/>
