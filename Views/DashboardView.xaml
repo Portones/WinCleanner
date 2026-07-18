@@ -33,11 +33,13 @@
                 </StackPanel>
             </StackPanel>
 
-            <Border Grid.Column="1" Background="#1E293B" BorderBrush="#334155" BorderThickness="1"
-                    CornerRadius="20" Padding="14,6" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="9" Height="9" Fill="{Binding HealthColor, FallbackValue=#10B981}"
-                             Margin="0,0,8,0" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="📊 Generar Reporte" Command="{Binding GenerateReportCommand}" Style="{StaticResource SidebarButton}" Height="34" Padding="14,0" Margin="0,0,12,0"/>
+                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1"
+                        CornerRadius="20" Padding="14,6">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="9" Height="9" Fill="{Binding HealthColor, FallbackValue=#10B981}"
+                                 Margin="0,0,8,0" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                         <Ellipse.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Ellipse.RenderTransform>
                         <Ellipse.Triggers>
                             <EventTrigger RoutedEvent="Ellipse.Loaded">
@@ -55,6 +57,7 @@
                     <TextBlock Text="{Binding OverallHealth}" FontSize="12.5" FontWeight="Bold" Foreground="#F8FAFC" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
+        </StackPanel>
         </Grid>
 
         <!-- ═══ RECOMENDACIONES ═══ -->

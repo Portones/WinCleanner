@@ -375,6 +375,86 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
+
+                <!-- CARD 5: NOTIFICACIONES Y MONITOREO EN SEGUNDO PLANO -->
+                <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="18" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="Notificaciones y Bandeja del Sistema" FontSize="16" FontWeight="Bold" Foreground="#38BDF8" Margin="0,0,0,15"/>
+
+                        <!-- Minimizar a la Bandeja -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Minimizar a la Bandeja del Sistema (System Tray)" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Al minimizar o cerrar la aplicación, permanecerá activa junto al reloj de Windows." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding MinimizeToTray, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#334155" Margin="0,0,0,12"/>
+
+                        <!-- Monitoreo Silencioso -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Monitoreo Silencioso de Hardware" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Supervisa de forma constante la memoria RAM, espacio libre y temperaturas en segundo plano." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding EnableBackgroundMonitoring, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#334155" Margin="0,0,0,12"/>
+
+                        <!-- Alerta RAM -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Notificación por Memoria RAM Elevada (> 85%)" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Muestra un aviso emergente cuando la memoria RAM esté saturada." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding NotifyHighRam, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#334155" Margin="0,0,0,12"/>
+
+                        <!-- Alerta Disco -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Notificación por Poco Espacio en Disco C: (&lt; 10 GB)" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Avisa cuando el disco principal tenga poco espacio disponible." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding NotifyLowDiskSpace, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <Border Height="1" Background="#334155" Margin="0,0,0,12"/>
+
+                        <!-- Alerta Temperatura -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Notificación por Temperatura Crítica (> 80°C)" FontSize="13" FontWeight="SemiBold" Foreground="#F8FAFC"/>
+                                <TextBlock Text="Avisa si la CPU o GPU sobrepasan los límites seguros de temperatura." FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding NotifyHighTemp, Mode=TwoWay}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
     </Grid>

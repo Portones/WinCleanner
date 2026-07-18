@@ -17,6 +17,7 @@ namespace WinCleaner.ViewModels
         private readonly IConfigurationService _configurationService;
         private readonly ISystemDiagnosticService _diagnosticService;
         private readonly IRamBoosterService _ramBooster;
+        private readonly IReportGeneratorService _reportGenerator;
         private readonly DispatcherTimer _timer;
 
         private string _statusMessage = "WinCleaner - Diagnóstico en Tiempo Real Activo";
@@ -129,18 +130,22 @@ namespace WinCleaner.ViewModels
 
         public ICommand OptimizeRamCommand { get; }
         public ICommand ExecuteRecommendationCommand { get; }
+        public ICommand GenerateReportCommand { get; }
 
         public DashboardViewModel(
             IConfigurationService configurationService, 
             ISystemDiagnosticService diagnosticService,
-            IRamBoosterService ramBooster)
+            IRamBoosterService ramBooster,
+            IReportGeneratorService reportGenerator)
         {
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
             _diagnosticService = diagnosticService ?? throw new ArgumentNullException(nameof(diagnosticService));
             _ramBooster = ramBooster ?? throw new ArgumentNullException(nameof(ramBooster));
+            _reportGenerator = reportGenerator ?? throw new ArgumentNullException(nameof(reportGenerator));
 
             OptimizeRamCommand = new AsyncRelayCommand(OptimizeRamAsync);
             ExecuteRecommendationCommand = new AsyncRelayCommand<OptimizationRecommendation>(ExecuteRecommendationAsync);
+            GenerateReportCommand = new AsyncRelayCommand(GenerateReportAsync);
 
             RefreshMetrics();
 
@@ -337,6 +342,21 @@ namespace WinCleaner.ViewModels
             finally
             {
                 IsOptimizingRam = false;
+            }
+        }
+
+        private async Task GenerateReportAsync()
+        {
+            try
+            {
+                StatusMessage = "Generando reporte de diagnóstico...";
+                string filePath = await _reportGenerator.GenerateAndOpenReportAsync();
+                StatusMessage = "Reporte de diagnóstico generado con éxito.";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "Error al generar el reporte.";
+                Serilog.Log.Error(ex, "Error al generar el reporte desde DashboardViewModel.");
             }
         }
 

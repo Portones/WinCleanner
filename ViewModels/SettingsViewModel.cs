@@ -65,6 +65,76 @@ namespace WinCleaner.ViewModels
             }
         }
 
+        public bool MinimizeToTray
+        {
+            get => _configurationService.CurrentSettings.MinimizeToTray;
+            set
+            {
+                if (_configurationService.CurrentSettings.MinimizeToTray != value)
+                {
+                    _configurationService.CurrentSettings.MinimizeToTray = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool EnableBackgroundMonitoring
+        {
+            get => _configurationService.CurrentSettings.EnableBackgroundMonitoring;
+            set
+            {
+                if (_configurationService.CurrentSettings.EnableBackgroundMonitoring != value)
+                {
+                    _configurationService.CurrentSettings.EnableBackgroundMonitoring = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool NotifyHighRam
+        {
+            get => _configurationService.CurrentSettings.NotifyHighRam;
+            set
+            {
+                if (_configurationService.CurrentSettings.NotifyHighRam != value)
+                {
+                    _configurationService.CurrentSettings.NotifyHighRam = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool NotifyLowDiskSpace
+        {
+            get => _configurationService.CurrentSettings.NotifyLowDiskSpace;
+            set
+            {
+                if (_configurationService.CurrentSettings.NotifyLowDiskSpace != value)
+                {
+                    _configurationService.CurrentSettings.NotifyLowDiskSpace = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool NotifyHighTemp
+        {
+            get => _configurationService.CurrentSettings.NotifyHighTemp;
+            set
+            {
+                if (_configurationService.CurrentSettings.NotifyHighTemp != value)
+                {
+                    _configurationService.CurrentSettings.NotifyHighTemp = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public long MinLargeFileSizeMb
         {
             get => _configurationService.CurrentSettings.MinLargeFileSizeMb;

@@ -10,6 +10,13 @@ namespace WinCleaner.Models
         public bool BypassRecycleBin { get; set; } = false; // Requiere confirmación doble si es true
         public bool StartWithWindows { get; set; } = false;
         public bool StartMinimized { get; set; } = false;
+        public bool MinimizeToTray { get; set; } = true;
+        public bool EnableBackgroundMonitoring { get; set; } = true;
+
+        // Notificaciones nativas
+        public bool NotifyHighRam { get; set; } = true;
+        public bool NotifyLowDiskSpace { get; set; } = true;
+        public bool NotifyHighTemp { get; set; } = true;
         
         // Configuración de Archivos Grandes
         public long MinLargeFileSizeMb { get; set; } = 100; // Por defecto 100MB

@@ -49,18 +49,18 @@ namespace WinCleaner
                     return;
                 }
 
-                // Configurar icono en la bandeja de sistema (SysTray)
-                SetupSystemTray();
-
                 // Mostrar la ventana principal inyectada
                 var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-                mainWindow.Closing += MainWindow_Closing;
+
+                // Inicializar servicio de bandeja del sistema y monitoreo silencioso
+                var trayService = ServiceProvider.GetRequiredService<ISystemTrayService>();
+                trayService.Initialize(mainWindow);
 
                 if (e.Args.Contains("--minimized", StringComparer.OrdinalIgnoreCase))
                 {
                     Log.Information("Iniciando minimizado en la bandeja del sistema (--minimized)...");
                     mainWindow.WindowState = WindowState.Minimized;
-                    mainWindow.Hide();
+                    trayService.HideToTray();
                 }
                 else
                 {
@@ -146,6 +146,9 @@ namespace WinCleaner
             services.AddSingleton<IScheduledMaintenanceService, ScheduledMaintenanceService>();
             services.AddSingleton<IBatteryService, BatteryService>();
             services.AddSingleton<IDriverService, DriverService>();
+            services.AddSingleton<INotificationService, NotificationService>();
+            services.AddSingleton<IReportGeneratorService, ReportGeneratorService>();
+            services.AddSingleton<ISystemTrayService, SystemTrayService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();
