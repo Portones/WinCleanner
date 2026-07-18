@@ -12,6 +12,7 @@ namespace WinCleaner.Models
         public bool StartMinimized { get; set; } = false;
         public bool MinimizeToTray { get; set; } = true;
         public bool EnableBackgroundMonitoring { get; set; } = true;
+        public bool AutoCheckUpdates { get; set; } = true;
 
         // Notificaciones nativas
         public bool NotifyHighRam { get; set; } = true;

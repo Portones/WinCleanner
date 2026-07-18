@@ -56,6 +56,32 @@ namespace WinCleaner
                 var uninstallWatcher = ServiceProvider.GetRequiredService<IUninstallWatcherService>();
                 uninstallWatcher.StartWatching();
 
+                // Comprobar actualizaciones automáticamente al iniciar si está habilitado
+                var configService = ServiceProvider.GetRequiredService<IConfigurationService>();
+                if (configService.CurrentSettings.AutoCheckUpdates)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var updateService = ServiceProvider.GetRequiredService<IWinCleanerUpdateService>();
+                            var updateInfo = await updateService.CheckForUpdatesAsync();
+                            if (updateInfo.IsUpdateAvailable)
+                            {
+                                var notificationService = ServiceProvider.GetRequiredService<INotificationService>();
+                                notificationService.ShowNotification(
+                                    "Actualización de WinCleaner Disponible",
+                                    $"La versión v{updateInfo.LatestVersion} está disponible. Ve a Configuración para actualizar.",
+                                    NotificationType.Info);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Verbose(ex, "Error en la comprobación automática de actualizaciones al iniciar.");
+                        }
+                    });
+                }
+
                 if (e.Args.Contains("--minimized", StringComparer.OrdinalIgnoreCase))
                 {
                     Log.Information("Iniciando minimizado en la bandeja del sistema (--minimized)...");
@@ -155,6 +181,7 @@ namespace WinCleaner
             services.AddSingleton<IBrowserCleanupService, BrowserCleanupService>();
             services.AddSingleton<IEventLogCleanerService, EventLogCleanerService>();
             services.AddSingleton<IUninstallWatcherService, UninstallWatcherService>();
+            services.AddSingleton<IWinCleanerUpdateService, WinCleanerUpdateService>();
 
             // Registrar Módulos de Limpieza (Inyección múltiple de ICleanupModule)
             services.AddSingleton<ICleanupModule, TempFilesCleanupModule>();

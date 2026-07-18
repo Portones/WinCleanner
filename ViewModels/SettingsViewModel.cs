@@ -12,11 +12,84 @@ namespace WinCleaner.ViewModels
         private readonly IConfigurationService _configurationService;
         private readonly IScheduledMaintenanceService _maintenanceService;
         private readonly IStartupManagerService _startupManager;
+        private readonly IWinCleanerUpdateService _winCleanerUpdateService;
 
         private string _maintenanceNextRunText = "Cargando...";
 
         private ObservableCollection<string> _excludedDirectories = null!;
         private ObservableCollection<string> _customScanDirectories = null!;
+
+        // Propiedades de Auto-Actualización
+        private bool _isCheckingUpdates;
+        private bool _isDownloadingUpdate;
+        private double _downloadProgress;
+        private string _updateStatusText = "Sin comprobar";
+        private string _latestVersionText = string.Empty;
+        private string _releaseNotesText = string.Empty;
+        private bool _isUpdateAvailable;
+        private string _updateDownloadUrl = string.Empty;
+
+        public bool AutoCheckUpdates
+        {
+            get => _configurationService.CurrentSettings.AutoCheckUpdates;
+            set
+            {
+                if (_configurationService.CurrentSettings.AutoCheckUpdates != value)
+                {
+                    _configurationService.CurrentSettings.AutoCheckUpdates = value;
+                    _configurationService.SaveSettings();
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsCheckingUpdates
+        {
+            get => _isCheckingUpdates;
+            set => SetProperty(ref _isCheckingUpdates, value);
+        }
+
+        public bool IsDownloadingUpdate
+        {
+            get => _isDownloadingUpdate;
+            set => SetProperty(ref _isDownloadingUpdate, value);
+        }
+
+        public double DownloadProgress
+        {
+            get => _downloadProgress;
+            set => SetProperty(ref _downloadProgress, value);
+        }
+
+        public string UpdateStatusText
+        {
+            get => _updateStatusText;
+            set => SetProperty(ref _updateStatusText, value);
+        }
+
+        public string LatestVersionText
+        {
+            get => _latestVersionText;
+            set => SetProperty(ref _latestVersionText, value);
+        }
+
+        public string ReleaseNotesText
+        {
+            get => _releaseNotesText;
+            set => SetProperty(ref _releaseNotesText, value);
+        }
+
+        public bool IsUpdateAvailable
+        {
+            get => _isUpdateAvailable;
+            set => SetProperty(ref _isUpdateAvailable, value);
+        }
+
+        public string UpdateDownloadUrl
+        {
+            get => _updateDownloadUrl;
+            set => SetProperty(ref _updateDownloadUrl, value);
+        }
 
         public bool BypassRecycleBin
         {
@@ -229,15 +302,19 @@ namespace WinCleaner.ViewModels
         public ICommand AddCustomDirectoryCommand { get; }
         public ICommand RemoveCustomDirectoryCommand { get; }
         public ICommand SaveMaintenanceCommand { get; }
+        public ICommand CheckForUpdatesCommand { get; }
+        public ICommand InstallUpdateCommand { get; }
 
         public SettingsViewModel(
             IConfigurationService configurationService, 
             IScheduledMaintenanceService maintenanceService,
-            IStartupManagerService startupManager)
+            IStartupManagerService startupManager,
+            IWinCleanerUpdateService winCleanerUpdateService)
         {
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
             _maintenanceService = maintenanceService ?? throw new ArgumentNullException(nameof(maintenanceService));
             _startupManager = startupManager ?? throw new ArgumentNullException(nameof(startupManager));
+            _winCleanerUpdateService = winCleanerUpdateService ?? throw new ArgumentNullException(nameof(winCleanerUpdateService));
 
             // Vincular colecciones observables y responder a cambios de colección automáticamente
             InitializeCollections();
@@ -247,8 +324,72 @@ namespace WinCleaner.ViewModels
             AddCustomDirectoryCommand = new RelayCommand(AddCustomDirectory);
             RemoveCustomDirectoryCommand = new RelayCommand<string>(RemoveCustomDirectory);
             SaveMaintenanceCommand = new RelayCommand(SaveMaintenanceSettings);
+            CheckForUpdatesCommand = new AsyncRelayCommand(CheckForUpdatesAsync);
+            InstallUpdateCommand = new AsyncRelayCommand(InstallUpdateAsync);
 
             RefreshMaintenanceStatus();
+        }
+
+        public async System.Threading.Tasks.Task CheckForUpdatesAsync()
+        {
+            IsCheckingUpdates = true;
+            UpdateStatusText = "Buscando actualizaciones en GitHub...";
+            try
+            {
+                var result = await _winCleanerUpdateService.CheckForUpdatesAsync();
+                LatestVersionText = result.LatestVersion;
+                ReleaseNotesText = result.ReleaseNotes;
+                UpdateDownloadUrl = result.DownloadUrl;
+                IsUpdateAvailable = result.IsUpdateAvailable;
+
+                if (result.IsUpdateAvailable)
+                {
+                    UpdateStatusText = $"¡Nueva versión v{result.LatestVersion} disponible!";
+                }
+                else if (!string.IsNullOrEmpty(result.LatestVersion))
+                {
+                    UpdateStatusText = $"WinCleaner está actualizado (v{result.CurrentVersion}).";
+                }
+                else
+                {
+                    UpdateStatusText = "No se pudo consultar el servidor de actualizaciones.";
+                }
+            }
+            catch (Exception ex)
+            {
+                UpdateStatusText = $"Error al buscar actualizaciones: {ex.Message}";
+            }
+            finally
+            {
+                IsCheckingUpdates = false;
+            }
+        }
+
+        public async System.Threading.Tasks.Task InstallUpdateAsync()
+        {
+            if (string.IsNullOrEmpty(UpdateDownloadUrl)) return;
+
+            IsDownloadingUpdate = true;
+            DownloadProgress = 0;
+            UpdateStatusText = "Descargando instalador de la actualización...";
+            try
+            {
+                var progress = new Progress<double>(p => DownloadProgress = p);
+                bool success = await _winCleanerUpdateService.DownloadAndInstallUpdateAsync(UpdateDownloadUrl, progress);
+                
+                if (!success)
+                {
+                    UpdateStatusText = "Ocurrió un error al descargar o iniciar la instalación.";
+                }
+            }
+            catch (Exception ex)
+            {
+                UpdateStatusText = $"Error al instalar actualización: {ex.Message}";
+            }
+            finally
+            {
+                IsDownloadingUpdate = false;
+            }
         }
 
         private void InitializeCollections()
