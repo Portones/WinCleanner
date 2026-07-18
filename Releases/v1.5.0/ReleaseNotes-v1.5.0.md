@@ -1,4 +1,4 @@
-# Notas de Lanzamiento - WinCleaner v1.5.0
+# 🚀 WinCleaner v1.5.0 - Release Notes
 
 ¡Nos complace presentar la versión **v1.5.0** de WinCleaner! Este lanzamiento consolida dos grandes módulos diseñados para extender el diagnóstico del hardware en equipos portátiles y la salud de los controladores del sistema de forma segura.
 

@@ -1,4 +1,4 @@
-# Notas de Lanzamiento - WinCleaner v1.6.0
+# 🚀 WinCleaner v1.6.0 - Release Notes
 
 ¡Estamos orgullosos de presentar la versión **v1.6.0** de WinCleaner! Este lanzamiento introduce el **Motor de Sugerencias Contextuales Inteligentes**, transformando WinCleaner en un asistente proactivo que analiza tu sistema y te sugiere optimizaciones en cada sección.
 

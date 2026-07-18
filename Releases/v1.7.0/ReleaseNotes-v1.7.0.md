@@ -1,4 +1,4 @@
-# Notas de Lanzamiento - WinCleaner v1.7.0
+# 🚀 WinCleaner v1.7.0 - Release Notes
 
 **Fecha de Lanzamiento**: 18 de Julio de 2026  
 **Versión**: v1.7.0  
