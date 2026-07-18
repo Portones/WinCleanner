@@ -27,11 +27,11 @@ Write-Host "   WinCleaner - Generador de Release v$Version  " -ForegroundColor C
 Write-Host "=============================================" -ForegroundColor Cyan
 
 try {
-    # 1. Limpieza de compilaciones anteriores
+    # 1. Limpieza de carpetas temporales y compilaciones previas
     Write-Host "`n[1/3] Limpiando carpetas temporales y compilaciones previas..." -ForegroundColor Yellow
-    if (Test-Path "bin") { Remove-Item -Recurse -Force "bin" }
-    if (Test-Path "obj") { Remove-Item -Recurse -Force "obj" }
-    Write-Host "✔ Carpetas de caché eliminadas con éxito." -ForegroundColor Green
+    try { Remove-Item -Path "bin\Release" -Recurse -Force -ErrorAction SilentlyContinue } catch {}
+    try { Remove-Item -Path "obj\Release" -Recurse -Force -ErrorAction SilentlyContinue } catch {}
+    Write-Host "✔ Preparación de directorios completada." -ForegroundColor Green
 
     # 2. Publicación de la aplicación (Autocontenida)
     Write-Host "`n[2/3] Publicando aplicación (Modo Release, Autocontenido x64)..." -ForegroundColor Yellow
@@ -58,17 +58,20 @@ try {
 
     if ($null -ne $iscc) {
         Write-Host "Encontrado compilador de Inno Setup en: $iscc" -ForegroundColor Gray
-        # Pasar la versión dinámica usando el parámetro /D de ISCC
-        & $iscc "/DAppVersion=$Version" "installer.iss"
-        Write-Host "`n✔ ¡Instalador WinCleanerSetup-v$Version.exe creado con éxito en la carpeta Releases/!" -ForegroundColor Green
+        $releaseDir = "Releases\v$Version"
+        if (-not (Test-Path $releaseDir)) { New-Item -ItemType Directory -Path $releaseDir | Out-Null }
+
+        # Pasar la versión dinámica y directorio de salida usando los parámetros /D y /O de ISCC
+        & $iscc "/DAppVersion=$Version" "/O$releaseDir" "installer.iss"
+        Write-Host "`n✔ ¡Instalador WinCleanerSetup-v$Version.exe creado con éxito en $releaseDir!" -ForegroundColor Green
 
         # 4. Comprimir el instalador en un archivo ZIP
         Write-Host "`nComprimiendo instalador en un archivo ZIP..." -ForegroundColor Yellow
-        $exePath = "Releases\WinCleanerSetup-v$Version.exe"
-        $zipPath = "Releases\WinCleanerSetup-v$Version.zip"
+        $exePath = Join-Path $releaseDir "WinCleanerSetup-v$Version.exe"
+        $zipPath = Join-Path $releaseDir "WinCleanerSetup-v$Version.zip"
         if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
         Compress-Archive -Path $exePath -DestinationPath $zipPath -Force
-        Write-Host "✔ ¡Archivo ZIP WinCleanerSetup-v$Version.zip creado con éxito en Releases/!" -ForegroundColor Green
+        Write-Host "✔ ¡Archivo ZIP WinCleanerSetup-v$Version.zip creado con éxito en $releaseDir!" -ForegroundColor Green
     } else {
         Write-Host "`n⚠ No se detectó 'ISCC.exe' en las rutas por defecto de Inno Setup." -ForegroundColor Orange
         Write-Host "Se omitió el empaquetado automático." -ForegroundColor Orange
