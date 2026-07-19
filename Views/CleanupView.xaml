@@ -153,25 +153,32 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" Content="Analizar Sistema" Style="{StaticResource ActionButton}" Command="{Binding ScanCommand}" IsEnabled="{Binding CanScan}" Margin="0,0,10,0"/>
                 
-                <Button Grid.Column="1" Content="Cancelar" Style="{StaticResource SidebarButton}" Command="{Binding CancelScanCommand}" IsEnabled="{Binding IsScanning}" Margin="0,0,10,0"/>
+                <!-- Selector de Unidad -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <TextBlock Text="Unidad:" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox Style="{StaticResource ModernComboBox}" ItemsSource="{Binding AvailableDrives}" SelectedItem="{Binding SelectedDrive}" IsEnabled="{Binding CanScan}" Width="100"/>
+                </StackPanel>
 
-                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsScanning, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button Grid.Column="2" Content="Cancelar" Style="{StaticResource SidebarButton}" Command="{Binding CancelScanCommand}" IsEnabled="{Binding IsScanning}" Margin="0,0,10,0"/>
+
+                <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsScanning, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock Text="Analizando directorios..." FontSize="11" Foreground="#94A3B8" Margin="0,0,0,4"/>
                     <ProgressBar Value="{Binding Progress, Mode=OneWay}" Minimum="0" Maximum="100" Height="6" Style="{StaticResource ModernProgressBar}"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsCleaning, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="10,0" Visibility="{Binding IsCleaning, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBlock Text="Eliminando elementos..." FontSize="11" Foreground="#94A3B8" Margin="0,0,0,4"/>
                     <ProgressBar Value="{Binding Progress, Mode=OneWay}" Minimum="0" Maximum="100" Height="6" Style="{StaticResource ModernProgressBar}"/>
                 </StackPanel>
 
-                <Button Grid.Column="3" Content="Ejecutar Limpieza" Command="{Binding CleanCommand}" IsEnabled="{Binding CanClean}" Margin="0,0,0,0">
+                <Button Grid.Column="4" Content="Ejecutar Limpieza" Command="{Binding CleanCommand}" IsEnabled="{Binding CanClean}" Margin="0,0,0,0">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource ActionButton}">
                             <Setter Property="Background" Value="#EF4444"/>

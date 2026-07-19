@@ -117,6 +117,14 @@
                         <!-- Grid de Miniaturas -->
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                             <ListBox ItemsSource="{Binding Screenshots}" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="0"/>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel Margin="0,5"/>
@@ -124,7 +132,12 @@
                                 </ListBox.ItemsPanel>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="150" Margin="6" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="6">
+                                        <Border Width="150" Margin="6" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="8" Padding="6" Cursor="Hand" ToolTip="Doble clic para abrir imagen">
+                                            <Border.InputBindings>
+                                                <MouseBinding Gesture="LeftDoubleClick" 
+                                                              Command="{Binding DataContext.OpenPhotoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                              CommandParameter="{Binding Path}"/>
+                                            </Border.InputBindings>
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="100"/>
@@ -231,7 +244,12 @@
                                                     </ItemsControl.ItemsPanel>
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Border Width="245" Margin="4" Background="#0B0F19" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="6">
+                                                            <Border Width="245" Margin="4" Background="#0B0F19" BorderBrush="#334155" BorderThickness="1" CornerRadius="6" Padding="6" Cursor="Hand" ToolTip="Doble clic para abrir imagen">
+                                                                <Border.InputBindings>
+                                                                    <MouseBinding Gesture="LeftDoubleClick" 
+                                                                                  Command="{Binding DataContext.OpenPhotoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                                                  CommandParameter="{Binding Path}"/>
+                                                                </Border.InputBindings>
                                                                 <Grid>
                                                                     <Grid.ColumnDefinitions>
                                                                         <ColumnDefinition Width="65"/>

@@ -248,7 +248,7 @@ namespace WinCleaner
                 var cleanupManager = ServiceProvider.GetRequiredService<ICleanupManagerService>();
 
                 Log.Information("Modo Silencioso: Iniciando escaneo de archivos temporales...");
-                var scanResult = await cleanupManager.ScanAllAsync(new Progress<double>(), CancellationToken.None);
+                var scanResult = await cleanupManager.ScanAllAsync("Todos", new Progress<double>(), CancellationToken.None);
 
                 if (scanResult.Items.Count > 0)
                 {

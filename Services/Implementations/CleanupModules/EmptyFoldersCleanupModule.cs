@@ -24,7 +24,7 @@ namespace WinCleaner.Services.Implementations.CleanupModules
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
         }
 
-        public async Task<ScanResult> ScanAsync(IProgress<double> progress, CancellationToken cancellationToken)
+        public async Task<ScanResult> ScanAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken)
         {
             var result = new ScanResult();
             var targetFolders = GetTargetFolders();
@@ -33,6 +33,10 @@ namespace WinCleaner.Services.Implementations.CleanupModules
             int processedFolders = 0;
             progress.Report(0);
 
+            string? driveFilter = (!string.IsNullOrEmpty(selectedDrive) && !selectedDrive.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+                ? selectedDrive.TrimEnd('\\').ToLowerInvariant()
+                : null;
+
             var foundFolders = new List<CleanableItem>();
 
             foreach (var folder in targetFolders)
@@ -40,6 +44,12 @@ namespace WinCleaner.Services.Implementations.CleanupModules
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (!Directory.Exists(folder))
+                {
+                    processedFolders++;
+                    continue;
+                }
+
+                if (driveFilter != null && !folder.ToLowerInvariant().StartsWith(driveFilter))
                 {
                     processedFolders++;
                     continue;

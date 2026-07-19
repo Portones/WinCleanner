@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,21 @@ namespace WinCleaner.ViewModels
         private string _searchText = string.Empty;
         private string _selectedCategory = "Todos";
         private List<string> _categories = new() { "Todos" };
+
+        private List<string> _availableDrives = new();
+        private string _selectedDrive = "Todos";
+
+        public List<string> AvailableDrives
+        {
+            get => _availableDrives;
+            set => SetProperty(ref _availableDrives, value);
+        }
+
+        public string SelectedDrive
+        {
+            get => _selectedDrive;
+            set => SetProperty(ref _selectedDrive, value);
+        }
         
         private long _totalFoundSize;
         private string _totalFoundSizeText = "0 Bytes";
@@ -160,6 +176,16 @@ namespace WinCleaner.ViewModels
             _cleanupManager = cleanupManager ?? throw new ArgumentNullException(nameof(cleanupManager));
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
 
+            try
+            {
+                var drives = DriveInfo.GetDrives().Where(d => d.IsReady).Select(d => d.Name.TrimEnd('\\')).ToList();
+                AvailableDrives = new List<string> { "Todos" }.Concat(drives).ToList();
+            }
+            catch
+            {
+                AvailableDrives = new List<string> { "Todos" };
+            }
+
             ScanCommand = new AsyncRelayCommand(ScanAsync);
             CancelScanCommand = new RelayCommand(CancelScan);
             CleanCommand = new AsyncRelayCommand(CleanAsync);
@@ -186,7 +212,7 @@ namespace WinCleaner.ViewModels
             try
             {
                 var progressIndicator = new Progress<double>(val => Progress = val);
-                var scanResult = await _cleanupManager.ScanAllAsync(progressIndicator, _scanCts.Token);
+                var scanResult = await _cleanupManager.ScanAllAsync(SelectedDrive, progressIndicator, _scanCts.Token);
 
                 _allItems = scanResult.Items;
                 _totalFoundSize = scanResult.TotalSize;

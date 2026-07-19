@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -68,6 +69,7 @@ namespace WinCleaner.ViewModels
         public ICommand SelectFolderCommand { get; }
         public ICommand KeepNewestInGroupsCommand { get; }
         public ICommand KeepOldestInGroupsCommand { get; }
+        public ICommand OpenPhotoCommand { get; }
 
         public PhotosCleanupViewModel(IPhotosCleanupService photosService)
         {
@@ -80,6 +82,7 @@ namespace WinCleaner.ViewModels
             SelectFolderCommand = new RelayCommand(SelectFolder);
             KeepNewestInGroupsCommand = new RelayCommand(KeepNewestInGroups);
             KeepOldestInGroupsCommand = new RelayCommand(KeepOldestInGroups);
+            OpenPhotoCommand = new RelayCommand<string>(OpenPhoto);
 
             // Inicializar ruta de escaneo de duplicados a Imágenes del usuario
             ScanPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
@@ -310,6 +313,23 @@ namespace WinCleaner.ViewModels
             var temp = DuplicateGroups;
             DuplicateGroups = null!;
             DuplicateGroups = temp;
+        }
+
+        private void OpenPhoto(string? filePath)
+        {
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "No se pudo abrir la imagen {Path}", filePath);
+            }
         }
 
         private static string FormatSize(long size)

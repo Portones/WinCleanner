@@ -9,7 +9,7 @@ namespace WinCleaner.Services.Interfaces
     public interface ICleanupManagerService
     {
         IEnumerable<ICleanupModule> Modules { get; }
-        Task<ScanResult> ScanAllAsync(IProgress<double> progress, CancellationToken cancellationToken);
+        Task<ScanResult> ScanAllAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken);
         Task<int> CleanItemsAsync(List<CleanableItem> items, IProgress<double> progress, CancellationToken cancellationToken);
     }
 }

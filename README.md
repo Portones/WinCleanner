@@ -65,9 +65,13 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 * **Filtros e Interfaz**: Caja de búsqueda interactiva por nombre o ID del paquete, y visualización de progreso global.
 
 ### 6. Limpiador Inteligente de Fotos y Buscador de Archivos Duplicados
-* **Capturas Obsoletas**: Escaneo en directorios comunes (Imágenes, Escritorio, Descargas) para encontrar capturas de pantalla de antigüedad configurable (ej. > 30 días) con previsualización eficiente en miniaturas.
+* **Capturas Obsoletas y Doble Clic**: Escaneo en directorios comunes (Imágenes, Escritorio, Descargas) para encontrar capturas de pantalla de antigüedad configurable (ej. > 30 días) con previsualización en miniaturas y apertura instantánea mediante el visor de imágenes nativo de Windows haciendo doble clic.
 * **Previsualización Ultraligera (RAM Fix)**: Instanciación optimizada de `BitmapImage` con decodificación de anchura ajustada (`DecodePixelWidth`) y creación diferida (`DelayCreation`), evitando picos de consumo de memoria RAM al previsualizar álbumes pesados.
 * **Búsqueda de Duplicados en Paralelo**: Algoritmo multietapa optimizado que descarta inmediatamente archivos con cabecera distinta mediante **Hash Parcial (4 KB)** y calcula firmas SHA-256 completas en paralelo utilizando `Parallel.ForEachAsync` multitarea.
+
+### 7. Limpieza Avanzada de Sistema con Selección de Unidad
+* **Selección de Disco por Unidad**: Selector dinámico de unidad física de disco (`ComboBox` con detección de unidades `DriveInfo.GetDrives()`) para filtrar el escaneo y vaciado de archivos temporales, carpetas vacías, descargas y papelera en un volumen concreto (ej. `C:`, `D:`) o globalmente en `Todos`.
+* **Módulos de Limpieza Integrados**: 8 módulos especializados de escaneo profundo y limpieza con opción de vaciado permanente o envío seguro a la Papelera de reciclaje de la unidad correspondiente.
 
 ### 7. Desinstalador por Lotes y Debloater de Windows
 * **Doble Pestaña**: Separación clara entre aplicaciones instaladas comunes y aplicaciones UWP nativas preinstaladas por el fabricante (Bloatware de Windows).

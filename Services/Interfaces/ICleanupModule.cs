@@ -11,7 +11,7 @@ namespace WinCleaner.Services.Interfaces
         string Id { get; }
         string Name { get; }
         string Description { get; }
-        Task<ScanResult> ScanAsync(IProgress<double> progress, CancellationToken cancellationToken);
+        Task<ScanResult> ScanAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken);
         Task<int> CleanAsync(List<CleanableItem> itemsToClean, IProgress<double> progress, CancellationToken cancellationToken);
     }
 }

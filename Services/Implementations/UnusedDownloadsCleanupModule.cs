@@ -15,17 +15,21 @@ namespace WinCleaner.Services.Implementations
         public string Name => "Descargas Olvidadas";
         public string Description => "Archivos de más de 100 MB en la carpeta de Descargas que no han sido modificados en los últimos 6 meses.";
 
-        public async Task<ScanResult> ScanAsync(IProgress<double> progress, CancellationToken cancellationToken)
+        public async Task<ScanResult> ScanAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
             {
                 var result = new ScanResult();
                 progress.Report(10);
 
+                string? driveFilter = (!string.IsNullOrEmpty(selectedDrive) && !selectedDrive.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+                    ? selectedDrive.TrimEnd('\\').ToLowerInvariant()
+                    : null;
+
                 try
                 {
                     string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-                    if (Directory.Exists(downloadsPath))
+                    if (Directory.Exists(downloadsPath) && (driveFilter == null || downloadsPath.ToLowerInvariant().StartsWith(driveFilter)))
                     {
                         var files = Directory.GetFiles(downloadsPath, "*.*", SearchOption.TopDirectoryOnly);
                         int totalFiles = files.Length;

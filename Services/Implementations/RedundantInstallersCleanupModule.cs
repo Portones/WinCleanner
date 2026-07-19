@@ -23,12 +23,16 @@ namespace WinCleaner.Services.Implementations
             _uninstallerService = uninstallerService ?? throw new ArgumentNullException(nameof(uninstallerService));
         }
 
-        public async Task<ScanResult> ScanAsync(IProgress<double> progress, CancellationToken cancellationToken)
+        public async Task<ScanResult> ScanAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken)
         {
             return await Task.Run(async () =>
             {
                 var result = new ScanResult();
                 progress.Report(10);
+
+                string? driveFilter = (!string.IsNullOrEmpty(selectedDrive) && !selectedDrive.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+                    ? selectedDrive.TrimEnd('\\').ToLowerInvariant()
+                    : null;
 
                 try
                 {
@@ -46,12 +50,12 @@ namespace WinCleaner.Services.Implementations
                     string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
                     var files = new List<string>();
-                    if (Directory.Exists(downloadsPath))
+                    if (Directory.Exists(downloadsPath) && (driveFilter == null || downloadsPath.ToLowerInvariant().StartsWith(driveFilter)))
                     {
                         files.AddRange(Directory.GetFiles(downloadsPath, "*.exe"));
                         files.AddRange(Directory.GetFiles(downloadsPath, "*.msi"));
                     }
-                    if (Directory.Exists(desktopPath))
+                    if (Directory.Exists(desktopPath) && (driveFilter == null || desktopPath.ToLowerInvariant().StartsWith(driveFilter)))
                     {
                         files.AddRange(Directory.GetFiles(desktopPath, "*.exe"));
                         files.AddRange(Directory.GetFiles(desktopPath, "*.msi"));

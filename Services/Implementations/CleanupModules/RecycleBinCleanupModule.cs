@@ -35,10 +35,14 @@ namespace WinCleaner.Services.Implementations.CleanupModules
         public string Name => "Papelera de Reciclaje";
         public string Description => "Muestra el espacio y archivos acumulados en la Papelera de reciclaje de Windows y permite vaciarla.";
 
-        public async Task<ScanResult> ScanAsync(IProgress<double> progress, CancellationToken cancellationToken)
+        public async Task<ScanResult> ScanAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken)
         {
             var result = new ScanResult();
             progress.Report(0);
+
+            string? rootPath = (!string.IsNullOrEmpty(selectedDrive) && !selectedDrive.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+                ? selectedDrive.TrimEnd('\\') + @"\"
+                : null;
 
             try
             {
@@ -48,7 +52,7 @@ namespace WinCleaner.Services.Implementations.CleanupModules
                     var rbInfo = new SHQUERYRBINFO();
                     rbInfo.cbSize = (uint)Marshal.SizeOf(typeof(SHQUERYRBINFO));
                     
-                    int hresult = SHQueryRecycleBin(null, ref rbInfo);
+                    int hresult = SHQueryRecycleBin(rootPath, ref rbInfo);
                     if (hresult == 0)
                     {
                         return rbInfo;
@@ -60,10 +64,11 @@ namespace WinCleaner.Services.Implementations.CleanupModules
 
                 if (info.i64NumItems > 0)
                 {
+                    string driveLabel = rootPath != null ? $" ({rootPath.TrimEnd('\\')})" : string.Empty;
                     var item = new CleanableItem
                     {
-                        Path = "RecycleBin", // Identificador simbólico
-                        Name = $"Papelera de reciclaje ({info.i64NumItems} archivos)",
+                        Path = rootPath ?? "RecycleBin", // Ruta del disco o identificador simbólico
+                        Name = $"Papelera de reciclaje{driveLabel} ({info.i64NumItems} archivos)",
                         Size = info.i64Size,
                         LastModified = DateTime.Now,
                         FileType = "Papelera de Reciclaje",
@@ -84,7 +89,6 @@ namespace WinCleaner.Services.Implementations.CleanupModules
 
         public async Task<int> CleanAsync(List<CleanableItem> itemsToClean, IProgress<double> progress, CancellationToken cancellationToken)
         {
-            // Nota: En la papelera de reciclaje, el vaciado es global para todas las unidades
             if (itemsToClean == null || itemsToClean.Count == 0) return 0;
 
             progress.Report(10);
@@ -94,8 +98,9 @@ namespace WinCleaner.Services.Implementations.CleanupModules
             {
                 int hresult = await Task.Run(() =>
                 {
+                    string? rootPath = (itemsToClean[0].Path != "RecycleBin" && itemsToClean[0].Path.Contains(":")) ? itemsToClean[0].Path : null;
                     // Vaciado sin confirmación nativa de Windows (SHERB_NOCONFIRMATION), sin sonido y sin UI de progreso
-                    return SHEmptyRecycleBin(IntPtr.Zero, null, SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
+                    return SHEmptyRecycleBin(IntPtr.Zero, rootPath, SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
                 });
 
                 progress.Report(90);

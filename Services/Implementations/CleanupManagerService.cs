@@ -18,12 +18,12 @@ namespace WinCleaner.Services.Implementations
             Modules = modules ?? throw new ArgumentNullException(nameof(modules));
         }
 
-        public async Task<ScanResult> ScanAllAsync(IProgress<double> progress, CancellationToken cancellationToken)
+        public async Task<ScanResult> ScanAllAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken)
         {
             var modulesList = Modules.ToList();
             if (modulesList.Count == 0) return new ScanResult();
 
-            Log.Information("Iniciando escaneo general de limpieza en {Count} módulos.", modulesList.Count);
+            Log.Information("Iniciando escaneo general de limpieza en {Count} módulos para la unidad {Drive}.", modulesList.Count, selectedDrive);
 
             var tasks = new List<Task<ScanResult>>();
             var progressTracker = new double[modulesList.Count];
@@ -43,7 +43,7 @@ namespace WinCleaner.Services.Implementations
                     }
                 });
 
-                tasks.Add(Task.Run(() => module.ScanAsync(moduleProgress, cancellationToken), cancellationToken));
+                tasks.Add(Task.Run(() => module.ScanAsync(selectedDrive, moduleProgress, cancellationToken), cancellationToken));
             }
 
             try

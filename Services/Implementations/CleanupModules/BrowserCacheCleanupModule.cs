@@ -24,7 +24,7 @@ namespace WinCleaner.Services.Implementations.CleanupModules
             _configurationService = configurationService ?? throw new ArgumentNullException(nameof(configurationService));
         }
 
-        public async Task<ScanResult> ScanAsync(IProgress<double> progress, CancellationToken cancellationToken)
+        public async Task<ScanResult> ScanAsync(string selectedDrive, IProgress<double> progress, CancellationToken cancellationToken)
         {
             var result = new ScanResult();
             progress.Report(0);
@@ -41,9 +41,19 @@ namespace WinCleaner.Services.Implementations.CleanupModules
 
             int processedBrowsers = 0;
 
+            string? driveFilter = (!string.IsNullOrEmpty(selectedDrive) && !selectedDrive.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+                ? selectedDrive.TrimEnd('\\').ToLowerInvariant()
+                : null;
+
             foreach (var scan in browserScans)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                if (driveFilter != null && !scan.Path.ToLowerInvariant().StartsWith(driveFilter))
+                {
+                    processedBrowsers++;
+                    continue;
+                }
 
                 if (!Directory.Exists(scan.Path))
                 {
