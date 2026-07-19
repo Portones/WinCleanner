@@ -159,5 +159,31 @@ namespace WinCleaner.Services.Implementations
                 }
             }, cancellationToken);
         }
+        public async Task<bool> IsRuntimeInstalledAsync(string id, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "winget",
+                    Arguments = $"list --id \"{id}\" --exact",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = System.Text.Encoding.UTF8
+                };
+
+                using var process = Process.Start(psi);
+                if (process == null) return false;
+
+                await process.WaitForExitAsync(cancellationToken);
+                return process.ExitCode == 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

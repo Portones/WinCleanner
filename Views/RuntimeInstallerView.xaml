@@ -36,6 +36,7 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="🔄 Actualizar" Command="{Binding RefreshCommand}" Style="{StaticResource SidebarButton}" Margin="0,0,6,0"/>
                     <Button Content="✓ Seleccionar Todos" Command="{Binding SelectAllCommand}" Style="{StaticResource SidebarButton}" Margin="0,0,6,0"/>
                     <Button Content="✗ Desmarcar Todos" Command="{Binding DeselectAllCommand}" Style="{StaticResource SidebarButton}" Margin="0,0,10,0"/>
 

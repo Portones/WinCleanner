@@ -83,9 +83,6 @@ namespace WinCleaner.ViewModels
 
             // Inicializar ruta de escaneo de duplicados a Imágenes del usuario
             ScanPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-
-            // Cargar por defecto
-            _ = ScanScreenshotsAsync();
         }
 
         private void SelectFolder()

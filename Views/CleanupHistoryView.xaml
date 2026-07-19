@@ -77,7 +77,7 @@
 
         <!-- TABLA DE REGISTROS HISTÓRICOS -->
         <Border Grid.Row="3" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="10" Padding="10">
-            <ListView ItemsSource="{Binding HistoryItems}" Background="Transparent" BorderThickness="0" Foreground="#F8FAFC">
+            <ListView ItemsSource="{Binding HistoryItems}" Style="{StaticResource ModernListView}" ItemContainerStyle="{StaticResource ModernListViewItem}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Fecha / Hora" Width="180" DisplayMemberBinding="{Binding DateText}"/>

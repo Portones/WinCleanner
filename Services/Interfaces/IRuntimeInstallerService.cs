@@ -10,5 +10,6 @@ namespace WinCleaner.Services.Interfaces
     {
         List<RuntimeItem> GetAvailableRuntimes();
         Task<bool> InstallRuntimeAsync(RuntimeItem item, IProgress<string> logProgress, CancellationToken cancellationToken);
+        Task<bool> IsRuntimeInstalledAsync(string id, CancellationToken cancellationToken = default);
     }
 }

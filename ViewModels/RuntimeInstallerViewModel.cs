@@ -66,24 +66,38 @@ namespace WinCleaner.ViewModels
         public ICommand InstallSelectedCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand ClearLogCommand { get; }
+        public ICommand RefreshCommand { get; }
 
         public RuntimeInstallerViewModel(IRuntimeInstallerService installerService)
         {
             _installerService = installerService ?? throw new ArgumentNullException(nameof(installerService));
 
-            LoadRuntimes();
+            _ = LoadRuntimesAsync();
 
             SelectAllCommand = new RelayCommand(() => SetAllSelected(true));
             DeselectAllCommand = new RelayCommand(() => SetAllSelected(false));
             InstallSelectedCommand = new AsyncRelayCommand(InstallSelectedAsync, () => CanExecuteAction);
             CancelCommand = new RelayCommand(CancelInstallation, () => IsInstalling);
             ClearLogCommand = new RelayCommand(() => ConsoleLog = string.Empty);
+            RefreshCommand = new AsyncRelayCommand(LoadRuntimesAsync);
         }
 
-        private void LoadRuntimes()
+        private async Task LoadRuntimesAsync()
         {
+            StatusMessage = "Comprobando dependencias instaladas...";
             var list = _installerService.GetAvailableRuntimes();
+
+            var tasks = list.Select(async item =>
+            {
+                bool installed = await _installerService.IsRuntimeInstalledAsync(item.Id);
+                item.Status = installed ? "Instalado" : "No Instalado";
+                item.IsSelected = !installed;
+            }).ToArray();
+
+            await Task.WhenAll(tasks);
+
             Runtimes = new ObservableCollection<RuntimeItem>(list);
+            StatusMessage = "Selecciona las dependencias deseadas y haz clic en 'Instalar Seleccionados'.";
         }
 
         private void SetAllSelected(bool selected)
@@ -128,6 +142,9 @@ namespace WinCleaner.ViewModels
                 }
 
                 StatusMessage = $"✅ Proceso finalizado: {installedCount} de {selectedItems.Count} dependencias instaladas.";
+                
+                // Recargar el estado actual de las dependencias
+                await LoadRuntimesAsync();
             }
             catch (OperationCanceledException)
             {
