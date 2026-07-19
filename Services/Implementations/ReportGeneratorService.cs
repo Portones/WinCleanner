@@ -138,7 +138,7 @@ namespace WinCleaner.Services.Implementations
 
                     // Footer
                     sb.AppendLine("    <div class='footer'>");
-                    sb.AppendLine("      WinCleaner v1.13.0 &bull; Informe de Diagnóstico Profesional &bull; Desarrollado con .NET 9 & WPF");
+                    sb.AppendLine("      WinCleaner v1.13.1 &bull; Informe de Diagnóstico Profesional &bull; Desarrollado con .NET 9 & WPF");
                     sb.AppendLine("    </div>");
 
                     sb.AppendLine("  </div>");
