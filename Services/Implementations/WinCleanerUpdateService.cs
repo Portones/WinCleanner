@@ -236,7 +236,7 @@ namespace WinCleaner.Services.Implementations
             {
                 // Ignorar
             }
-            return "1.13.1";
+            return "1.14.0";
         }
     }
 }
