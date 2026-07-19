@@ -63,9 +63,10 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 * **Instalación Silenciosa**: Descarga e instala en segundo plano las aplicaciones seleccionadas de forma automática, omitiendo los asistentes interactivos.
 * **Filtros e Interfaz**: Caja de búsqueda interactiva por nombre o ID del paquete, y visualización de progreso global.
 
-### 6. Limpiador Inteligente de Fotos
+### 6. Limpiador Inteligente de Fotos y Buscador de Archivos Duplicados
 * **Capturas Obsoletas**: Escaneo en directorios comunes (Imágenes, Escritorio, Descargas) para encontrar capturas de pantalla de antigüedad configurable (ej. > 30 días) con previsualización eficiente en miniaturas.
-* **Fotos Duplicadas (SHA-256)**: Algoritmo de doble filtro (agrupamiento rápido por peso y posterior coincidencia de firma SHA-256) para identificar y comparar imágenes idénticas lado a lado con casillas de acción.
+* **Previsualización Ultraligera (RAM Fix)**: Instanciación optimizada de `BitmapImage` con decodificación de anchura ajustada (`DecodePixelWidth`) y creación diferida (`DelayCreation`), evitando picos de consumo de memoria RAM al previsualizar álbumes pesados.
+* **Búsqueda de Duplicados en Paralelo**: Algoritmo multietapa optimizado que descarta inmediatamente archivos con cabecera distinta mediante **Hash Parcial (4 KB)** y calcula firmas SHA-256 completas en paralelo utilizando `Parallel.ForEachAsync` multitarea.
 
 ### 7. Desinstalador por Lotes y Debloater de Windows
 * **Doble Pestaña**: Separación clara entre aplicaciones instaladas comunes y aplicaciones UWP nativas preinstaladas por el fabricante (Bloatware de Windows).

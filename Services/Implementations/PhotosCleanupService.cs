@@ -186,10 +186,11 @@ namespace WinCleaner.Services.Implementations
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.UriSource = new Uri(path);
-                image.DecodePixelWidth = 120; // Resolución miniatura baja y eficiente
-                image.CacheOption = BitmapCacheOption.OnLoad; // Leer completo y cerrar flujo de archivo
+                image.DecodePixelWidth = 120; // Reduce la resolución en RAM al tamaño real de la miniatura de la UI
+                image.CacheOption = BitmapCacheOption.OnLoad; // Libera el descriptor del archivo físico de inmediato
+                image.CreateOptions = BitmapCreateOptions.DelayCreation;
                 image.EndInit();
-                image.Freeze(); // Desbloquear archivo y optimizar rendimiento de WPF
+                image.Freeze(); // Permite usar la imagen en hilos cruzados de WPF
                 return image;
             }
             catch

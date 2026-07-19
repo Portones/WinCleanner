@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -72,53 +73,91 @@ namespace WinCleaner.Services.Implementations
                 return groups;
             }
 
-            Log.Information("Encontrados {Count} grupos de tamaño con posibles duplicados. Calculando SHA-256...", sizeGroups.Count);
+            Log.Information("Encontrados {Count} grupos de tamaño con posibles duplicados. Aplicando filtro de Hash Parcial...", sizeGroups.Count);
 
-            // 3. Calcular hash SHA-256 únicamente para archivos que comparten el mismo tamaño
-            var hashDictionary = new Dictionary<string, List<FileInfo>>();
-            int processedGroups = 0;
+            // 3. Segunda Optimización: Filtrar por Hash Parcial (primeros 4KB)
+            var candidateGroups = new List<List<FileInfo>>();
+            int processedSizeGroups = 0;
 
             foreach (var sizeGroup in sizeGroups)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                foreach (var file in sizeGroup)
+                var partialHashGroups = sizeGroup
+                    .Select(f => new { File = f, PartialHash = CalculatePartialHash(f.FullName) })
+                    .Where(x => !string.IsNullOrEmpty(x.PartialHash))
+                    .GroupBy(x => x.PartialHash)
+                    .Where(g => g.Count() > 1);
+
+                foreach (var phGroup in partialHashGroups)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    candidateGroups.Add(phGroup.Select(x => x.File).ToList());
+                }
+
+                processedSizeGroups++;
+                progress.Report(20.0 + ((double)processedSizeGroups / sizeGroups.Count * 20.0)); // 20% a 40% asignado a hash parcial
+            }
+
+            if (candidateGroups.Count == 0)
+            {
+                progress.Report(100);
+                return groups;
+            }
+
+            Log.Information("Encontrados {Count} grupos candidatos tras Hash Parcial. Calculando SHA-256 completo en paralelo...", candidateGroups.Count);
+
+            // 4. Tercera Optimización: Calcular hash SHA-256 completo en paralelo usando Parallel.ForEachAsync
+            var hashDictionary = new ConcurrentDictionary<string, ConcurrentBag<FileInfo>>();
+            int totalCandidates = candidateGroups.Sum(g => g.Count);
+            int processedCandidates = 0;
+
+            var parallelOptions = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount,
+                CancellationToken = cancellationToken
+            };
+
+            foreach (var candidateGroup in candidateGroups)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                await Parallel.ForEachAsync(candidateGroup, parallelOptions, async (file, ct) =>
+                {
+                    ct.ThrowIfCancellationRequested();
                     try
                     {
-                        var hash = await Task.Run(() => CalculateSHA256(file.FullName), cancellationToken);
-                        if (string.IsNullOrEmpty(hash)) continue;
-
-                        if (!hashDictionary.TryGetValue(hash, out var fileList))
+                        var fullHash = await Task.Run(() => CalculateSHA256(file.FullName), ct);
+                        if (!string.IsNullOrEmpty(fullHash))
                         {
-                            fileList = new List<FileInfo>();
-                            hashDictionary[hash] = fileList;
+                            var bag = hashDictionary.GetOrAdd(fullHash, _ => new ConcurrentBag<FileInfo>());
+                            bag.Add(file);
                         }
-                        fileList.Add(file);
                     }
                     catch (Exception ex)
                     {
-                        Log.Warning("No se pudo procesar hash para {Path}: {Msg}", file.FullName, ex.Message);
+                        Log.Warning("No se pudo procesar hash completo para {Path}: {Msg}", file.FullName, ex.Message);
                     }
-                }
-
-                processedGroups++;
-                double calcProgress = 20.0 + ((double)processedGroups / sizeGroups.Count * 80.0);
-                progress.Report(calcProgress);
+                    finally
+                    {
+                        int currentProcessed = Interlocked.Increment(ref processedCandidates);
+                        double calcProgress = 40.0 + ((double)currentProcessed / totalCandidates * 60.0);
+                        progress.Report(calcProgress);
+                    }
+                });
             }
 
-            // 4. Agrupar resultados y descartar aquellos que no tengan duplicados reales (grupos de 1 elemento)
+            // 5. Agrupar resultados y descartar aquellos que no tengan duplicados reales (grupos de 1 elemento)
             foreach (var kvp in hashDictionary)
             {
-                if (kvp.Value.Count > 1)
+                var fileList = kvp.Value.ToList();
+                if (fileList.Count > 1)
                 {
-                    var fileInfoSample = kvp.Value[0];
+                    var fileInfoSample = fileList[0];
                     var group = new DuplicateGroup
                     {
                         Hash = kvp.Key,
                         Size = fileInfoSample.Length,
-                        Files = kvp.Value.Select(f => new DuplicateFile
+                        Files = fileList.Select(f => new DuplicateFile
                         {
                             Path = f.FullName,
                             Name = f.Name,
@@ -172,6 +211,25 @@ namespace WinCleaner.Services.Implementations
 
             progress.Report(100);
             return cleanedCount;
+        }
+
+        public static string CalculatePartialHash(string filePath, int bytesToRead = 4096)
+        {
+            try
+            {
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                byte[] buffer = new byte[bytesToRead];
+                int bytesRead = stream.Read(buffer, 0, bytesToRead);
+                if (bytesRead <= 0) return string.Empty;
+
+                using var sha256 = SHA256.Create();
+                byte[] hashBytes = sha256.ComputeHash(buffer, 0, bytesRead);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         private static string CalculateSHA256(string filePath)
