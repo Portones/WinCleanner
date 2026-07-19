@@ -1,0 +1,48 @@
+<UserControl x:Class="WinCleaner.Views.Categories.OptimizationCategoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:catVm="clr-namespace:WinCleaner.ViewModels.Categories"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance catVm:OptimizationCategoryViewModel}"
+             d:DesignHeight="650" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type vm:PerformanceViewModel}">
+            <local:PerformanceView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TcpTweakerViewModel}">
+            <local:TcpTweakerView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SystemRepairViewModel}">
+            <local:SystemRepairView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RamOptimizerViewModel}">
+            <local:RamOptimizerView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:StartupViewModel}">
+            <local:StartupView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ServicesViewModel}">
+            <local:ServicesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ContextMenuViewModel}">
+            <local:ContextMenuView/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="5">
+        <TabControl Style="{StaticResource ModernCategoryTabControl}">
+            <TabItem Header="⚡ Rendimiento y Red" Content="{Binding PerformanceViewModel}"/>
+            <TabItem Header="🌐 Ajustes TCP/IP" Content="{Binding TcpTweakerViewModel}"/>
+            <TabItem Header="🛠️ Reparar SFC/DISM" Content="{Binding SystemRepairViewModel}"/>
+            <TabItem Header="🧠 Optimizar RAM" Content="{Binding RamOptimizerViewModel}"/>
+            <TabItem Header="🚀 Gestión de Inicio" Content="{Binding StartupViewModel}"/>
+            <TabItem Header="⚙️ Servicios" Content="{Binding ServicesViewModel}"/>
+            <TabItem Header="🖱️ Menú Contextual" Content="{Binding ContextMenuViewModel}"/>
+        </TabControl>
+    </Grid>
+</UserControl>

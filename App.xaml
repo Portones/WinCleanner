@@ -417,5 +417,42 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Estilo de TabControl y TabItem para las Vistas de Categoría -->
+        <Style x:Key="ModernCategoryTabItem" TargetType="TabItem">
+            <Setter Property="Foreground" Value="#94A3B8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="border" CornerRadius="8,8,0,0" Background="#1E293B" BorderBrush="#334155" BorderThickness="1,1,1,0" Padding="{TemplateBinding Padding}" Margin="{TemplateBinding Margin}">
+                            <ContentPresenter x:Name="contentPresenter" ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#334155"/>
+                                <Setter Property="Foreground" Value="#F8FAFC"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#4F46E5"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#6366F1"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernCategoryTabControl" TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource ModernCategoryTabItem}"/>
+        </Style>
     </Application.Resources>
 </Application>

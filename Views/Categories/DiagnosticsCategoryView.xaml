@@ -1,0 +1,36 @@
+<UserControl x:Class="WinCleaner.Views.Categories.DiagnosticsCategoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:WinCleaner.Views"
+             xmlns:vm="clr-namespace:WinCleaner.ViewModels"
+             xmlns:catVm="clr-namespace:WinCleaner.ViewModels.Categories"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance catVm:DiagnosticsCategoryViewModel}"
+             d:DesignHeight="650" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type vm:TemperatureViewModel}">
+            <local:TemperatureView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:BatteryViewModel}">
+            <local:BatteryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DriverViewModel}">
+            <local:DriverView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CrashInspectorViewModel}">
+            <local:CrashInspectorView/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="5">
+        <TabControl Style="{StaticResource ModernCategoryTabControl}">
+            <TabItem Header="🌡️ Sensor Térmico" Content="{Binding TemperatureViewModel}"/>
+            <TabItem Header="🔋 Batería y Energía" Content="{Binding BatteryViewModel}"/>
+            <TabItem Header="🧩 Controladores" Content="{Binding DriverViewModel}"/>
+            <TabItem Header="🚨 Inspector de Fallos" Content="{Binding CrashInspectorViewModel}"/>
+        </TabControl>
+    </Grid>
+</UserControl>

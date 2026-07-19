@@ -11,6 +11,7 @@ using WinCleaner.Services.Implementations;
 using WinCleaner.Services.Implementations.CleanupModules;
 using WinCleaner.Services.Interfaces;
 using WinCleaner.ViewModels;
+using WinCleaner.ViewModels.Categories;
 using WinCleaner.Views;
 
 namespace WinCleaner
@@ -226,6 +227,13 @@ namespace WinCleaner
             services.AddSingleton<TcpTweakerViewModel>();
             services.AddSingleton<CleanupHistoryViewModel>();
             services.AddSingleton<SsdOptimizerViewModel>();
+
+            // ViewModels de Categorías
+            services.AddSingleton<DiagnosticsCategoryViewModel>();
+            services.AddSingleton<CleanupCategoryViewModel>();
+            services.AddSingleton<DiskCategoryViewModel>();
+            services.AddSingleton<AppCategoryViewModel>();
+            services.AddSingleton<OptimizationCategoryViewModel>();
 
             // Vistas
             services.AddSingleton<MainWindow>();

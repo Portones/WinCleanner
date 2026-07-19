@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using WinCleaner.ViewModels.Categories;
 
 namespace WinCleaner.ViewModels
 {
@@ -8,29 +9,19 @@ namespace WinCleaner.ViewModels
     {
         private ViewModelBase _currentPage;
         private string _activePage = "Dashboard";
+
         private readonly DashboardViewModel _dashboardViewModel;
-        private readonly CleanupViewModel _cleanupViewModel;
-        private readonly DuplicateFilesViewModel _duplicateFilesViewModel;
-        private readonly StartupViewModel _startupViewModel;
-        private readonly ServicesViewModel _servicesViewModel;
-        private readonly ContextMenuViewModel _contextMenuViewModel;
-        private readonly UninstallerViewModel _uninstallerViewModel;
-        private readonly DiskAnalyzerViewModel _diskAnalyzerViewModel;
-        private readonly PerformanceViewModel _performanceViewModel;
-        private readonly UpdaterViewModel _updaterViewModel;
-        private readonly PhotosCleanupViewModel _photosCleanupViewModel;
+        private readonly DiagnosticsCategoryViewModel _diagnosticsCategoryViewModel;
+        private readonly CleanupCategoryViewModel _cleanupCategoryViewModel;
+        private readonly DiskCategoryViewModel _diskCategoryViewModel;
+        private readonly AppCategoryViewModel _appCategoryViewModel;
+        private readonly OptimizationCategoryViewModel _optimizationCategoryViewModel;
         private readonly SettingsViewModel _settingsViewModel;
+
+        // Referencias a ViewModels individuales para inicio/paro de temporizadores
         private readonly RamOptimizerViewModel _ramOptimizerViewModel;
         private readonly TemperatureViewModel _temperatureViewModel;
         private readonly BatteryViewModel _batteryViewModel;
-        private readonly DriverViewModel _driverViewModel;
-        private readonly BrowserCleanupViewModel _browserCleanupViewModel;
-        private readonly SystemRepairViewModel _systemRepairViewModel;
-        private readonly CrashInspectorViewModel _crashInspectorViewModel;
-        private readonly RuntimeInstallerViewModel _runtimeInstallerViewModel;
-        private readonly TcpTweakerViewModel _tcpTweakerViewModel;
-        private readonly CleanupHistoryViewModel _cleanupHistoryViewModel;
-        private readonly SsdOptimizerViewModel _ssdOptimizerViewModel;
 
         public ViewModelBase CurrentPage
         {
@@ -48,52 +39,26 @@ namespace WinCleaner.ViewModels
 
         public MainViewModel(
             DashboardViewModel dashboardViewModel, 
-            CleanupViewModel cleanupViewModel, 
-            DuplicateFilesViewModel duplicateFilesViewModel,
-            StartupViewModel startupViewModel,
-            ServicesViewModel servicesViewModel,
-            ContextMenuViewModel contextMenuViewModel,
-            UninstallerViewModel uninstallerViewModel,
-            DiskAnalyzerViewModel diskAnalyzerViewModel,
-            PerformanceViewModel performanceViewModel,
-            UpdaterViewModel updaterViewModel,
-            PhotosCleanupViewModel photosCleanupViewModel,
+            DiagnosticsCategoryViewModel diagnosticsCategoryViewModel,
+            CleanupCategoryViewModel cleanupCategoryViewModel,
+            DiskCategoryViewModel diskCategoryViewModel,
+            AppCategoryViewModel appCategoryViewModel,
+            OptimizationCategoryViewModel optimizationCategoryViewModel,
             SettingsViewModel settingsViewModel,
             RamOptimizerViewModel ramOptimizerViewModel,
             TemperatureViewModel temperatureViewModel,
-            BatteryViewModel batteryViewModel,
-            DriverViewModel driverViewModel,
-            BrowserCleanupViewModel browserCleanupViewModel,
-            SystemRepairViewModel systemRepairViewModel,
-            CrashInspectorViewModel crashInspectorViewModel,
-            RuntimeInstallerViewModel runtimeInstallerViewModel,
-            TcpTweakerViewModel tcpTweakerViewModel,
-            CleanupHistoryViewModel cleanupHistoryViewModel,
-            SsdOptimizerViewModel ssdOptimizerViewModel)
+            BatteryViewModel batteryViewModel)
         {
             _dashboardViewModel = dashboardViewModel ?? throw new ArgumentNullException(nameof(dashboardViewModel));
-            _cleanupViewModel = cleanupViewModel ?? throw new ArgumentNullException(nameof(cleanupViewModel));
-            _duplicateFilesViewModel = duplicateFilesViewModel ?? throw new ArgumentNullException(nameof(duplicateFilesViewModel));
-            _startupViewModel = startupViewModel ?? throw new ArgumentNullException(nameof(startupViewModel));
-            _servicesViewModel = servicesViewModel ?? throw new ArgumentNullException(nameof(servicesViewModel));
-            _contextMenuViewModel = contextMenuViewModel ?? throw new ArgumentNullException(nameof(contextMenuViewModel));
-            _uninstallerViewModel = uninstallerViewModel ?? throw new ArgumentNullException(nameof(uninstallerViewModel));
-            _diskAnalyzerViewModel = diskAnalyzerViewModel ?? throw new ArgumentNullException(nameof(diskAnalyzerViewModel));
-            _performanceViewModel = performanceViewModel ?? throw new ArgumentNullException(nameof(performanceViewModel));
-            _updaterViewModel = updaterViewModel ?? throw new ArgumentNullException(nameof(updaterViewModel));
-            _photosCleanupViewModel = photosCleanupViewModel ?? throw new ArgumentNullException(nameof(photosCleanupViewModel));
+            _diagnosticsCategoryViewModel = diagnosticsCategoryViewModel ?? throw new ArgumentNullException(nameof(diagnosticsCategoryViewModel));
+            _cleanupCategoryViewModel = cleanupCategoryViewModel ?? throw new ArgumentNullException(nameof(cleanupCategoryViewModel));
+            _diskCategoryViewModel = diskCategoryViewModel ?? throw new ArgumentNullException(nameof(diskCategoryViewModel));
+            _appCategoryViewModel = appCategoryViewModel ?? throw new ArgumentNullException(nameof(appCategoryViewModel));
+            _optimizationCategoryViewModel = optimizationCategoryViewModel ?? throw new ArgumentNullException(nameof(optimizationCategoryViewModel));
             _settingsViewModel = settingsViewModel ?? throw new ArgumentNullException(nameof(settingsViewModel));
             _ramOptimizerViewModel = ramOptimizerViewModel ?? throw new ArgumentNullException(nameof(ramOptimizerViewModel));
             _temperatureViewModel = temperatureViewModel ?? throw new ArgumentNullException(nameof(temperatureViewModel));
             _batteryViewModel = batteryViewModel ?? throw new ArgumentNullException(nameof(batteryViewModel));
-            _driverViewModel = driverViewModel ?? throw new ArgumentNullException(nameof(driverViewModel));
-            _browserCleanupViewModel = browserCleanupViewModel ?? throw new ArgumentNullException(nameof(browserCleanupViewModel));
-            _systemRepairViewModel = systemRepairViewModel ?? throw new ArgumentNullException(nameof(systemRepairViewModel));
-            _crashInspectorViewModel = crashInspectorViewModel ?? throw new ArgumentNullException(nameof(crashInspectorViewModel));
-            _runtimeInstallerViewModel = runtimeInstallerViewModel ?? throw new ArgumentNullException(nameof(runtimeInstallerViewModel));
-            _tcpTweakerViewModel = tcpTweakerViewModel ?? throw new ArgumentNullException(nameof(tcpTweakerViewModel));
-            _cleanupHistoryViewModel = cleanupHistoryViewModel ?? throw new ArgumentNullException(nameof(cleanupHistoryViewModel));
-            _ssdOptimizerViewModel = ssdOptimizerViewModel ?? throw new ArgumentNullException(nameof(ssdOptimizerViewModel));
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;
@@ -107,18 +72,15 @@ namespace WinCleaner.ViewModels
         {
             if (string.IsNullOrEmpty(destination)) return;
 
-            // Detener refresco automático de procesos si salimos de Optimizar RAM
-            if (ActivePage.Equals("RamOptimizer", StringComparison.OrdinalIgnoreCase))
-            {
-                _ramOptimizerViewModel.StopTimer();
-            }
-            else if (ActivePage.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
+            // Gestión de temporizadores al cambiar de categoría
+            if (ActivePage.Equals("DiagnosticsCategory", StringComparison.OrdinalIgnoreCase))
             {
                 _temperatureViewModel.StopTimer();
-            }
-            else if (ActivePage.Equals("Battery", StringComparison.OrdinalIgnoreCase))
-            {
                 _batteryViewModel.StopTimer();
+            }
+            else if (ActivePage.Equals("OptimizationCategory", StringComparison.OrdinalIgnoreCase))
+            {
+                _ramOptimizerViewModel.StopTimer();
             }
 
             ActivePage = destination;
@@ -127,97 +89,59 @@ namespace WinCleaner.ViewModels
             {
                 CurrentPage = _dashboardViewModel;
             }
-            else if (destination.Equals("Cleanup", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _cleanupViewModel;
-            }
-            else if (destination.Equals("Duplicates", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _duplicateFilesViewModel;
-            }
-            else if (destination.Equals("Startup", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _startupViewModel;
-            }
-            else if (destination.Equals("Services", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _servicesViewModel;
-            }
-            else if (destination.Equals("ContextMenu", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _contextMenuViewModel;
-            }
-            else if (destination.Equals("Uninstaller", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _uninstallerViewModel;
-            }
-            else if (destination.Equals("DiskAnalyzer", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _diskAnalyzerViewModel;
-            }
-            else if (destination.Equals("Performance", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _performanceViewModel;
-            }
-            else if (destination.Equals("Updater", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _updaterViewModel;
-            }
-            else if (destination.Equals("PhotosCleanup", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _photosCleanupViewModel;
-            }
-            else if (destination.Equals("RamOptimizer", StringComparison.OrdinalIgnoreCase))
-            {
-                _ramOptimizerViewModel.StartTimer();
-                CurrentPage = _ramOptimizerViewModel;
-            }
-            else if (destination.Equals("Temperature", StringComparison.OrdinalIgnoreCase))
+            else if (destination.Equals("DiagnosticsCategory", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Temperature", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Battery", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Drivers", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("CrashInspector", StringComparison.OrdinalIgnoreCase))
             {
                 _temperatureViewModel.StartTimer();
-                CurrentPage = _temperatureViewModel;
-            }
-            else if (destination.Equals("Battery", StringComparison.OrdinalIgnoreCase))
-            {
                 _batteryViewModel.StartTimer();
-                CurrentPage = _batteryViewModel;
+                ActivePage = "DiagnosticsCategory";
+                CurrentPage = _diagnosticsCategoryViewModel;
             }
-            else if (destination.Equals("Drivers", StringComparison.OrdinalIgnoreCase))
+            else if (destination.Equals("CleanupCategory", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Cleanup", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Duplicates", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("PhotosCleanup", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("BrowserCleanup", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("CleanupHistory", StringComparison.OrdinalIgnoreCase))
             {
-                CurrentPage = _driverViewModel;
+                _cleanupCategoryViewModel.CleanupHistoryViewModel.LoadHistory();
+                ActivePage = "CleanupCategory";
+                CurrentPage = _cleanupCategoryViewModel;
+            }
+            else if (destination.Equals("DiskCategory", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("DiskAnalyzer", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("SsdOptimizer", StringComparison.OrdinalIgnoreCase))
+            {
+                ActivePage = "DiskCategory";
+                CurrentPage = _diskCategoryViewModel;
+            }
+            else if (destination.Equals("AppCategory", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Uninstaller", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Updater", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("RuntimeInstaller", StringComparison.OrdinalIgnoreCase))
+            {
+                ActivePage = "AppCategory";
+                CurrentPage = _appCategoryViewModel;
+            }
+            else if (destination.Equals("OptimizationCategory", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Performance", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("TcpTweaker", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("SystemRepair", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("RamOptimizer", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Startup", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("Services", StringComparison.OrdinalIgnoreCase) ||
+                     destination.Equals("ContextMenu", StringComparison.OrdinalIgnoreCase))
+            {
+                _ramOptimizerViewModel.StartTimer();
+                ActivePage = "OptimizationCategory";
+                CurrentPage = _optimizationCategoryViewModel;
             }
             else if (destination.Equals("Settings", StringComparison.OrdinalIgnoreCase))
             {
                 CurrentPage = _settingsViewModel;
-            }
-            else if (destination.Equals("BrowserCleanup", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _browserCleanupViewModel;
-            }
-            else if (destination.Equals("SystemRepair", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _systemRepairViewModel;
-            }
-            else if (destination.Equals("CrashInspector", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _crashInspectorViewModel;
-            }
-            else if (destination.Equals("RuntimeInstaller", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _runtimeInstallerViewModel;
-            }
-            else if (destination.Equals("TcpTweaker", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _tcpTweakerViewModel;
-            }
-            else if (destination.Equals("CleanupHistory", StringComparison.OrdinalIgnoreCase))
-            {
-                _cleanupHistoryViewModel.LoadHistory();
-                CurrentPage = _cleanupHistoryViewModel;
-            }
-            else if (destination.Equals("SsdOptimizer", StringComparison.OrdinalIgnoreCase))
-            {
-                CurrentPage = _ssdOptimizerViewModel;
             }
         }
     }
