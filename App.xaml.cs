@@ -167,6 +167,8 @@ namespace WinCleaner
             services.AddSingleton<IRamBoosterService, RamBoosterService>();
             services.AddSingleton<IWindowsServicesService, WindowsServicesService>();
             services.AddSingleton<IContextMenuService, ContextMenuService>();
+            services.AddSingleton<IRegistryAppScanner, RegistryAppScanner>();
+            services.AddSingleton<IAppIconProvider, AppIconProvider>();
             services.AddSingleton<IAppUninstallerService, AppUninstallerService>();
             services.AddSingleton<IDiskAnalyzerService, DiskAnalyzerService>();
             services.AddSingleton<IPerformanceService, PerformanceService>();

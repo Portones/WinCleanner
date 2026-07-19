@@ -1,6 +1,8 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using WinCleaner.Models;
 using WinCleaner.ViewModels.Categories;
 
 namespace WinCleaner.ViewModels
@@ -22,6 +24,9 @@ namespace WinCleaner.ViewModels
         private readonly RamOptimizerViewModel _ramOptimizerViewModel;
         private readonly TemperatureViewModel _temperatureViewModel;
         private readonly BatteryViewModel _batteryViewModel;
+
+        public ObservableCollection<NavigationMenuItem> NavigationItems { get; }
+        public ObservableCollection<NavigationMenuItem> OptionItems { get; }
 
         public ViewModelBase CurrentPage
         {
@@ -59,6 +64,21 @@ namespace WinCleaner.ViewModels
             _ramOptimizerViewModel = ramOptimizerViewModel ?? throw new ArgumentNullException(nameof(ramOptimizerViewModel));
             _temperatureViewModel = temperatureViewModel ?? throw new ArgumentNullException(nameof(temperatureViewModel));
             _batteryViewModel = batteryViewModel ?? throw new ArgumentNullException(nameof(batteryViewModel));
+
+            NavigationItems = new ObservableCollection<NavigationMenuItem>
+            {
+                new NavigationMenuItem { Title = "📊  Dashboard", Parameter = "Dashboard" },
+                new NavigationMenuItem { Title = "🔍  Diagnóstico y Monitorización", Parameter = "DiagnosticsCategory" },
+                new NavigationMenuItem { Title = "🧹  Limpieza de Almacenamiento", Parameter = "CleanupCategory" },
+                new NavigationMenuItem { Title = "💽  Herramientas de Disco", Parameter = "DiskCategory" },
+                new NavigationMenuItem { Title = "📦  Gestor de Aplicaciones", Parameter = "AppCategory" },
+                new NavigationMenuItem { Title = "⚡  Optimización del Sistema", Parameter = "OptimizationCategory" }
+            };
+
+            OptionItems = new ObservableCollection<NavigationMenuItem>
+            {
+                new NavigationMenuItem { Title = "⚙️  Configuración", Parameter = "Settings" }
+            };
 
             // Configurar página de inicio por defecto
             _currentPage = _dashboardViewModel;

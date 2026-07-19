@@ -14,209 +14,18 @@ namespace WinCleaner.Services.Implementations
 {
     public class AppUninstallerService : IAppUninstallerService
     {
-        private static readonly HashSet<string> KnownBloatware = new(StringComparer.OrdinalIgnoreCase)
+        private readonly IRegistryAppScanner _appScanner;
+        private readonly IAppIconProvider _iconProvider;
+
+        public AppUninstallerService(IRegistryAppScanner appScanner, IAppIconProvider iconProvider)
         {
-            "Microsoft.549981C3F5F10", // Cortana
-            "Microsoft.GetHelp",
-            "Microsoft.Getstarted",
-            "Microsoft.Messaging",
-            "Microsoft.MixedReality.Portal",
-            "Microsoft.OneConnect",
-            "Microsoft.People",
-            "Microsoft.SkypeApp",
-            "Microsoft.Xbox.TCUI",
-            "Microsoft.XboxApp",
-            "Microsoft.XboxGameOverlay",
-            "Microsoft.XboxGamingOverlay",
-            "Microsoft.XboxIdentityProvider",
-            "Microsoft.XboxSpeechToTextOverlay",
-            "Microsoft.YourPhone",
-            "Microsoft.ZuneMusic",
-            "Microsoft.ZuneVideo",
-            "Microsoft.MicrosoftSolitaireCollection",
-            "Microsoft.BingNews",
-            "Microsoft.BingWeather",
-            "Microsoft.MicrosoftOfficeHub",
-            "Microsoft.BingSearch",
-            "Microsoft.WindowsFeedbackHub",
-            "Microsoft.WindowsMaps",
-            "Microsoft.StickyNotes",
-            "Microsoft.Office.OneNote"
-        };
+            _appScanner = appScanner ?? throw new ArgumentNullException(nameof(appScanner));
+            _iconProvider = iconProvider ?? throw new ArgumentNullException(nameof(iconProvider));
+        }
+
         public async Task<List<InstalledApp>> GetInstalledAppsAsync(CancellationToken cancellationToken)
         {
-            return await Task.Run(() =>
-            {
-                var apps = new List<InstalledApp>();
-
-                // 1. Cargar aplicaciones Win32 desde el Registro (64 bits, 32 bits y Usuario)
-                cancellationToken.ThrowIfCancellationRequested();
-                LoadWin32Apps(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", false, apps);
-                LoadWin32Apps(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall", false, apps);
-                LoadWin32Apps(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", true, apps);
-
-                // 2. Cargar aplicaciones UWP/Store usando APIs nativas de Windows Runtime
-                cancellationToken.ThrowIfCancellationRequested();
-                try
-                {
-                    LoadUwpApps(apps);
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning("No se pudieron cargar las aplicaciones UWP/Store (puede no ser compatible con esta edición de Windows): {Msg}", ex.Message);
-                }
-
-                // Filtrar duplicados por nombre y ruta de desinstalación y ordenar por Nombre de forma alfabética
-                return apps
-                    .GroupBy(x => new { Name = x.DisplayName.ToLowerInvariant(), x.UninstallString })
-                    .Select(g => g.First())
-                    .OrderBy(x => x.DisplayName)
-                    .ToList();
-            }, cancellationToken);
-        }
-
-        private void LoadWin32Apps(string registryPath, bool useCurrentUser, List<InstalledApp> apps)
-        {
-            var rootKey = useCurrentUser ? Registry.CurrentUser : Registry.LocalMachine;
-            try
-            {
-                using (var key = rootKey.OpenSubKey(registryPath, false))
-                {
-                    if (key == null) return;
-
-                    foreach (var subKeyName in key.GetSubKeyNames())
-                    {
-                        using (var subKey = key.OpenSubKey(subKeyName, false))
-                        {
-                            if (subKey == null) continue;
-
-                            string displayName = subKey.GetValue("DisplayName")?.ToString() ?? string.Empty;
-                            string uninstallString = subKey.GetValue("UninstallString")?.ToString() ?? string.Empty;
-
-                            // Ignorar actualizaciones, parches o programas sin desinstalador
-                            if (string.IsNullOrEmpty(displayName) || string.IsNullOrEmpty(uninstallString))
-                                continue;
-
-                            // Evitar registrar componentes del sistema o actualizaciones de seguridad de Windows
-                            bool isSystemComponent = subKey.GetValue("SystemComponent")?.ToString() == "1";
-                            bool isUpdate = subKey.GetValue("ParentKeyName") != null || displayName.Contains("Security Update") || displayName.Contains("KB9");
-                            if (isSystemComponent || isUpdate)
-                                continue;
-
-                            string publisher = subKey.GetValue("Publisher")?.ToString() ?? string.Empty;
-                            string version = subKey.GetValue("DisplayVersion")?.ToString() ?? string.Empty;
-                            string installLocation = subKey.GetValue("InstallLocation")?.ToString() ?? string.Empty;
-                            string iconPath = subKey.GetValue("DisplayIcon")?.ToString() ?? string.Empty;
-
-                            // Tamaño estimado
-                            long size = 0;
-                            var sizeVal = subKey.GetValue("EstimatedSize");
-                            if (sizeVal != null && long.TryParse(sizeVal.ToString(), out var sizeKb))
-                            {
-                                size = sizeKb * 1024; // Convertir de KB a Bytes
-                            }
-
-                            // Fecha de instalación
-                            DateTime? installDate = null;
-                            var dateVal = subKey.GetValue("InstallDate")?.ToString();
-                            if (!string.IsNullOrEmpty(dateVal) && dateVal.Length == 8)
-                            {
-                                if (DateTime.TryParseExact(dateVal, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var date))
-                                {
-                                    installDate = date;
-                                }
-                            }
-
-                            apps.Add(new InstalledApp
-                            {
-                                Name = subKeyName,
-                                DisplayName = displayName,
-                                Publisher = publisher,
-                                DisplayVersion = version,
-                                EstimatedSize = size,
-                                UninstallString = uninstallString,
-                                InstallLocation = installLocation,
-                                IconPath = iconPath,
-                                IsUwp = false
-                            });
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning("Error al leer aplicaciones de registro en {Path}: {Msg}", registryPath, ex.Message);
-            }
-        }
-
-        private void LoadUwpApps(List<InstalledApp> apps)
-        {
-            var pm = new Windows.Management.Deployment.PackageManager();
-            // Buscar paquetes del usuario actual
-            var packages = pm.FindPackagesForUser(string.Empty);
-
-            foreach (var pkg in packages)
-            {
-                try
-                {
-                    // Omitir frameworks, recursos o paquetes de desarrollo (dependencias silenciosas)
-                    if (pkg.IsFramework || pkg.IsResourcePackage || pkg.IsDevelopmentMode)
-                        continue;
-
-                    string displayName = pkg.Id.Name;
-                    try
-                    {
-                        displayName = pkg.DisplayName;
-                    }
-                    catch { }
-
-                    // Si no tiene nombre amigable, omitir o usar el identificador básico
-                    if (string.IsNullOrEmpty(displayName))
-                        continue;
-
-                    // Omitir componentes nativos esenciales de Windows (a menos que sean bloatware conocido)
-                    bool isBloatware = KnownBloatware.Contains(pkg.Id.Name);
-                    if (!isBloatware && (pkg.SignatureKind == Windows.ApplicationModel.PackageSignatureKind.System || 
-                        pkg.Id.PublisherId == "cw5n1h2txyewy")) // Clave de firmas nativas de Microsoft
-                        continue;
-
-                    string publisher = pkg.PublisherDisplayName;
-                    string version = $"{pkg.Id.Version.Major}.{pkg.Id.Version.Minor}.{pkg.Id.Version.Build}.{pkg.Id.Version.Revision}";
-                    string installLocation = string.Empty;
-                    long size = 0;
-
-                    try
-                    {
-                        installLocation = pkg.InstalledLocation?.Path ?? string.Empty;
-                        if (!string.IsNullOrEmpty(installLocation))
-                        {
-                            size = GetFolderSize(installLocation);
-                        }
-                    }
-                    catch { }
-
-                    DateTime? installDate = null;
-                    try
-                    {
-                        installDate = pkg.InstalledDate.DateTime;
-                    }
-                    catch { }
-
-                    apps.Add(new InstalledApp
-                    {
-                        Name = pkg.Id.Name,
-                        DisplayName = displayName,
-                        Publisher = publisher,
-                        DisplayVersion = version,
-                        EstimatedSize = size,
-                        InstallLocation = installLocation,
-                        PackageFullName = pkg.Id.FullName,
-                        IsUwp = true,
-                        IsBloatware = isBloatware
-                    });
-                }
-                catch { }
-            }
+            return await _appScanner.ScanInstalledAppsAsync(cancellationToken);
         }
 
         public async Task<bool> UninstallAppAsync(InstalledApp app, CancellationToken cancellationToken)
@@ -367,8 +176,6 @@ namespace WinCleaner.Services.Implementations
                             // Comprobar si coincide con alguna palabra clave del programa
                             if (cleanKeywords.Any(k => dirName.Contains(k)))
                             {
-                                // Confirmar que la carpeta de instalación no esté activa 
-                                // (si el desinstalador la vació, pero dejó la carpeta madre)
                                 long size = GetFolderSize(dir);
                                 residuals.Add(new ResidualItem
                                 {
@@ -430,7 +237,6 @@ namespace WinCleaner.Services.Implementations
                     {
                         string cleanSubName = subName.ToLowerInvariant();
 
-                        // Buscar coincidencia directa de clave
                         if (keywords.Any(k => cleanSubName.Contains(k)))
                         {
                             residuals.Add(new ResidualItem
@@ -440,7 +246,6 @@ namespace WinCleaner.Services.Implementations
                                 Size = 0
                             });
                         }
-                        // Buscar coincidencia de publicador (ej. Software\Publisher\AppName)
                         else if (!string.IsNullOrEmpty(publisher) && publisher.Length > 3 && cleanSubName.Contains(publisher.ToLowerInvariant()))
                         {
                             try
@@ -574,7 +379,6 @@ namespace WinCleaner.Services.Implementations
                         }
                         else if (item.Type == "Registro")
                         {
-                            // Parsear ruta de registro (ej. HKEY_CURRENT_USER\Software\AppName)
                             string[] parts = item.Path.Split('\\');
                             if (parts.Length > 2)
                             {

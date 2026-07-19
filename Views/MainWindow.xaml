@@ -75,19 +75,37 @@
                     </Border>
                 </StackPanel>
 
-                <!-- BOTONES DE NAVEGACIÓN PRINCIPALES (COMPACTO DE 6 CATEGORÍAS + CONFIGURACIÓN) -->
+                <!-- BOTONES DE NAVEGACIÓN PRINCIPALES DINÁMICOS -->
                 <StackPanel Grid.Row="1">
                     <TextBlock Text="MENÚ PRINCIPAL" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,0,0,10"/>
 
-                    <Button Content="📊  Dashboard" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard" Tag="Dashboard" Margin="0,0,0,6"/>
-                    <Button Content="🔍  Diagnóstico y Monitorización" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="DiagnosticsCategory" Tag="DiagnosticsCategory" Margin="0,0,0,6"/>
-                    <Button Content="🧹  Limpieza de Almacenamiento" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="CleanupCategory" Tag="CleanupCategory" Margin="0,0,0,6"/>
-                    <Button Content="💽  Herramientas de Disco" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="DiskCategory" Tag="DiskCategory" Margin="0,0,0,6"/>
-                    <Button Content="📦  Gestor de Aplicaciones" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="AppCategory" Tag="AppCategory" Margin="0,0,0,6"/>
-                    <Button Content="⚡  Optimización del Sistema" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="OptimizationCategory" Tag="OptimizationCategory" Margin="0,0,0,20"/>
+                    <ItemsControl ItemsSource="{Binding NavigationItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding Title}" 
+                                        Style="{StaticResource SidebarNavButton}" 
+                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                        CommandParameter="{Binding Parameter}" 
+                                        Tag="{Binding Parameter}" 
+                                        Margin="0,0,0,6"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                    <TextBlock Text="OPCIONES" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,0,0,10"/>
-                    <Button Content="⚙️  Configuración" Style="{StaticResource SidebarNavButton}" Command="{Binding NavigateCommand}" CommandParameter="Settings" Tag="Settings" Margin="0,0,0,8"/>
+                    <TextBlock Text="OPCIONES" FontSize="9.5" FontWeight="Bold" Foreground="#475569" Margin="5,14,0,10"/>
+
+                    <ItemsControl ItemsSource="{Binding OptionItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding Title}" 
+                                        Style="{StaticResource SidebarNavButton}" 
+                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                        CommandParameter="{Binding Parameter}" 
+                                        Tag="{Binding Parameter}" 
+                                        Margin="0,0,0,8"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
 
                 <!-- Footer del Sidebar -->

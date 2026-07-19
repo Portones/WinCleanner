@@ -47,6 +47,7 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
   * **Limpieza de Espacio**: Limpieza Avanzada, Archivos Duplicados, Limpiador de Fotos, Historial Gráfico, Navegadores y Logs, Desinstalador de Apps.
   * **Optimización y Sistema**: Reparar Sistema (SFC/DISM), Instalador de Runtimes, Ajustes TCP/IP, Rendimiento y Red, Optimizar RAM, Actualizar Apps, Gestión de Inicio, Servicios de Windows, Menú Contextual.
   * **Opciones**: Configuración de tema/idioma.
+* **Navegación Desacoplada**: Menú lateral dinámico alimentado mediante `NavigationMenuItem` y `ItemsControl` en `MainViewModel` en lugar de controles estáticos en XAML.
 * **Indicador de Página Activa**: Resaltado en azul índigo del apartado abierto actualmente.
 
 ### 3. Rediseño Estético de Tablas y Scrollbars
@@ -71,6 +72,7 @@ Si deseas estudiar el código, modificar la aplicación o ejecutarla de forma lo
 ### 7. Desinstalador por Lotes y Debloater de Windows
 * **Doble Pestaña**: Separación clara entre aplicaciones instaladas comunes y aplicaciones UWP nativas preinstaladas por el fabricante (Bloatware de Windows).
 * **Desinstalación por Lotes**: Selección de múltiples aplicaciones a la vez mediante casillas de verificación para ejecutarlas secuencialmente en segundo plano con indicadores de progreso dinámicos.
+* **Arquitectura Modular (SRP)**: División limpia de responsabilidades separando el escaneo del Registro y UWP (`RegistryAppScanner`), la resolución de iconos nativos (`AppIconProvider`) y la orquestación de desinstalación (`AppUninstallerService`).
 
 ### 8. Desactivador de Telemetría y Privacidad (Privacy Tweaker)
 * **Control Completo**: Interruptores modernos tipo ToggleSwitch en el apartado de Rendimiento para desactivar la telemetría corporativa (DiagTrack), los informes de error de Windows (WER), el ID de publicidad invasivo para anuncios personalizados, el asistente de Cortana y las conexiones entre dispositivos en segundo plano (Rome SDK).
